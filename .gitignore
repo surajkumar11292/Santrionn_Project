@@ -5,6 +5,10 @@ node_modules/
 
 # Internal Assignment & Agent Tooling
 ASSIGNMENT.md
+PRODUCT.md
+DESIGN.md
+**/PRODUCT.md
+**/DESIGN.md
 .agent/
 .claude/
 .gemini/

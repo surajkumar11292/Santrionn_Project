@@ -1,14 +1,23 @@
 const disasterRepo = require('../repositories/disaster.repo');
+const geoService = require('./geo.service');
 const { NotFoundError } = require('../utils/errors');
 
 class DisasterService {
   /**
-   * Create a new disaster
+   * Create a new disaster with automatic location resolution
    */
   async createDisaster(data, userId) {
-    const locationName = data.location_name || 'Manhattan, NYC';
-    const latitude = data.latitude !== undefined ? data.latitude : 40.7831;
-    const longitude = data.longitude !== undefined ? data.longitude : -73.9712;
+    let locationName = data.location_name;
+    let latitude = data.latitude;
+    let longitude = data.longitude;
+
+    // Automatic location resolution from description if coordinates not provided
+    if (latitude === undefined || longitude === undefined || !locationName) {
+      const resolved = await geoService.resolveLocationFromText(data.description);
+      locationName = locationName || resolved.locationName;
+      latitude = latitude !== undefined ? latitude : resolved.latitude;
+      longitude = longitude !== undefined ? longitude : resolved.longitude;
+    }
 
     const disaster = await disasterRepo.create({
       title: data.title,

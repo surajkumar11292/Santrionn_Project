@@ -46,16 +46,29 @@ app.get('/health', async (req, res) => {
   });
 });
 
+const authRoutes = require('./routes/auth.routes');
+const disasterRoutes = require('./routes/disaster.routes');
+const errorHandler = require('./middleware/errorHandler');
+
 // Root API information endpoint
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Disaster Response Coordination Platform API',
     version: '1.0.0',
-    documentation: '/api-docs',
-    health: '/health'
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      disasters: '/disasters'
+    }
   });
 });
+
+// Mount Routes (supporting both /disasters and /api/disasters)
+app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/disasters', disasterRoutes);
+app.use('/api/disasters', disasterRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {
@@ -70,23 +83,6 @@ app.use((req, res, next) => {
 });
 
 // Centralized error handling middleware
-app.use((err, req, res, next) => {
-  const status = err.statusCode || err.status || 500;
-  const message = err.message || 'Internal Server Error';
-
-  if (config.env !== 'test' && status === 500) {
-    console.error('Unhandled Application Error:', err);
-  }
-
-  res.status(status).json({
-    success: false,
-    error: {
-      code: err.code || 'INTERNAL_SERVER_ERROR',
-      message,
-      status,
-      ...(config.env === 'development' && { stack: err.stack })
-    }
-  });
-});
+app.use(errorHandler);
 
 module.exports = app;

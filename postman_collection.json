@@ -410,6 +410,33 @@
           }
         }
       ]
+    },
+    {
+      "name": "Background Jobs & Workers",
+      "item": [
+        {
+          "name": "Trigger Async External Reports Sync (HTTP 202)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/sync-reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "sync-reports"]
+            }
+          }
+        },
+        {
+          "name": "Get Async Job Execution Telemetry",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/jobs/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs", "{{jobId}}"]
+            }
+          }
+        }
+      ]
     }
   ]
 }

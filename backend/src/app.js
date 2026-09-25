@@ -83,10 +83,12 @@ app.get('/socket-test', (req, res) => {
 });
 
 // Mount Routes (supporting both /disasters and /api/disasters)
+const jobRoutes = require('./routes/job.routes');
 app.use('/auth', authRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/disasters', disasterRoutes);
 app.use('/api/disasters', disasterRoutes);
+app.use('/jobs', jobRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {

@@ -568,3 +568,90 @@ paths:
           description: Advisory broadcast successfully
         403:
           description: Forbidden (requires admin role)
+
+  /disasters/{id}/sync-reports:
+    post:
+      tags:
+        - Jobs
+      summary: Enqueue asynchronous external crisis stream sync
+      description: >
+        Enqueues an asynchronous background job to pull simulated external social media and sensor crisis reports,
+        classify their priorities, persist them to the database, flush Redis cache, and broadcast real-time Socket.IO notifications.
+        Returns HTTP 202 Accepted immediately with a job ID and status tracking URL.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Target disaster UUID
+      responses:
+        202:
+          description: Background job enqueued successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Background job enqueued for asynchronous processing
+                  jobId:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    example: queued
+                  checkStatusUrl:
+                    type: string
+                    example: /jobs/38d3705e-b57d-4445-b118-bc10708911a8
+
+  /jobs/{jobId}:
+    get:
+      tags:
+        - Jobs
+      summary: Get asynchronous job execution status
+      description: Query the real-time execution state, processing telemetry, and results of an enqueued background job.
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Job unique identifier
+      responses:
+        200:
+          description: Job status and telemetry retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  type:
+                    type: string
+                    example: sync_external_reports
+                  disasterId:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum: [queued, processing, completed, failed]
+                  progress:
+                    type: integer
+                    example: 100
+                  result:
+                    type: object
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+        404:
+          description: Job not found

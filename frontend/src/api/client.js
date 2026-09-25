@@ -60,7 +60,13 @@ export const api = {
 
   // Community Reports (Redis Cache-Aside)
   reports: {
-    getByDisaster: (disasterId) => apiClient.get(`/disasters/${disasterId}/reports`)
+    getByDisaster: (disasterId) => apiClient.get(`/disasters/${disasterId}/reports`),
+    syncExternal: (disasterId) => apiClient.post(`/disasters/${disasterId}/sync-reports`)
+  },
+
+  // Asynchronous Background Jobs
+  jobs: {
+    getStatus: (jobId) => apiClient.get(`/jobs/${jobId}`)
   },
 
   // Official Emergency Bulletins & Advisories

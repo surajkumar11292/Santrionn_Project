@@ -193,11 +193,13 @@ The test suite runs against the real, live PostgreSQL + PostGIS and Redis contai
 docker compose exec backend npm test
 ```
 
-### Verified Test Suites
+### Verified Test Suites (20/20 Passing Tests)
 1. **`tests/disaster.test.js`**: Full CRUD lifecycle (POST with NLP extraction, GET details, PATCH updates, DELETE removal, and 404 verification).
 2. **`tests/validation.test.js`**: Joi validation failure scenarios (missing title, missing description, invalid status enum) returning standard 400 Bad Request error envelopes.
 3. **`tests/rbac.test.js`**: Security enforcement (401 Unauthorized for missing tokens, 403 Forbidden when `viewer` or `contributor` attempts admin deletions or resource additions).
 4. **`tests/caching.test.js`**: Redis Cache-Aside pattern (asserting `meta.cached: false` on cache miss and `meta.cached: true` with positive TTL on subsequent requests).
+5. **`tests/officialUpdates.test.js`**: Official emergency agency advisories, cache invalidation, and role restrictions.
+6. **`tests/queue.test.js`**: Asynchronous job queue (`POST /disasters/:id/sync-reports` returning HTTP 202 Accepted, worker processing state machine, telemetry tracking, and completion).
 
 ---
 
@@ -209,14 +211,16 @@ Import `postman_collection.json` into Postman to explore and execute pre-configu
 - `3. Disaster Management`: Filtering by tag/status, CRUD operations, NLP geocoding
 - `4. Geospatial Emergency Resources`: PostGIS radius queries and resource creation
 - `5. Community Reports`: Cached crisis intelligence stream
+- `6. Official Advisories`: Authorized bulletins with WebSocket broadcasting
+- `7. Background Jobs & Workers`: Async stream sync (HTTP 202) and job telemetry tracking
 
 ---
 
 ## ⚖️ Trade-offs & Production Considerations
 
-1. **In-Memory Worker vs Distributed Queue**:
-   - *Current*: External social stream fetching occurs synchronously with a 5-minute Redis cache.
-   - *Production Scale*: For massive tweet volumes (10,000+ msgs/sec), an asynchronous message queue (RabbitMQ, Kafka, or BullMQ with Redis) would ingest streams into background workers and push normalized entries into PostgreSQL via batch inserts.
+1. **Asynchronous Distributed Job Queue & Worker**:
+   - *Implemented Architecture*: Redis-backed FIFO queue with state machine (`queued` $\rightarrow$ `processing` $\rightarrow$ `completed` / `failed`), decoupled worker loop, HTTP 202 Accepted ingestion, and real-time Socket.IO completion alerts.
+   - *Production Scale*: Scale out worker pods horizontally across Kubernetes with consumer groups or migrate to BullMQ / AWS SQS for dead-letter queuing and distributed backpressure.
 2. **JWT Revocation Strategy**:
    - *Current*: Short-lived access tokens (15 minutes) paired with refresh tokens (7 days).
    - *Production Scale*: Add Redis token blacklisting / revocation lists for instant session revocation upon password change or breach detection.

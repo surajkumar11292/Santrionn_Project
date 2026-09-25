@@ -99,6 +99,36 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
     }
   };
 
+  // Background Job Sync State
+  const [syncJob, setSyncJob] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleTriggerSync = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await api.reports.syncExternal(disaster.id);
+      setSyncJob(res.data);
+
+      const interval = setInterval(async () => {
+        try {
+          const statusRes = await api.jobs.getStatus(res.data.jobId);
+          setSyncJob(statusRes.data);
+          if (statusRes.data.status === 'completed' || statusRes.data.status === 'failed') {
+            clearInterval(interval);
+            setIsSyncing(false);
+            loadReports();
+          }
+        } catch (e) {
+          clearInterval(interval);
+          setIsSyncing(false);
+        }
+      }, 1000);
+    } catch (err) {
+      alert(`Sync dispatch failed: ${err.message}`);
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'resources') {
       loadResources();
@@ -530,7 +560,7 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                   padding: 'var(--space-2) var(--space-4)',
                   background: 'var(--color-bg-elevated)',
                   borderRadius: 'var(--radius-md)',
-                  marginBottom: 'var(--space-4)',
+                  marginBottom: 'var(--space-3)',
                   fontSize: '0.8rem',
                   fontFamily: 'var(--font-mono)'
                 }}>
@@ -542,6 +572,41 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                   </span>
                 </div>
               )}
+
+              {/* Background Worker Sync Action & Telemetry */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: 'var(--space-3)',
+                background: 'var(--color-bg-elevated)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: 'var(--space-4)',
+                border: '1px solid var(--color-border)'
+              }}>
+                <button
+                  onClick={handleTriggerSync}
+                  disabled={isSyncing}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: isSyncing ? 'var(--color-bg-base)' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    color: 'white',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    boxShadow: 'var(--shadow-glow-info)',
+                    cursor: isSyncing ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {isSyncing ? '⏳ Syncing via Background Worker...' : '⚡ Trigger Async Stream Sync (HTTP 202)'}
+                </button>
+
+                {syncJob && (
+                  <div style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: syncJob.status === 'completed' ? '#10b981' : '#f59e0b' }}>
+                    WORKER: {syncJob.status?.toUpperCase()} ({syncJob.progress || 0}%) {syncJob.result?.persistedReports ? `→ +${syncJob.result.persistedReports} reports ingested` : ''}
+                  </div>
+                )}
+              </div>
 
               {loading ? (
                 <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--color-text-muted)' }}>

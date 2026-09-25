@@ -3,6 +3,7 @@ const disasterController = require('../controllers/disaster.controller');
 const reportController = require('../controllers/report.controller');
 const resourceController = require('../controllers/resource.controller');
 const officialUpdateController = require('../controllers/officialUpdate.controller');
+const jobController = require('../controllers/job.controller');
 const authenticate = require('../middleware/auth');
 const authorize = require('../middleware/rbac');
 const validate = require('../middleware/validate');
@@ -22,6 +23,9 @@ router.get('/', validate(queryDisastersSchema, 'query'), disasterController.getA
 
 // Community Reports with Redis Caching and External Stream Integration
 router.get('/:id/reports', reportController.getByDisasterId);
+
+// Asynchronous background job to sync external crisis stream (HTTP 202 Accepted)
+router.post('/:id/sync-reports', jobController.syncReports);
 
 // Official Emergency Agency Advisories with Redis Caching
 router.get('/:id/updates', officialUpdateController.getByDisaster);

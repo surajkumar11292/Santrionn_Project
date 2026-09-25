@@ -203,3 +203,27 @@ INSERT INTO reports (disaster_id, content, user_handle, source, priority, verifi
     'critical',
     true
   );
+
+-- Official Emergency Bulletins & Agency Advisories
+INSERT INTO official_updates (disaster_id, agency, severity, headline, body) VALUES
+  (
+    'a1111111-1111-1111-1111-111111111111',
+    'NYC Emergency Management',
+    'evacuation',
+    'MANDATORY EVACUATION: Zone A Ground Floors & Basements',
+    'Due to unprecedented storm surge reaching 4 feet above ground level, all residents in Zone A ground floors must immediately evacuate to higher elevations or designated emergency shelters.'
+  ),
+  (
+    'a1111111-1111-1111-1111-111111111111',
+    'National Weather Service NY',
+    'warning',
+    'Flash Flood Emergency Warning in Effect Through Midnight',
+    'Life-threatening flash flooding ongoing across lower Manhattan. Do not drive or walk through standing waters. Rapid water level increases expected along riverbanks.'
+  ),
+  (
+    'a2222222-2222-2222-2222-222222222222',
+    'Miami-Dade Emergency Operations',
+    'warning',
+    'Category 4 Hurricane Surge Watch & Bridge Closures',
+    'Causeways to Miami Beach will be closed to vehicle traffic at 18:00 EST. Settle in place with 72 hours of water and non-perishable rations.'
+  );

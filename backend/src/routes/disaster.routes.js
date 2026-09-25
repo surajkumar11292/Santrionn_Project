@@ -2,6 +2,7 @@ const express = require('express');
 const disasterController = require('../controllers/disaster.controller');
 const reportController = require('../controllers/report.controller');
 const resourceController = require('../controllers/resource.controller');
+const officialUpdateController = require('../controllers/officialUpdate.controller');
 const authenticate = require('../middleware/auth');
 const authorize = require('../middleware/rbac');
 const validate = require('../middleware/validate');
@@ -10,7 +11,8 @@ const {
   updateDisasterSchema,
   queryDisastersSchema,
   nearbyResourcesQuerySchema,
-  createResourceSchema
+  createResourceSchema,
+  createOfficialUpdateSchema
 } = require('../schemas/validation');
 
 const router = express.Router();
@@ -20,6 +22,18 @@ router.get('/', validate(queryDisastersSchema, 'query'), disasterController.getA
 
 // Community Reports with Redis Caching and External Stream Integration
 router.get('/:id/reports', reportController.getByDisasterId);
+
+// Official Emergency Agency Advisories with Redis Caching
+router.get('/:id/updates', officialUpdateController.getByDisaster);
+
+// Broadcast Official Emergency Advisory (Admin only)
+router.post(
+  '/:id/updates',
+  authenticate,
+  authorize('admin'),
+  validate(createOfficialUpdateSchema, 'body'),
+  officialUpdateController.create
+);
 
 // Nearby Emergency Resources with PostGIS ST_DWithin and Redis Caching
 router.get('/:id/resources', validate(nearbyResourcesQuerySchema, 'query'), resourceController.getNearby);

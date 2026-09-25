@@ -502,3 +502,69 @@ paths:
           description: Disaster reports list with cache metadata (cached, cache_ttl)
         404:
           description: Disaster not found
+
+  /disasters/{id}/updates:
+    get:
+      tags:
+        - Updates
+      summary: Retrieve official emergency agency bulletins (Redis Cache-Aside)
+      description: >
+        Fetches official advisories, warnings, and evacuation orders issued by government agencies
+        (e.g., FEMA, National Weather Service, City Emergency Operations). Cached in Redis for 3 minutes.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: List of official bulletins
+        404:
+          description: Disaster not found
+
+    post:
+      tags:
+        - Updates
+      summary: Broadcast official emergency advisory (Admin only)
+      description: Issues an authoritative emergency advisory and broadcasts real-time WebSocket alert.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - agency
+                - severity
+                - headline
+                - body
+              properties:
+                agency:
+                  type: string
+                  example: FEMA Joint Disaster Operations
+                severity:
+                  type: string
+                  enum: [evacuation, warning, advisory, all_clear]
+                  example: warning
+                headline:
+                  type: string
+                  example: Storm Surge Emergency Warning in Effect
+                body:
+                  type: string
+                  example: Water levels expected to rise 3-5 feet above normal tide levels.
+      responses:
+        201:
+          description: Advisory broadcast successfully
+        403:
+          description: Forbidden (requires admin role)

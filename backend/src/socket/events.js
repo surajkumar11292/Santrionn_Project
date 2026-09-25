@@ -65,9 +65,26 @@ const emitReportAdded = (disasterId, report) => {
   }
 };
 
+const emitOfficialUpdate = (disasterId, update) => {
+  const io = getIO();
+  const payload = {
+    event: 'official_update',
+    timestamp: new Date().toISOString(),
+    disasterId,
+    update
+  };
+
+  // Broadcast to global feed for emergency alerts
+  io.emit('official_update', payload);
+  if (io.to) {
+    io.to(`disaster:${disasterId}`).emit('official_update', payload);
+  }
+};
+
 module.exports = {
   emitDisasterCreated,
   emitDisasterUpdated,
   emitDisasterDeleted,
-  emitReportAdded
+  emitReportAdded,
+  emitOfficialUpdate
 };

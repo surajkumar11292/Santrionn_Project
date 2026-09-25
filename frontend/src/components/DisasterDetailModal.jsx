@@ -73,13 +73,61 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
     }
   };
 
+  // Official Updates State
+  const [updates, setUpdates] = useState([]);
+  const [updatesMeta, setUpdatesMeta] = useState(null);
+  const [newUpdate, setNewUpdate] = useState({
+    agency: 'FEMA Emergency Management',
+    severity: 'warning',
+    headline: '',
+    body: ''
+  });
+  const [creatingUpdate, setCreatingUpdate] = useState(false);
+
+  const loadUpdates = async () => {
+    if (!disaster?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.updates.getByDisaster(disaster.id);
+      setUpdates(res.data || []);
+      setUpdatesMeta(res.meta || null);
+    } catch (err) {
+      setError(err.message || 'Failed to load official bulletins');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'resources') {
       loadResources();
     } else if (activeTab === 'reports') {
       loadReports();
+    } else if (activeTab === 'updates') {
+      loadUpdates();
     }
   }, [activeTab, radius, resourceType, disaster?.id]);
+
+  const handleCreateUpdate = async (e) => {
+    e.preventDefault();
+    if (!newUpdate.headline || !newUpdate.body) return;
+    setCreatingUpdate(true);
+    try {
+      await api.updates.create(disaster.id, newUpdate);
+      setNewUpdate({
+        agency: 'FEMA Emergency Management',
+        severity: 'warning',
+        headline: '',
+        body: ''
+      });
+      loadUpdates();
+    } catch (err) {
+      alert(`Advisory broadcast failed: ${err.message}`);
+    } finally {
+      setCreatingUpdate(false);
+    }
+  };
 
   const handleCreateResource = async (e) => {
     e.preventDefault();
@@ -219,7 +267,21 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
               background: activeTab === 'reports' ? 'var(--color-bg-elevated)' : 'transparent'
             }}
           >
-            📢 Community & Social Feed (Redis Cache)
+            📢 Community Feed (Redis Cache)
+          </button>
+          <button
+            onClick={() => setActiveTab('updates')}
+            style={{
+              flex: 1,
+              padding: 'var(--space-3)',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              color: activeTab === 'updates' ? '#f59e0b' : 'var(--color-text-secondary)',
+              borderBottom: activeTab === 'updates' ? '2px solid #f59e0b' : '2px solid transparent',
+              background: activeTab === 'updates' ? 'var(--color-bg-elevated)' : 'transparent'
+            }}
+          >
+            🏛️ Official Bulletins
           </button>
           <button
             onClick={() => setActiveTab('overview')}
@@ -546,6 +608,199 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                     );
                   })}
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* OFFICIAL UPDATES & ADVISORIES TAB */}
+          {activeTab === 'updates' && (
+            <div>
+              {/* Cache Header */}
+              {updatesMeta && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: 'var(--space-2) var(--space-4)',
+                  background: 'var(--color-bg-elevated)',
+                  borderRadius: 'var(--radius-md)',
+                  marginBottom: 'var(--space-4)',
+                  fontSize: '0.8rem',
+                  fontFamily: 'var(--font-mono)'
+                }}>
+                  <span>Source: <strong style={{ color: '#3b82f6' }}>Verified Government & Emergency Command</strong></span>
+                  <span style={{ color: updatesMeta.cached ? '#10b981' : '#f59e0b' }}>
+                    {updatesMeta.cached ? `⚡ Redis Cache Hit (TTL ${updatesMeta.cache_ttl}s)` : '● Fresh Bulletin Stream'}
+                  </span>
+                </div>
+              )}
+
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--color-text-muted)' }}>
+                  Loading official agency advisories...
+                </div>
+              ) : updates.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--color-text-muted)' }}>
+                  No official emergency bulletins issued yet for this incident.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  {updates.map((upd) => {
+                    const isEvacuation = upd.severity === 'evacuation';
+                    const isWarning = upd.severity === 'warning';
+                    return (
+                      <div
+                        key={upd.id}
+                        style={{
+                          background: 'var(--color-bg-base)',
+                          border: '1px solid var(--color-border)',
+                          borderLeft: `5px solid ${isEvacuation ? '#ef4444' : isWarning ? '#f59e0b' : '#3b82f6'}`,
+                          borderRadius: 'var(--radius-md)',
+                          padding: 'var(--space-4)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <span style={{ fontSize: '1rem' }}>🏛️</span>
+                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
+                              {upd.agency}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                              {new Date(upd.issued_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+
+                          <span style={{
+                            fontSize: '0.7rem',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            padding: '3px 10px',
+                            borderRadius: 'var(--radius-sm)',
+                            background: isEvacuation ? 'rgba(239, 68, 68, 0.25)' : isWarning ? 'rgba(245, 158, 11, 0.25)' : 'rgba(59, 130, 246, 0.25)',
+                            color: isEvacuation ? '#ef4444' : isWarning ? '#f59e0b' : '#3b82f6',
+                            border: `1px solid ${isEvacuation ? '#ef4444' : isWarning ? '#f59e0b' : '#3b82f6'}`
+                          }}>
+                            {upd.severity}
+                          </span>
+                        </div>
+
+                        <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '2px' }}>
+                          {upd.headline}
+                        </h4>
+
+                        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                          {upd.body}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Admin Broadcast Advisory Form */}
+              {isAdmin && (
+                <form
+                  onSubmit={handleCreateUpdate}
+                  style={{
+                    marginTop: 'var(--space-6)',
+                    padding: 'var(--space-4)',
+                    background: 'var(--color-bg-elevated)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border)'
+                  }}
+                >
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 'var(--space-3)', color: '#f59e0b' }}>
+                    📢 Issue Official Emergency Advisory (Admin Broadcast)
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-2)' }}>
+                      <input
+                        type="text"
+                        placeholder="Agency Name (e.g. FEMA Joint Command, NWS)..."
+                        value={newUpdate.agency}
+                        onChange={(e) => setNewUpdate({ ...newUpdate, agency: e.target.value })}
+                        style={{
+                          padding: '6px 10px',
+                          background: 'var(--color-bg-base)',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          color: 'white',
+                          fontSize: '0.85rem'
+                        }}
+                        required
+                      />
+                      <select
+                        value={newUpdate.severity}
+                        onChange={(e) => setNewUpdate({ ...newUpdate, severity: e.target.value })}
+                        style={{
+                          padding: '6px',
+                          background: 'var(--color-bg-base)',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          color: 'white',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        <option value="evacuation">Evacuation Order</option>
+                        <option value="warning">Emergency Warning</option>
+                        <option value="advisory">Public Advisory</option>
+                        <option value="all_clear">All Clear / Rescinded</option>
+                      </select>
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="Advisory Headline..."
+                      value={newUpdate.headline}
+                      onChange={(e) => setNewUpdate({ ...newUpdate, headline: e.target.value })}
+                      style={{
+                        padding: '6px 10px',
+                        background: 'var(--color-bg-base)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'white',
+                        fontSize: '0.85rem'
+                      }}
+                      required
+                    />
+
+                    <textarea
+                      rows={2}
+                      placeholder="Detailed official directive or safety advisory..."
+                      value={newUpdate.body}
+                      onChange={(e) => setNewUpdate({ ...newUpdate, body: e.target.value })}
+                      style={{
+                        padding: '6px 10px',
+                        background: 'var(--color-bg-base)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'white',
+                        fontSize: '0.85rem',
+                        resize: 'vertical'
+                      }}
+                      required
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={creatingUpdate}
+                      style={{
+                        alignSelf: 'flex-end',
+                        padding: '6px 18px',
+                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                        color: 'white',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.85rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      {creatingUpdate ? 'Broadcasting Advisory...' : 'Broadcast Emergency Advisory'}
+                    </button>
+                  </div>
+                </form>
               )}
             </div>
           )}

@@ -79,6 +79,21 @@ const createResourceSchema = Joi.object({
   status: Joi.string().valid('available', 'limited', 'full').default('available')
 });
 
+const createOfficialUpdateSchema = Joi.object({
+  agency: Joi.string().min(2).max(255).required().messages({
+    'any.required': 'Issuing agency name is required (e.g., FEMA, NWS)'
+  }),
+  severity: Joi.string().valid('evacuation', 'warning', 'advisory', 'all_clear').required().messages({
+    'any.required': 'Advisory severity is required (evacuation, warning, advisory, all_clear)'
+  }),
+  headline: Joi.string().min(5).max(500).required().messages({
+    'any.required': 'Advisory headline is required'
+  }),
+  body: Joi.string().min(10).required().messages({
+    'any.required': 'Advisory body text is required'
+  })
+});
+
 module.exports = {
   loginSchema,
   refreshTokenSchema,
@@ -86,5 +101,6 @@ module.exports = {
   updateDisasterSchema,
   queryDisastersSchema,
   nearbyResourcesQuerySchema,
-  createResourceSchema
+  createResourceSchema,
+  createOfficialUpdateSchema
 };

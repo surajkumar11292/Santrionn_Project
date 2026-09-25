@@ -63,6 +63,12 @@ export const api = {
     getByDisaster: (disasterId) => apiClient.get(`/disasters/${disasterId}/reports`)
   },
 
+  // Official Emergency Bulletins & Advisories
+  updates: {
+    getByDisaster: (disasterId) => apiClient.get(`/disasters/${disasterId}/updates`),
+    create: (disasterId, data) => apiClient.post(`/disasters/${disasterId}/updates`, data)
+  },
+
   // Health Check
   health: () => apiClient.get('/health')
 };

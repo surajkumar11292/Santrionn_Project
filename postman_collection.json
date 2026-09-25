@@ -368,6 +368,48 @@
           }
         }
       ]
+    },
+    {
+      "name": "6. Official Emergency Advisories",
+      "item": [
+        {
+          "name": "Get Official Advisories (Cached)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/updates",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "updates"]
+            }
+          }
+        },
+        {
+          "name": "Broadcast Official Emergency Advisory (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agency\": \"FEMA Joint Command\",\n  \"severity\": \"evacuation\",\n  \"headline\": \"MANDATORY EVACUATION: Lowland Sector 4\",\n  \"body\": \"All civilians in lowlands must evacuate to designated shelters immediately.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/updates",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "updates"]
+            }
+          }
+        }
+      ]
     }
   ]
 }

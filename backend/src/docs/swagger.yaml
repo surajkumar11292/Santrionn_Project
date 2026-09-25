@@ -1,0 +1,504 @@
+openapi: 3.0.3
+info:
+  title: Disaster Response Coordination Platform API
+  description: >
+    Production-grade RESTful API and Real-Time Gateway for disaster crisis management,
+    geospatial resource allocation (PostGIS ST_DWithin), resilient external social reports
+    stream aggregation, and Redis Cache-Aside acceleration.
+  version: 1.0.0
+  contact:
+    name: Disaster Relief Engineering Team
+    email: dev@relief.io
+
+servers:
+  - url: http://localhost:3000
+    description: Local Docker Development Server
+
+tags:
+  - name: Health
+    description: System liveness and PostGIS database connectivity
+  - name: Auth
+    description: Role-based JWT authentication and token lifecycle
+  - name: Disasters
+    description: Disaster incident reporting, geocoding resolution, and management
+  - name: Resources
+    description: Geospatial resource tracking, categorization, and proximity queries
+  - name: Reports
+    description: Crisis social intelligence stream and Redis Cache-Aside feed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Enter your JWT Bearer token obtained from /api/auth/login
+
+  schemas:
+    StandardResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            cached:
+              type: boolean
+            cache_ttl:
+              type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: "\"title\" is required"
+            status:
+              type: integer
+              example: 400
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@relief.io
+        password:
+          type: string
+          example: admin123
+
+    AuthTokens:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+            role:
+              type: string
+              enum: [admin, contributor, viewer]
+        tokens:
+          type: object
+          properties:
+            accessToken:
+              type: string
+            refreshToken:
+              type: string
+            tokenType:
+              type: string
+              example: Bearer
+            expiresIn:
+              type: string
+              example: 15m
+
+    DisasterInput:
+      type: object
+      required:
+        - title
+        - description
+      properties:
+        title:
+          type: string
+          example: Massive Flash Flood in Downtown Miami
+        description:
+          type: string
+          example: Category 4 storm surge causing rising waters near Miami, FL. Roads impassable.
+        location_name:
+          type: string
+          example: Miami, FL
+        latitude:
+          type: number
+          example: 25.7617
+        longitude:
+          type: number
+          example: -80.1918
+        tags:
+          type: array
+          items:
+            type: string
+          example: [flood, hurricane, evacuation]
+        status:
+          type: string
+          enum: [active, resolved, monitoring]
+          example: active
+
+    DisasterItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [active, resolved, monitoring]
+        tags:
+          type: array
+          items:
+            type: string
+        location:
+          type: object
+          properties:
+            name:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ResourceInput:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          example: Mount Sinai Emergency Shelter & Clinic
+        type:
+          type: string
+          enum: [shelter, hospital, food, water, rescue]
+          example: shelter
+        location_name:
+          type: string
+          example: Miami Beach, FL
+        latitude:
+          type: number
+          example: 25.7907
+        longitude:
+          type: number
+          example: -80.1300
+
+    ResourceItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        disaster_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [shelter, hospital, food, water, rescue]
+        location_name:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        distance_km:
+          type: number
+          example: 1.45
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Confirms application health and PostgreSQL with PostGIS extension status.
+      responses:
+        200:
+          description: System healthy
+        503:
+          description: Degraded / database connection failure
+
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate user
+      description: Returns JWT access token (15m expiry) and refresh token (7d expiry).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: Authentication successful
+        401:
+          description: Invalid email or password
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh access token
+      description: Issues a fresh access token using a valid refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        200:
+          description: Access token refreshed successfully
+        401:
+          description: Invalid or expired refresh token
+
+  /disasters:
+    get:
+      tags:
+        - Disasters
+      summary: List all disaster incidents
+      description: Retrieve paginated disasters with optional filtering by status and tag.
+      parameters:
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Filter by specific tag (e.g. flood, wildfire)
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, resolved, monitoring]
+          description: Filter by status
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        200:
+          description: List of disasters
+
+    post:
+      tags:
+        - Disasters
+      summary: Create new disaster incident
+      description: >
+        Creates a new disaster incident. If coordinates are omitted, the system performs
+        automatic NLP location extraction from the description text and coordinates resolution.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisasterInput'
+      responses:
+        201:
+          description: Disaster incident created successfully
+        400:
+          description: Validation error
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden (insufficient role permissions)
+
+  /disasters/{id}:
+    get:
+      tags:
+        - Disasters
+      summary: Retrieve single disaster
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Disaster details found
+        404:
+          description: Disaster not found
+
+    patch:
+      tags:
+        - Disasters
+      summary: Partial update of disaster incident
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: string
+                  enum: [active, resolved, monitoring]
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Disaster updated successfully
+        403:
+          description: Forbidden (viewer cannot modify)
+        404:
+          description: Disaster not found
+
+    delete:
+      tags:
+        - Disasters
+      summary: Delete disaster incident
+      description: Admin-only operation. Removes disaster and cascading relations.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Disaster deleted successfully
+        403:
+          description: Forbidden (requires admin role)
+        404:
+          description: Disaster not found
+
+  /disasters/{id}/resources:
+    get:
+      tags:
+        - Resources
+      summary: Find nearby emergency resources (PostGIS ST_DWithin)
+      description: >
+        Queries resources within a radial distance (km) using PostGIS ST_DWithin and
+        computes spherical distance with ST_Distance. Results are cached in Redis for 2 minutes.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: lat
+          schema:
+            type: number
+          description: Center search latitude (defaults to disaster latitude)
+        - in: query
+          name: lng
+          schema:
+            type: number
+          description: Center search longitude (defaults to disaster longitude)
+        - in: query
+          name: radius
+          schema:
+            type: number
+            default: 10
+          description: Radial search distance in kilometers
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [shelter, hospital, food, water, rescue]
+          description: Filter by resource type
+      responses:
+        200:
+          description: Nearby resources sorted nearest first with distance_km
+
+    post:
+      tags:
+        - Resources
+      summary: Add emergency resource to disaster
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        201:
+          description: Resource registered successfully
+        403:
+          description: Forbidden (requires admin role)
+
+  /disasters/{id}/reports:
+    get:
+      tags:
+        - Reports
+      summary: Retrieve community reports feed (Redis Cache-Aside)
+      description: >
+        Aggregates persistent database community reports and simulated live social media crisis reports.
+        Performs AI priority classification and caches results in Redis with a 5-minute TTL.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Disaster reports list with cache metadata (cached, cache_ttl)
+        404:
+          description: Disaster not found

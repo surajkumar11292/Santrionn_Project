@@ -54,6 +54,13 @@ const authRoutes = require('./routes/auth.routes');
 const disasterRoutes = require('./routes/disaster.routes');
 const errorHandler = require('./middleware/errorHandler');
 
+// Swagger API Documentation
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load(path.join(__dirname, 'docs/swagger.yaml'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', (req, res) => res.redirect('/api-docs'));
+
 // Root API information endpoint
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -62,8 +69,10 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
+      docs: '/api-docs',
       auth: '/api/auth',
-      disasters: '/disasters'
+      disasters: '/disasters',
+      realtimeTest: '/socket-test'
     }
   });
 });

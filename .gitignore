@@ -3,6 +3,13 @@ node_modules/
 .pnp/
 .pnp.js
 
+# Internal Assignment & Agent Tooling
+ASSIGNMENT.md
+.agent/
+.claude/
+.gemini/
+.impeccable/
+
 # Environment Variables
 .env
 .env.local

@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-disaster_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-disaster_password_secure}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -37,11 +37,13 @@ services:
       - disaster_network
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: node:20-alpine
     container_name: disaster_backend
     restart: unless-stopped
+    working_dir: /usr/src/app
+    volumes:
+      - ./backend:/usr/src/app
+    command: node src/server.js
     ports:
       - "${PORT:-3000}:3000"
     environment:
@@ -66,11 +68,13 @@ services:
       - disaster_network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: node:20-alpine
     container_name: disaster_frontend
     restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: npm run dev
     ports:
       - "5173:5173"
     environment:

@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const config = require('./config');
+const { testConnection } = require('./config/database');
 
 const app = express();
 
@@ -27,13 +28,21 @@ if (config.env !== 'test') {
 }
 
 // Health Check Endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    status: 'UP',
+app.get('/health', async (req, res) => {
+  const dbHealth = await testConnection();
+
+  const isHealthy = dbHealth.connected;
+  res.status(isHealthy ? 200 : 503).json({
+    success: isHealthy,
+    status: isHealthy ? 'UP' : 'DEGRADED',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    service: 'disaster-response-backend'
+    service: 'disaster-response-backend',
+    database: {
+      connected: dbHealth.connected,
+      postgis: dbHealth.postgis || null,
+      error: dbHealth.error || null
+    }
   });
 });
 

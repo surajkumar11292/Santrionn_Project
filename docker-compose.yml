@@ -1,0 +1,92 @@
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: disaster_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-disaster_db}
+      POSTGRES_USER: ${POSTGRES_USER:-disaster_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-disaster_password_secure}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-disaster_user} -d ${POSTGRES_DB:-disaster_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - disaster_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: disaster_redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - disaster_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: disaster_backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-disaster_db}
+      DB_USER: ${POSTGRES_USER:-disaster_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-disaster_password_secure}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_disaster_platform_2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-super_secret_refresh_jwt_key_disaster_platform_2026}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - disaster_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: disaster_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+      VITE_SOCKET_URL: http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - disaster_network
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local
+
+networks:
+  disaster_network:
+    driver: bridge

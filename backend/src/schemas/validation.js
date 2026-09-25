@@ -53,10 +53,38 @@ const queryDisastersSchema = Joi.object({
   limit: Joi.number().integer().min(1).max(100).default(10)
 });
 
+const nearbyResourcesQuerySchema = Joi.object({
+  lat: Joi.number().min(-90).max(90).optional(),
+  lng: Joi.number().min(-180).max(180).optional(),
+  radius: Joi.number().positive().max(500).default(10).optional(),
+  type: Joi.string().valid('shelter', 'hospital', 'food', 'water', 'rescue').optional()
+});
+
+const createResourceSchema = Joi.object({
+  name: Joi.string().min(2).max(255).required().messages({
+    'any.required': 'Resource name is required'
+  }),
+  type: Joi.string().valid('shelter', 'hospital', 'food', 'water', 'rescue').required().messages({
+    'any.required': 'Resource type is required (shelter, hospital, food, water, rescue)'
+  }),
+  latitude: Joi.number().min(-90).max(90).required().messages({
+    'any.required': 'Latitude coordinate is required'
+  }),
+  longitude: Joi.number().min(-180).max(180).required().messages({
+    'any.required': 'Longitude coordinate is required'
+  }),
+  location_name: Joi.string().max(255).optional(),
+  capacity: Joi.number().integer().min(1).default(100),
+  available_units: Joi.number().integer().min(0).optional(),
+  status: Joi.string().valid('available', 'limited', 'full').default('available')
+});
+
 module.exports = {
   loginSchema,
   refreshTokenSchema,
   createDisasterSchema,
   updateDisasterSchema,
-  queryDisastersSchema
+  queryDisastersSchema,
+  nearbyResourcesQuerySchema,
+  createResourceSchema
 };

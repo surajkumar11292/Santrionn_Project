@@ -94,6 +94,14 @@ const createOfficialUpdateSchema = Joi.object({
   })
 });
 
+const verifyImageSchema = Joi.object({
+  imageUrl: Joi.string().uri().required().messages({
+    'any.required': 'Valid image URL is required for verification',
+    'string.uri': 'imageUrl must be a valid HTTP or HTTPS URI'
+  }),
+  caption: Joi.string().max(500).allow('', null).optional()
+});
+
 module.exports = {
   loginSchema,
   refreshTokenSchema,
@@ -102,5 +110,6 @@ module.exports = {
   queryDisastersSchema,
   nearbyResourcesQuerySchema,
   createResourceSchema,
-  createOfficialUpdateSchema
+  createOfficialUpdateSchema,
+  verifyImageSchema
 };

@@ -19,6 +19,7 @@ async function runSeed() {
     const resourcesCount = await client.query('SELECT COUNT(*) FROM resources;');
     const reportsCount = await client.query('SELECT COUNT(*) FROM reports;');
     const updatesCount = await client.query('SELECT COUNT(*) FROM official_updates;');
+    const imagesCount = await client.query('SELECT COUNT(*) FROM disaster_image_verifications;');
 
     console.log('[Seed Runner] Seeding completed successfully:');
     console.log(`  - Users seeded:            ${usersCount.rows[0].count}`);
@@ -26,6 +27,7 @@ async function runSeed() {
     console.log(`  - Resources seeded:        ${resourcesCount.rows[0].count}`);
     console.log(`  - Reports seeded:          ${reportsCount.rows[0].count}`);
     console.log(`  - Official updates seeded: ${updatesCount.rows[0].count}`);
+    console.log(`  - Verified images seeded:  ${imagesCount.rows[0].count}`);
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[Seed Runner] Seeding failed with error:', err);

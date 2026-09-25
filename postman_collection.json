@@ -437,6 +437,43 @@
           }
         }
       ]
+    },
+    {
+      "name": "AI Image Verification",
+      "item": [
+        {
+          "name": "Get Verified Damage Images",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/images",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "images"]
+            }
+          }
+        },
+        {
+          "name": "Verify Damage Image via AI Vision",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageUrl\": \"https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80\",\n  \"caption\": \"Severe road flooding and submerged infrastructure along 8th Avenue\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/verify-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "verify-image"]
+            }
+          }
+        }
+      ]
     }
   ]
 }

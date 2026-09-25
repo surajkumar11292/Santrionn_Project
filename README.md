@@ -193,13 +193,14 @@ The test suite runs against the real, live PostgreSQL + PostGIS and Redis contai
 docker compose exec backend npm test
 ```
 
-### Verified Test Suites (20/20 Passing Tests)
+### Verified Test Suites (24/24 Passing Tests)
 1. **`tests/disaster.test.js`**: Full CRUD lifecycle (POST with NLP extraction, GET details, PATCH updates, DELETE removal, and 404 verification).
 2. **`tests/validation.test.js`**: Joi validation failure scenarios (missing title, missing description, invalid status enum) returning standard 400 Bad Request error envelopes.
 3. **`tests/rbac.test.js`**: Security enforcement (401 Unauthorized for missing tokens, 403 Forbidden when `viewer` or `contributor` attempts admin deletions or resource additions).
 4. **`tests/caching.test.js`**: Redis Cache-Aside pattern (asserting `meta.cached: false` on cache miss and `meta.cached: true` with positive TTL on subsequent requests).
 5. **`tests/officialUpdates.test.js`**: Official emergency agency advisories, cache invalidation, and role restrictions.
 6. **`tests/queue.test.js`**: Asynchronous job queue (`POST /disasters/:id/sync-reports` returning HTTP 202 Accepted, worker processing state machine, telemetry tracking, and completion).
+7. **`tests/imageVerification.test.js`**: AI damage image verification, optical hazard classification, authenticity validation, and Redis cache-aside caching.
 
 ---
 
@@ -213,6 +214,7 @@ Import `postman_collection.json` into Postman to explore and execute pre-configu
 - `5. Community Reports`: Cached crisis intelligence stream
 - `6. Official Advisories`: Authorized bulletins with WebSocket broadcasting
 - `7. Background Jobs & Workers`: Async stream sync (HTTP 202) and job telemetry tracking
+- `8. AI Image Verification`: Automated damage assessment and hazard detection
 
 ---
 

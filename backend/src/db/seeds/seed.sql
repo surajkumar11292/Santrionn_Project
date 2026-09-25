@@ -227,3 +227,37 @@ INSERT INTO official_updates (disaster_id, agency, severity, headline, body) VAL
     'Category 4 Hurricane Surge Watch & Bridge Closures',
     'Causeways to Miami Beach will be closed to vehicle traffic at 18:00 EST. Settle in place with 72 hours of water and non-perishable rations.'
   );
+
+-- ============================================================================
+-- 6. SEED VERIFIED DAMAGE IMAGES & AI HAZARD ASSESSMENTS
+-- ============================================================================
+INSERT INTO disaster_image_verifications (
+  disaster_id,
+  image_url,
+  caption,
+  is_genuine,
+  confidence_score,
+  damage_severity,
+  detected_hazards,
+  ai_analysis
+) VALUES
+  (
+    'a1111111-1111-1111-1111-111111111111',
+    'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80',
+    'Severe street submergence along 8th Avenue with abandoned vehicles submerged past wheel wells.',
+    true,
+    0.965,
+    'severe',
+    ARRAY['floodwater_depth_high', 'submerged_vehicles', 'electrical_conduit_risk'],
+    '{"structuralIntegrity": "compromised_subsurface", "waterLevelEstMeters": 0.9, "detectedObjects": ["vehicle", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb
+  ),
+  (
+    'a2222222-2222-2222-2222-222222222222',
+    'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80',
+    'Downed utility poles and damaged structural facade along coastline corridor.',
+    true,
+    0.942,
+    'catastrophic',
+    ARRAY['downed_power_lines', 'structural_collapse_risk', 'flying_debris_hazard'],
+    '{"structuralIntegrity": "severe_facade_failure", "windDamageCategory": 4, "detectedObjects": ["utility_pole", "debris", "facade"], "manipulationArtifactsDetected": false}'::jsonb
+  );

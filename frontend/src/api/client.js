@@ -75,6 +75,12 @@ export const api = {
     create: (disasterId, data) => apiClient.post(`/disasters/${disasterId}/updates`, data)
   },
 
+  // AI Damage Image Verification & Hazard Assessment
+  images: {
+    getByDisaster: (disasterId) => apiClient.get(`/disasters/${disasterId}/images`),
+    verify: (disasterId, data) => apiClient.post(`/disasters/${disasterId}/verify-image`, data)
+  },
+
   // Health Check
   health: () => apiClient.get('/health')
 };

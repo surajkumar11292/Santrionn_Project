@@ -655,3 +655,62 @@ paths:
                     type: string
         404:
           description: Job not found
+
+  /disasters/{id}/images:
+    get:
+      tags:
+        - Image Verification
+      summary: Get verified disaster damage images (Redis Cache-Aside)
+      description: Retrieve verified damage photos, AI authenticity scores, and detected hazard markers.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: List of verified disaster images
+        404:
+          description: Disaster not found
+
+  /disasters/{id}/verify-image:
+    post:
+      tags:
+        - Image Verification
+      summary: Submit and verify damage image using AI Computer Vision
+      description: >
+        Analyzes damage imagery with AI computer vision heuristics, assesses authenticity against synthetic
+        artifacts, categorizes damage severity (catastrophic, severe, moderate, minor), detects specific hazard markers,
+        caches analysis in Redis, and broadcasts a real-time WebSocket event.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - imageUrl
+              properties:
+                imageUrl:
+                  type: string
+                  format: uri
+                  example: https://images.unsplash.com/photo-1547683905-f686c993aae5
+                caption:
+                  type: string
+                  example: Severe street submergence along 8th Avenue
+      responses:
+        201:
+          description: Image verified and AI hazard assessment completed
+        400:
+          description: Validation error (invalid URL or missing parameters)
+        404:
+          description: Disaster not found

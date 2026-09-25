@@ -84,6 +84,45 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
   });
   const [creatingUpdate, setCreatingUpdate] = useState(false);
 
+  // AI Damage Image Verification State
+  const [images, setImages] = useState([]);
+  const [imagesMeta, setImagesMeta] = useState(null);
+  const [newImage, setNewImage] = useState({
+    imageUrl: '',
+    caption: ''
+  });
+  const [verifyingImage, setVerifyingImage] = useState(false);
+
+  const loadImages = async () => {
+    if (!disaster?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.images.getByDisaster(disaster.id);
+      setImages(res.data || []);
+      setImagesMeta(res.meta || null);
+    } catch (err) {
+      setError(err.message || 'Failed to load damage images');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyImage = async (e) => {
+    e.preventDefault();
+    if (!newImage.imageUrl) return;
+    setVerifyingImage(true);
+    try {
+      await api.images.verify(disaster.id, newImage);
+      setNewImage({ imageUrl: '', caption: '' });
+      loadImages();
+    } catch (err) {
+      alert(`AI Image verification failed: ${err.message}`);
+    } finally {
+      setVerifyingImage(false);
+    }
+  };
+
   const loadUpdates = async () => {
     if (!disaster?.id) return;
     setLoading(true);
@@ -136,6 +175,8 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
       loadReports();
     } else if (activeTab === 'updates') {
       loadUpdates();
+    } else if (activeTab === 'images') {
+      loadImages();
     }
   }, [activeTab, radius, resourceType, disaster?.id]);
 
@@ -312,6 +353,20 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
             }}
           >
             🏛️ Official Bulletins
+          </button>
+          <button
+            onClick={() => setActiveTab('images')}
+            style={{
+              flex: 1,
+              padding: 'var(--space-3)',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              color: activeTab === 'images' ? '#a855f7' : 'var(--color-text-secondary)',
+              borderBottom: activeTab === 'images' ? '2px solid #a855f7' : '2px solid transparent',
+              background: activeTab === 'images' ? 'var(--color-bg-elevated)' : 'transparent'
+            }}
+          >
+            📷 AI Vision (Damage)
           </button>
           <button
             onClick={() => setActiveTab('overview')}
@@ -866,6 +921,248 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                     </button>
                   </div>
                 </form>
+              )}
+            </div>
+          )}
+
+          {/* AI VISION DAMAGE IMAGES TAB */}
+          {activeTab === 'images' && (
+            <div>
+              {/* Cache Header */}
+              {imagesMeta && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: 'var(--space-2) var(--space-4)',
+                  background: 'var(--color-bg-elevated)',
+                  borderRadius: 'var(--radius-md)',
+                  marginBottom: 'var(--space-4)',
+                  fontSize: '0.8rem',
+                  fontFamily: 'var(--font-mono)'
+                }}>
+                  <span>AI Engine: <strong style={{ color: '#a855f7' }}>Deep Visual Heuristic Neural Network</strong></span>
+                  <span style={{ color: imagesMeta.cached ? '#10b981' : '#f59e0b' }}>
+                    {imagesMeta.cached ? `⚡ Redis Cache Hit (TTL ${imagesMeta.cache_ttl}s)` : '● Fresh Computer Vision Analysis'}
+                  </span>
+                </div>
+              )}
+
+              {/* Verify New Image Form */}
+              <form
+                onSubmit={handleVerifyImage}
+                style={{
+                  padding: 'var(--space-4)',
+                  background: 'var(--color-bg-elevated)',
+                  borderRadius: 'var(--radius-md)',
+                  marginBottom: 'var(--space-5)',
+                  border: '1px solid var(--color-border)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#a855f7' }}>
+                    🔬 Verify Damage Photographic Evidence (AI Computer Vision)
+                  </h4>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setNewImage({
+                        imageUrl: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80',
+                        caption: 'Severe road flooding and submerged infrastructure'
+                      })}
+                      style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.4)' }}
+                    >
+                      Preset: Flood
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewImage({
+                        imageUrl: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80',
+                        caption: 'Downed utility poles and building facade collapse'
+                      })}
+                      style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)' }}
+                    >
+                      Preset: Collapse
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewImage({
+                        imageUrl: 'https://images.unsplash.com/photo-1524334228333-0f6db392f8a1?auto=format&fit=crop&w=800&q=80',
+                        caption: 'Wildfire front with heavy smoke and structural thermal damage'
+                      })}
+                      style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.4)' }}
+                    >
+                      Preset: Wildfire
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  <input
+                    type="url"
+                    placeholder="Enter Image URL (e.g. https://images.unsplash.com/...)..."
+                    value={newImage.imageUrl}
+                    onChange={(e) => setNewImage({ ...newImage, imageUrl: e.target.value })}
+                    style={{
+                      padding: '6px 10px',
+                      background: 'var(--color-bg-base)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      color: 'white',
+                      fontSize: '0.85rem'
+                    }}
+                    required
+                  />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 'var(--space-2)' }}>
+                    <input
+                      type="text"
+                      placeholder="Scene caption / Field observer notes (optional)..."
+                      value={newImage.caption}
+                      onChange={(e) => setNewImage({ ...newImage, caption: e.target.value })}
+                      style={{
+                        padding: '6px 10px',
+                        background: 'var(--color-bg-base)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'white',
+                        fontSize: '0.85rem'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={verifyingImage}
+                      style={{
+                        padding: '6px 18px',
+                        background: 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)',
+                        color: 'white',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        cursor: verifyingImage ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      {verifyingImage ? 'Analyzing Image...' : '⚡ Run AI Vision Verification'}
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              {/* Verified Images Grid */}
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--color-text-muted)' }}>
+                  Analyzing optical patterns and structural damage markers...
+                </div>
+              ) : images.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--color-text-muted)' }}>
+                  No damage images submitted yet for this disaster.
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-4)' }}>
+                  {images.map((img) => {
+                    const isCatastrophic = img.damage_severity === 'catastrophic';
+                    const isSevere = img.damage_severity === 'severe';
+                    const isModerate = img.damage_severity === 'moderate';
+
+                    return (
+                      <div
+                        key={img.id}
+                        style={{
+                          background: 'var(--color-bg-base)',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-md)',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <div style={{ position: 'relative', height: '170px', background: '#0f172a' }}>
+                          <img
+                            src={img.image_url}
+                            alt="Damage Scene"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                          <div style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            display: 'flex',
+                            gap: '4px'
+                          }}>
+                            <span style={{
+                              fontSize: '0.7rem',
+                              fontWeight: 800,
+                              textTransform: 'uppercase',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                              background: isCatastrophic ? 'rgba(239, 68, 68, 0.9)' : isSevere ? 'rgba(245, 158, 11, 0.9)' : isModerate ? 'rgba(234, 179, 8, 0.9)' : 'rgba(59, 130, 246, 0.9)',
+                              color: 'white',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                            }}>
+                              {img.damage_severity}
+                            </span>
+                            <span style={{
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                              background: img.is_genuine ? 'rgba(16, 185, 129, 0.9)' : 'rgba(239, 68, 68, 0.9)',
+                              color: 'white'
+                            }}>
+                              {img.is_genuine ? '☑️ GENUINE' : '⚠️ SYNTHETIC'}
+                            </span>
+                          </div>
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            left: '8px',
+                            background: 'rgba(0,0,0,0.7)',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            fontFamily: 'var(--font-mono)',
+                            color: '#e2e8f0'
+                          }}>
+                            Confidence: {Math.round(img.confidence_score * 100)}%
+                          </div>
+                        </div>
+
+                        <div style={{ padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-primary)', lineHeight: 1.4 }}>
+                            {img.caption || img.ai_analysis?.assessmentSummary || 'Disaster site inspection snapshot'}
+                          </p>
+
+                          {/* Detected Hazards Tags */}
+                          {img.detected_hazards?.length > 0 && (
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                              {img.detected_hazards.map((hazard, hIdx) => (
+                                <span
+                                  key={hIdx}
+                                  style={{
+                                    fontSize: '0.65rem',
+                                    fontFamily: 'var(--font-mono)',
+                                    background: 'rgba(239, 68, 68, 0.15)',
+                                    color: '#f87171',
+                                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                                    borderRadius: '4px',
+                                    padding: '1px 6px'
+                                  }}
+                                >
+                                  ⚠️ {hazard.replace(/_/g, ' ')}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Structural: <strong>{img.ai_analysis?.structuralIntegrity || 'Assessed'}</strong></span>
+                            <span>{new Date(img.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}

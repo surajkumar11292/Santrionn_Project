@@ -4,6 +4,7 @@ const reportController = require('../controllers/report.controller');
 const resourceController = require('../controllers/resource.controller');
 const officialUpdateController = require('../controllers/officialUpdate.controller');
 const jobController = require('../controllers/job.controller');
+const imageController = require('../controllers/imageVerification.controller');
 const authenticate = require('../middleware/auth');
 const authorize = require('../middleware/rbac');
 const validate = require('../middleware/validate');
@@ -13,7 +14,8 @@ const {
   queryDisastersSchema,
   nearbyResourcesQuerySchema,
   createResourceSchema,
-  createOfficialUpdateSchema
+  createOfficialUpdateSchema,
+  verifyImageSchema
 } = require('../schemas/validation');
 
 const router = express.Router();
@@ -26,6 +28,16 @@ router.get('/:id/reports', reportController.getByDisasterId);
 
 // Asynchronous background job to sync external crisis stream (HTTP 202 Accepted)
 router.post('/:id/sync-reports', jobController.syncReports);
+
+// Verified Damage Images & AI Hazard Assessments with Redis Caching
+router.get('/:id/images', imageController.getDisasterImages);
+
+// Submit and Verify Disaster Damage Image using AI Vision
+router.post(
+  '/:id/verify-image',
+  validate(verifyImageSchema, 'body'),
+  imageController.verifyImage
+);
 
 // Official Emergency Agency Advisories with Redis Caching
 router.get('/:id/updates', officialUpdateController.getByDisaster);

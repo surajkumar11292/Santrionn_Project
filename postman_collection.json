@@ -1,0 +1,373 @@
+{
+  "info": {
+    "_postman_id": "d15a5700-1129-4e89-9a8b-reliefio2026",
+    "name": "Disaster Response Coordination Platform API",
+    "description": "Production-grade RESTful API Collection for Disaster Incident Management, PostGIS Geospatial Radius Proximity Queries, Redis Cache-Aside Social Intelligence Streams, and Real-Time WebSocket Notifications.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "contribToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "viewerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "disasterId",
+      "value": "a1111111-1111-1111-1111-111111111111",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System Health",
+      "item": [
+        {
+          "name": "Health Check & PostGIS Liveness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Root Information",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Login - Admin Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.tokens) {",
+                  "  pm.collectionVariables.set('adminToken', json.data.tokens.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@relief.io\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Contributor Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.tokens) {",
+                  "  pm.collectionVariables.set('contribToken', json.data.tokens.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contrib@relief.io\",\n  \"password\": \"contrib123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Viewer Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.tokens) {",
+                  "  pm.collectionVariables.set('viewerToken', json.data.tokens.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"viewer@relief.io\",\n  \"password\": \"viewer123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Disaster Management",
+      "item": [
+        {
+          "name": "List Disasters (with tag & status filter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disasters?tag=flood&status=active&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters"],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "flood"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Disaster Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Disaster (NLP Location Resolution)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.collectionVariables.set('disasterId', json.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Severe Flash Flooding along Coast\",\n  \"description\": \"Rising flash flood waters inundating lowlands in Miami, FL with road closures.\",\n  \"tags\": [\"flood\", \"hurricane\", \"evacuation\"],\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disasters",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters"]
+            }
+          }
+        },
+        {
+          "name": "Update Disaster Incident (Status / Tags)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"monitoring\",\n  \"tags\": [\"flood\", \"monitoring\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Disaster Incident (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Geospatial Emergency Resources",
+      "item": [
+        {
+          "name": "Find Nearby Resources (PostGIS ST_DWithin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/resources?radius=25&type=shelter",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "resources"],
+              "query": [
+                {
+                  "key": "radius",
+                  "value": "25"
+                },
+                {
+                  "key": "type",
+                  "value": "shelter"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Resource to Disaster (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Emergency Field Hospital Alpha\",\n  \"type\": \"hospital\",\n  \"location_name\": \"Downtown Command Post\",\n  \"latitude\": 40.7831,\n  \"longitude\": -73.9712\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/resources",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "resources"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Community Reports (Redis Cache-Aside)",
+      "item": [
+        {
+          "name": "Get Crisis Reports Stream (Cached)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/disasters/{{disasterId}}/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["disasters", "{{disasterId}}", "reports"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

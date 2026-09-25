@@ -4,6 +4,7 @@ const classifierService = require('./classifier.service');
 const disasterRepo = require('../repositories/disaster.repo');
 const { query } = require('../config/database');
 const { NotFoundError } = require('../utils/errors');
+const { emitReportAdded } = require('../socket/events');
 
 class ReportService {
   constructor() {
@@ -83,6 +84,11 @@ class ReportService {
 
     // 6. Store normalized response in Redis Cache with TTL
     await cacheService.set(cacheKey, combinedReports, this.CACHE_TTL_SECONDS);
+
+    // 7. Dispatch real-time report event to subscribers in room
+    if (combinedReports.length > 0) {
+      emitReportAdded(disasterId, combinedReports[0]);
+    }
 
     return {
       reports: combinedReports,

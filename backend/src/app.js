@@ -5,10 +5,14 @@ const morgan = require('morgan');
 const config = require('./config');
 const { testConnection } = require('./config/database');
 
+const path = require('path');
+
 const app = express();
 
 // Security HTTP headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false // Allows socket-test.html CDN script in dev/testing
+}));
 
 // CORS configuration
 app.use(cors({
@@ -62,6 +66,11 @@ app.get('/', (req, res) => {
       disasters: '/disasters'
     }
   });
+});
+
+// Interactive Real-Time Socket.IO Test UI
+app.get('/socket-test', (req, res) => {
+  res.sendFile(path.join(__dirname, '../tests/socket-test.html'));
 });
 
 // Mount Routes (supporting both /disasters and /api/disasters)

@@ -1,13 +1,18 @@
 const http = require('http');
 const app = require('./app');
 const config = require('./config');
+const { initSocket } = require('./config/socket');
 
 const server = http.createServer(app);
+
+// Initialize Socket.IO server
+const io = initSocket(server);
 
 const PORT = config.port;
 
 server.listen(PORT, () => {
   console.log(`[Disaster Response API] Server running in ${config.env} mode on port ${PORT}`);
+  console.log('[Socket.IO] Real-time WebSocket gateway initialized');
 });
 
 // Graceful shutdown handling

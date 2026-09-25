@@ -1,5 +1,10 @@
 const disasterRepo = require('../repositories/disaster.repo');
 const geoService = require('./geo.service');
+const {
+  emitDisasterCreated,
+  emitDisasterUpdated,
+  emitDisasterDeleted
+} = require('../socket/events');
 const { NotFoundError } = require('../utils/errors');
 
 class DisasterService {
@@ -29,6 +34,9 @@ class DisasterService {
       status: data.status || 'active',
       createdBy: userId || null
     });
+
+    // Real-time broadcast to connected clients
+    emitDisasterCreated(disaster);
 
     return disaster;
   }
@@ -61,6 +69,10 @@ class DisasterService {
     }
 
     const updated = await disasterRepo.update(id, updates);
+
+    // Real-time broadcast to connected clients and disaster room
+    emitDisasterUpdated(updated, updates);
+
     return updated;
   }
 
@@ -74,6 +86,10 @@ class DisasterService {
     }
 
     await disasterRepo.delete(id);
+
+    // Real-time broadcast to connected clients
+    emitDisasterDeleted(id);
+
     return { id, deleted: true };
   }
 }

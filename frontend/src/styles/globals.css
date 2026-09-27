@@ -10,16 +10,24 @@ html, body {
   min-height: 100%;
   width: 100%;
   background-color: var(--color-paper);
-  background-image:
-    radial-gradient(circle 600px at 85% 60%, var(--color-bloom-1) 0%, transparent 70%),
-    radial-gradient(circle 500px at 8% 85%, var(--color-bloom-2) 0%, transparent 65%);
-  background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.45;
+  line-height: 1.55;
   overflow-x: clip;
+}
+
+/* Top Dark Forest Green Accent Bar (matching suraj-portfolio-io.vercel.app) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--color-forest);
+  z-index: 99999;
 }
 
 #root {
@@ -29,119 +37,128 @@ html, body {
 }
 
 /* ==========================================================================
-   Hallmark Aurora Typography (Clean, Geometric, Atmospheric)
+   Editorial Serif Typography (matching Suraj Kumar portfolio)
    ========================================================================== */
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  letter-spacing: -0.015em;
   color: var(--color-ink);
   line-height: 1.15;
 }
 
-/* Hallmark Eyebrow with Signature Cyan Square: ■ DISASTER OPERATIONS */
-.eyebrow, .mono-label {
-  font-family: var(--font-mono);
+h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.25;
+}
+
+/* Editorial Italic Accent */
+.editorial-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-forest);
+}
+
+/* Pill Badges (matching portfolio top badge) */
+.mono-label, .pill-badge {
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--color-muted);
+  color: var(--color-forest);
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 .eyebrow-square {
-  width: 6px;
-  height: 6px;
-  background-color: var(--color-accent);
+  width: 5px;
+  height: 5px;
+  background-color: var(--color-forest);
   display: inline-block;
   flex-shrink: 0;
+  border-radius: 50%;
 }
 
-/* Tabular Numerals for Precise Numbers */
 .tnum, .tabular-nums {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
 
 /* ==========================================================================
-   Functional Components
+   Editorial Surfaces & Buttons (Calm, Concentrated, Zero Clutter)
    ========================================================================== */
 
-/* Aurora Surface Card */
+/* Clean White Card Surface */
 .aurora-card {
   background-color: var(--color-paper-surface);
   border: 1px solid var(--color-rule);
-  border-radius: var(--radius-sm);
-  transition: border-color var(--transition-fast);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
 }
 
-.aurora-card:hover {
-  border-color: var(--color-rule-2);
+/* Primary Forest Green Pill Button */
+.btn-cyan, .btn-forest {
+  background-color: var(--color-forest);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
 }
 
-/* High-Contrast Action Buttons */
-.btn-cyan {
-  background-color: var(--color-accent);
-  color: #030d11;
+.btn-cyan:hover, .btn-forest:hover {
+  background-color: var(--color-forest-hover);
+}
+
+/* Outline Pill Button */
+.btn-outline {
+  background-color: var(--color-paper-surface);
+  color: var(--color-forest);
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.825rem;
-  padding: 6px 14px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--color-accent);
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-rule-2);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   text-decoration: none;
-  transition: background-color var(--transition-fast);
-}
-
-.btn-cyan:hover {
-  background-color: oklch(86% 0.15 190);
-}
-
-.btn-outline {
-  background-color: transparent;
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 0.825rem;
-  padding: 6px 12px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--color-rule);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  text-decoration: none;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .btn-outline:hover {
-  border-color: var(--color-rule-2);
-  background-color: var(--color-paper-elevated);
+  background-color: var(--color-paper-muted);
 }
 
-/* Standard Form Inputs */
+/* Clean Form Inputs */
 input, textarea, select {
   font-family: var(--font-sans);
   color: var(--color-ink);
-  background-color: var(--color-paper);
+  background-color: var(--color-paper-surface);
   border: 1px solid var(--color-rule);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   outline: none;
-  transition: border-color var(--transition-fast);
+  padding: 8px 12px;
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--color-accent);
+  border-color: var(--color-forest);
+  box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.12);
 }
 
 button {
@@ -152,12 +169,12 @@ button {
 }
 
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 1px;
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--color-forest);
   text-decoration: none;
 }
 
@@ -165,10 +182,10 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Lightweight Scrollbar */
+/* Subtle Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -176,10 +193,31 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-paper-elevated);
-  border-radius: var(--radius-xs);
+  background: var(--color-rule-2);
+  border-radius: var(--radius-pill);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-rule-2);
+/* Leaflet Overrides for Editorial Linen Theme */
+.leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e2dfd7 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: #1a1a1a !important;
+  padding: 8px 10px 0 0 !important;
 }

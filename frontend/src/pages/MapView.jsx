@@ -1,5 +1,5 @@
-/* Hallmark Theme: Aurora (usehallmark.com)
- * Disaster Spatial Radar - Geospatial Intelligence
+/* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
+ * Disaster Spatial Radar - Clean Cartography
  */
 import React, { useEffect, useRef } from 'react';
 import { useDisasterStore } from '../store/disasterStore';
@@ -20,13 +20,13 @@ export default function MapView({ onSelectDisaster }) {
 
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {
-        center: [39.8283, -98.5795],
-        zoom: 4,
+        center: [20.5937, 78.9629], // Centered default
+        zoom: 5,
         zoomControl: true
       });
 
-      // CartoDB Dark Matter (Tactical Dark Cartography)
-      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+      // CartoDB Positron (Clean Light Paper Cartography)
+      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
         subdomains: 'abcd',
         maxZoom: 19
@@ -52,69 +52,72 @@ export default function MapView({ onSelectDisaster }) {
 
         const markerColor =
           disaster.status === 'active'
-            ? '#ef4444'
+            ? '#b91c1c'
             : disaster.status === 'monitoring'
-            ? '#f59e0b'
-            : '#10b981';
+            ? '#b45309'
+            : '#1b4332';
 
-        // High-contrast Aurora Radar Pin
+        // Clean Pin with White Border & Soft Drop
         const customIcon = L.divIcon({
-          className: 'aurora-pin',
+          className: 'editorial-pin',
           html: `
             <div style="
-              width: 16px;
-              height: 16px;
+              width: 18px;
+              height: 18px;
               border-radius: 50%;
               background: ${markerColor};
-              border: 2px solid #030d11;
-              box-shadow: 0 0 10px ${markerColor}99;
+              border: 3px solid #ffffff;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
               cursor: pointer;
             "></div>
           `,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
         });
 
         const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
 
-        // Aurora Hairline Popup
+        // Clean Popup Card
         const popupContent = `
           <div style="
-            background: #07171e;
-            color: #f0fdfa;
-            font-family: 'Geist', sans-serif;
-            padding: 8px 6px;
-            min-width: 200px;
+            background: #ffffff;
+            color: #1a1a1a;
+            padding: 18px;
+            min-width: 220px;
           ">
             <div style="
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
               font-family: 'JetBrains Mono', monospace;
               font-size: 10px;
               font-weight: 700;
+              letter-spacing: 0.06em;
               color: ${markerColor};
-              margin-bottom: 2px;
+              margin-bottom: 6px;
+              text-transform: uppercase;
             ">
-              ${disaster.status?.toUpperCase()} · [${lat.toFixed(3)}, ${lng.toFixed(3)}]
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: ${markerColor};"></span>
+              ${disaster.status} · [${lat.toFixed(3)}, ${lng.toFixed(3)}]
             </div>
             <div style="
-              font-size: 13px;
-              font-weight: 700;
+              font-family: 'Instrument Serif', Georgia, serif;
+              font-size: 18px;
+              font-weight: 400;
+              color: #1a1a1a;
               margin-bottom: 4px;
+              line-height: 1.25;
             ">
               ${disaster.title}
             </div>
-            <div style="font-size: 11px; color: #99f6e4; margin-bottom: 8px;">
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">
               📍 ${disaster.location?.name || 'Unspecified Epicenter'}
             </div>
-            <button id="btn-${disaster.id}" style="
+            <button id="btn-${disaster.id}" class="btn-forest" style="
               width: 100%;
-              padding: 5px 8px;
-              background: #22d3ee;
-              color: #030d11;
-              border: none;
-              border-radius: 2px;
-              font-family: 'Geist', sans-serif;
-              font-size: 11px;
-              font-weight: 700;
+              padding: 7px 14px;
+              font-size: 12px;
+              font-weight: 600;
               cursor: pointer;
             ">
               Inspect Dossier →
@@ -136,12 +139,12 @@ export default function MapView({ onSelectDisaster }) {
     });
 
     if (bounds.length > 0) {
-      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
     }
   }, [disasters, onSelectDisaster]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 54px)', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 75px)', overflow: 'hidden' }}>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
 
       {/* Floating Tactical HUD Card */}
@@ -149,34 +152,53 @@ export default function MapView({ onSelectDisaster }) {
         className="aurora-card"
         style={{
           position: 'absolute',
-          top: '16px',
-          left: '16px',
-          padding: '12px 16px',
+          top: '20px',
+          left: '20px',
+          padding: '18px 22px',
           zIndex: 1000,
-          minWidth: '240px'
+          minWidth: '260px',
+          borderRadius: '16px',
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--color-rule)',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(8px)'
         }}
       >
-        <div className="mono-label" style={{ color: 'var(--color-accent)', marginBottom: '3px', fontSize: '10px' }}>
-          <span className="eyebrow-square" />
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          fontSize: '11px',
+          fontWeight: 700,
+          fontFamily: 'var(--font-mono)',
+          color: 'var(--color-forest)',
+          marginBottom: '4px'
+        }}>
+          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-forest)' }} />
           SPATIAL RADAR
         </div>
-        <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-ink)' }}>
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.4rem',
+          fontWeight: 400,
+          color: 'var(--color-ink)'
+        }}>
           {disasters.length} Epicenters Tracked
         </div>
-        <div style={{ fontSize: '11px', color: 'var(--color-ink-2)', marginTop: '2px' }}>
-          PostGIS ST_DWithin spatial proximity radius queries.
+        <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '2px' }}>
+          PostGIS ST_DWithin spatial radius search.
         </div>
 
         <div style={{
           display: 'flex',
           gap: '12px',
-          marginTop: '8px',
-          paddingTop: '6px',
-          borderTop: '1px solid var(--color-rule)'
+          marginTop: '12px',
+          paddingTop: '10px',
+          borderTop: '1px solid var(--color-paper-muted)'
         }}>
-          <span className="mono-label" style={{ color: 'var(--color-critical)', fontSize: '10px' }}>● ACTIVE</span>
-          <span className="mono-label" style={{ color: 'var(--color-warning)', fontSize: '10px' }}>● MONITORING</span>
-          <span className="mono-label" style={{ color: 'var(--color-success)', fontSize: '10px' }}>● RESOLVED</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#b91c1c' }}>● ACTIVE</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#b45309' }}>● MONITORING</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--color-forest)' }}>● RESOLVED</span>
         </div>
       </div>
     </div>

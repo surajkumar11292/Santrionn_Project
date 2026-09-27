@@ -1,30 +1,26 @@
-/* Hallmark Theme: Aurora (usehallmark.com)
- * Real-Time Disaster Broadcast Column
+/* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
+ * Real-Time Emergency Broadcast Feed
  */
 import React from 'react';
 
 export default function LiveFeed({ events = [], isConnected = false }) {
-  const getPacketColor = (level) => {
-    switch (level) {
-      case 'critical':
-        return 'var(--color-critical)';
-      case 'warning':
-        return 'var(--color-warning)';
-      default:
-        return 'var(--color-accent)';
-    }
-  };
+  // Filter out any lingering internal system/socket debug packets
+  const broadcastEvents = events.filter((evt) => evt.type !== 'system' && !evt.title?.includes('WebSocket'));
 
   return (
     <aside
-      aria-label="Live Telemetry Stream"
+      aria-label="Live Crisis Broadcast Feed"
       className="aurora-card"
       style={{
-        padding: '16px',
+        padding: '20px',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        maxHeight: 'calc(100vh - 160px)'
+        maxHeight: 'calc(100vh - 180px)',
+        backgroundColor: '#ffffff',
+        borderRadius: '16px',
+        border: '1px solid var(--color-rule)',
+        boxShadow: 'var(--shadow-sm)'
       }}
     >
       {/* Feed Header */}
@@ -32,60 +28,82 @@ export default function LiveFeed({ events = [], isConnected = false }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingBottom: '8px',
+        paddingBottom: '12px',
         borderBottom: '1px solid var(--color-rule)',
-        marginBottom: '10px'
+        marginBottom: '14px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="eyebrow-square" style={{ backgroundColor: 'var(--color-accent)' }} />
-          <h2 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-ink)' }}>
-            Live Crisis Feed
+          <span style={{
+            width: '7px',
+            height: '7px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--color-forest)'
+          }} />
+          <h2 style={{
+            fontSize: '1.2rem',
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
+            color: 'var(--color-ink)'
+          }}>
+            Live Broadcast Feed
           </h2>
         </div>
 
-        <span className="mono-label" style={{
-          fontSize: '9.5px',
-          color: isConnected ? 'var(--color-success)' : 'var(--color-critical)'
+        <span style={{
+          fontSize: '11px',
+          fontWeight: 700,
+          fontFamily: 'var(--font-mono)',
+          padding: '2px 8px',
+          borderRadius: 'var(--radius-pill)',
+          backgroundColor: isConnected ? 'var(--color-forest-subtle)' : '#fef2f2',
+          color: isConnected ? 'var(--color-forest)' : '#b91c1c',
+          border: `1px solid ${isConnected ? 'var(--color-forest-border)' : '#fecaca'}`
         }}>
           {isConnected ? '● STREAMING' : '○ OFFLINE'}
         </span>
       </header>
 
-      {/* Packet Stream */}
+      {/* Broadcast Stream */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '6px',
+        gap: '8px',
         overflowY: 'auto',
         paddingRight: '2px'
       }}>
-        {events.length === 0 ? (
+        {broadcastEvents.length === 0 ? (
           <div style={{
-            padding: '24px 8px',
+            padding: '36px 12px',
             textAlign: 'center',
             color: 'var(--color-muted)',
-            fontSize: '12px'
+            fontSize: '13px',
+            lineHeight: 1.5
           }}>
-            Monitoring active WebSocket channel for disaster events and field reports...
+            No emergency alerts broadcasted yet. Real-time updates will stream here automatically.
           </div>
         ) : (
-          events.map((evt) => {
-            const color = getPacketColor(evt.level);
+          broadcastEvents.map((evt) => {
+            const isCritical = evt.level === 'critical';
             return (
               <div
                 key={evt.id}
                 style={{
-                  backgroundColor: 'var(--color-paper)',
-                  border: '1px solid var(--color-rule)',
-                  borderRadius: 'var(--radius-xs)',
-                  padding: '8px 10px',
+                  backgroundColor: isCritical ? '#fef2f2' : 'var(--color-paper-elevated)',
+                  border: `1px solid ${isCritical ? '#fecaca' : 'var(--color-rule)'}`,
+                  borderRadius: '10px',
+                  padding: '10px 12px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '3px'
+                  gap: '4px'
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="mono-label" style={{ fontSize: '10px', color }}>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
+                    color: isCritical ? '#b91c1c' : 'var(--color-forest)'
+                  }}>
                     {evt.title}
                   </span>
                   <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)' }}>
@@ -93,7 +111,7 @@ export default function LiveFeed({ events = [], isConnected = false }) {
                   </span>
                 </div>
 
-                <div style={{ fontSize: '12px', color: 'var(--color-ink-2)', lineHeight: 1.4 }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--color-ink-2)', lineHeight: 1.45 }}>
                   {evt.detail}
                 </div>
               </div>

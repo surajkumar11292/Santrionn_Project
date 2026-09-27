@@ -1,4 +1,4 @@
-/* Hallmark Theme: Aurora (usehallmark.com)
+/* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
  * Disaster Incident Registration Modal
  */
 import React, { useState } from 'react';
@@ -61,13 +61,13 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(3, 13, 17, 0.75)',
+        backgroundColor: 'rgba(26, 26, 26, 0.45)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 2000,
-        padding: '16px'
+        padding: '20px'
       }}
       onClick={onClose}
     >
@@ -76,7 +76,11 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
         style={{
           maxWidth: '540px',
           width: '100%',
-          padding: '24px'
+          padding: '28px',
+          backgroundColor: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid var(--color-rule)',
+          boxShadow: 'var(--shadow-lg)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -85,17 +89,27 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          marginBottom: '16px',
+          marginBottom: '20px',
           borderBottom: '1px solid var(--color-rule)',
-          paddingBottom: '12px'
+          paddingBottom: '14px'
         }}>
           <div>
-            <div className="mono-label" style={{ color: 'var(--color-accent)', marginBottom: '3px', fontSize: '10px' }}>
-              <span className="eyebrow-square" />
+            <div style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--color-forest)',
+              marginBottom: '3px'
+            }}>
               INCIDENT REGISTRATION
             </div>
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-ink)' }}>
-              Log Disaster Incident Dossier
+            <h2 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.6rem',
+              fontWeight: 400,
+              color: 'var(--color-ink)'
+            }}>
+              Log Disaster Incident
             </h2>
           </div>
 
@@ -103,13 +117,15 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="mono-label"
             style={{
-              padding: '4px 8px',
-              borderRadius: 'var(--radius-xs)',
-              color: 'var(--color-muted)',
-              border: '1px solid var(--color-rule)',
-              backgroundColor: 'transparent'
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-pill)',
+              color: 'var(--color-ink)',
+              border: '1px solid var(--color-rule-2)',
+              backgroundColor: 'var(--color-paper)',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer'
             }}
           >
             ✕ ESC
@@ -118,21 +134,21 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
 
         {error && (
           <div style={{
-            padding: '8px 12px',
-            backgroundColor: 'var(--color-critical-dim)',
-            border: '1px solid var(--color-critical-border)',
-            borderRadius: 'var(--radius-xs)',
-            color: 'var(--color-critical)',
-            fontSize: '12px',
-            marginBottom: '12px'
+            padding: '10px 14px',
+            backgroundColor: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            color: '#b91c1c',
+            fontSize: '13px',
+            marginBottom: '14px'
           }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
-            <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)', marginBottom: '5px' }}>
               Incident Title *
             </label>
             <input
@@ -140,71 +156,74 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
               placeholder="e.g. Flash Flooding in Lower Manhattan, NYC"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}
+              style={{ width: '100%', padding: '9px 12px', fontSize: '13px', borderRadius: '8px' }}
               required
             />
           </div>
 
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <label className="mono-label">Field Description *</label>
-              <span className="mono-label" style={{ color: 'var(--color-accent)', fontSize: '10px' }}>
-                NLP AUTO-GEOCODE
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)' }}>
+                Field Description *
+              </label>
+              <span style={{ fontSize: '11px', color: 'var(--color-forest)', fontWeight: 600 }}>
+                Location Auto-Resolved
               </span>
             </div>
             <textarea
               rows={3}
-              placeholder="Detail emergency conditions. Locations mentioned (e.g. Mumbai, Delhi, Miami, London) are automatically parsed into geo-coordinates."
+              placeholder="Detail emergency conditions. Mentioned cities/regions (e.g. Mumbai, Delhi, Miami, London) are automatically parsed into geo-coordinates."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              style={{ width: '100%', padding: '8px 12px', fontSize: '13px', lineHeight: 1.45, resize: 'vertical' }}
+              style={{ width: '100%', padding: '9px 12px', fontSize: '13px', lineHeight: 1.45, resize: 'vertical', borderRadius: '8px' }}
               required
             />
           </div>
 
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <label className="mono-label">Specific Location (Optional)</label>
-              <span className="mono-label" style={{ color: 'var(--color-muted)', fontSize: '10px' }}>
-                AUTO-RESOLVED IF BLANK
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)' }}>
+                Specific Location (Optional)
+              </label>
+              <span style={{ fontSize: '11px', color: 'var(--color-muted)' }}>
+                Auto-extracted if blank
               </span>
             </div>
             <input
               type="text"
-              placeholder="e.g. Mumbai, Maharashtra or Manhattan, NYC (Leave empty to auto-extract)"
+              placeholder="e.g. Mumbai, Maharashtra or Manhattan, NYC"
               value={formData.location_name}
               onChange={(e) => setFormData({ ...formData, location_name: e.target.value })}
-              style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}
+              style={{ width: '100%', padding: '9px 12px', fontSize: '13px', borderRadius: '8px' }}
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
-                Operational Triage
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)', marginBottom: '5px' }}>
+                Operational Status
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="mono-label"
-                style={{ width: '100%', padding: '8px 12px', fontSize: '11px', cursor: 'pointer' }}
+                style={{ width: '100%', padding: '9px 12px', fontSize: '12px', fontWeight: 600, borderRadius: '8px', backgroundColor: '#ffffff' }}
               >
-                <option value="active">CRITICAL / ACTIVE</option>
+                <option value="active">ACTIVE</option>
                 <option value="monitoring">MONITORING</option>
                 <option value="resolved">RESOLVED</option>
               </select>
             </div>
 
             <div>
-              <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
-                Classification Tags
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)', marginBottom: '5px' }}>
+                Tags
               </label>
               <input
                 type="text"
                 placeholder="flood, urgent, medical"
                 value={formData.tagsInput}
                 onChange={(e) => setFormData({ ...formData, tagsInput: e.target.value })}
-                style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}
+                style={{ width: '100%', padding: '9px 12px', fontSize: '13px', borderRadius: '8px' }}
               />
             </div>
           </div>
@@ -212,9 +231,9 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
           <div style={{
             display: 'flex',
             justifyContent: 'flex-end',
-            gap: '8px',
+            gap: '10px',
             marginTop: '8px',
-            paddingTop: '12px',
+            paddingTop: '16px',
             borderTop: '1px solid var(--color-rule)'
           }}>
             <button
@@ -227,9 +246,9 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting}
-              className="btn-cyan"
+              className="btn-forest"
             >
-              {submitting ? 'Saving Incident...' : 'Broadcast Incident Dossier →'}
+              {submitting ? 'Saving Incident...' : 'Broadcast Incident →'}
             </button>
           </div>
         </form>

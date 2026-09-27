@@ -1,67 +1,62 @@
 :root {
   /* ==========================================================================
-     Hallmark Theme · Aurora (16 / 21 — usehallmark.com)
-     Atmospheric Cool Blue-Green / Teal Canvas with Fixed Ambient Blooms
+     Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
+     Calm, elegant, quiet luxury aesthetic — high concentration, zero clutter
      ========================================================================== */
 
-  /* Base Paper Canvas — Deep Cool Blue-Green (Aurora) */
-  --color-paper: oklch(11% 0.024 195);          /* #030d11 */
-  --color-paper-surface: oklch(15% 0.030 195);  /* #07171e */
-  --color-paper-elevated: oklch(19% 0.035 195); /* #0c212a */
-  --color-paper-glass: oklch(15% 0.030 195 / 0.88);
+  /* Base Paper Canvas — Warm Linen / Cream */
+  --color-paper: #f4f3ee;
+  --color-paper-surface: #ffffff;
+  --color-paper-muted: #eae7de;
+  --color-paper-pill: #e6e3d8;
+  --color-paper-elevated: #faf9f6;
 
   /* Surface Aliases */
   --color-bg-base: var(--color-paper);
   --color-bg-surface: var(--color-paper-surface);
   --color-bg-elevated: var(--color-paper-elevated);
-  --color-bg-glass: var(--color-paper-glass);
 
-  /* Primary Accent: Brilliant Aurora Cyan / Teal (■ ATMOSPHERIC · COOL) */
-  --color-accent: oklch(80% 0.14 190);          /* #22d3ee */
-  --color-accent-subtle: oklch(80% 0.14 190 / 0.12);
-  --color-accent-border: oklch(80% 0.14 190 / 0.38);
+  /* Signature Forest Green Accent (matching "Kumar" & top bar in screenshot) */
+  --color-forest: #1b4332;
+  --color-forest-hover: #133325;
+  --color-forest-subtle: #e8f0eb;
+  --color-forest-border: #c2d6cb;
+  --color-accent: var(--color-forest);
 
-  /* Atmospheric Aurora Blooms */
-  --color-bloom-1: oklch(75% 0.15 185 / 0.14); /* right-middle cyan bloom */
-  --color-bloom-2: oklch(70% 0.14 175 / 0.09); /* bottom-left teal bloom */
-
-  /* Semantic Alerts Calibrated for Disaster Triage */
-  --color-critical: oklch(65% 0.22 25);         /* #ef4444 */
-  --color-critical-dim: oklch(65% 0.22 25 / 0.14);
-  --color-critical-border: oklch(65% 0.22 25 / 0.35);
-
-  --color-warning: oklch(78% 0.17 72);          /* #f59e0b */
-  --color-warning-dim: oklch(78% 0.17 72 / 0.14);
-  --color-warning-border: oklch(78% 0.17 72 / 0.35);
-
-  --color-success: oklch(75% 0.16 160);         /* #10b981 */
-  --color-success-dim: oklch(75% 0.16 160 / 0.14);
-  --color-success-border: oklch(75% 0.16 160 / 0.35);
-
-  --color-info: var(--color-accent);
-  --color-info-dim: var(--color-accent-subtle);
-  --color-info-border: var(--color-accent-border);
-
-  /* Hairlines & Rules */
-  --color-rule: oklch(26% 0.035 195);           /* #112b36 */
-  --color-rule-2: oklch(36% 0.045 195);         /* #1a3f4e */
-  --color-border: var(--color-rule);
-  --color-border-active: var(--color-rule-2);
-
-  /* Typography / Optical Inks */
-  --color-ink: oklch(98% 0.005 195);            /* #f0fdfa */
-  --color-ink-2: oklch(78% 0.015 195);          /* #99f6e4 / #94a3b8 */
-  --color-muted: oklch(58% 0.020 195);          /* #5eead4 / #64748b */
+  /* Deep Charcoal Typography */
+  --color-ink: #1a1a1a;
+  --color-ink-2: #3d4451;
+  --color-muted: #6b7280;
+  --color-faint: #9ca3af;
 
   --color-text-primary: var(--color-ink);
   --color-text-secondary: var(--color-ink-2);
   --color-text-muted: var(--color-muted);
 
-  /* Fonts: Pure Geometric Geist + JetBrains Mono */
-  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Semantic Alerts */
+  --color-critical: #b91c1c;
+  --color-critical-dim: #fef2f2;
+  --color-critical-border: #fecaca;
+
+  --color-warning: #b45309;
+  --color-warning-dim: #fffbeb;
+  --color-warning-border: #fde68a;
+
+  --color-success: #1b4332;
+  --color-success-dim: #e8f0eb;
+  --color-success-border: #c2d6cb;
+
+  /* Borders & Rules */
+  --color-rule: #e2dfd7;
+  --color-rule-2: #d6d2c4;
+  --color-border: var(--color-rule);
+  --color-border-active: var(--color-forest);
+
+  /* Typography: High-Contrast Editorial Serif + Clean Inter */
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: var(--font-sans);
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --font-label: var(--font-mono);
 
   /* Spacing Scale */
@@ -75,18 +70,19 @@
   --space-10: 40px;
 
   /* Structural Radii */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 16px;
+  --radius-modal: 20px;
   --radius-pill: 9999px;
 
-  /* Restrained Shadows */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.35);
-  --shadow-md: 0 4px 14px oklch(0% 0 0 / 0.45);
-  --shadow-lg: 0 14px 32px oklch(0% 0 0 / 0.55);
+  /* Subtle Natural Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.07);
 
-  /* Performance Transitions */
-  --transition-fast: 90ms ease;
-  --transition-normal: 140ms ease;
+  /* Zero Animation / Pure Stability */
+  --transition-fast: 0s;
+  --transition-normal: 0.1s ease;
 }

@@ -1,5 +1,5 @@
-/* Hallmark Theme: Aurora (usehallmark.com)
- * Disaster Operations Cockpit - High-Density Single-View Layout
+/* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
+ * Disaster Operations Dashboard
  */
 import React, { useEffect } from 'react';
 import { useDisasterStore } from '../store/disasterStore';
@@ -24,12 +24,12 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
   }, []);
 
   const handleDeleteDisaster = async (id) => {
-    if (!window.confirm('Confirm de-registration of this active incident record?')) return;
+    if (!window.confirm('Confirm deletion of this incident record?')) return;
     try {
       await api.disasters.delete(id);
       fetchDisasters();
     } catch (err) {
-      alert(`De-registration failed: ${err.message}`);
+      alert(`Deletion failed: ${err.message}`);
     }
   };
 
@@ -37,71 +37,88 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
 
   return (
     <div style={{
-      maxWidth: '1440px',
+      maxWidth: '1320px',
       margin: '0 auto',
       width: '100%',
-      padding: 'var(--space-6)'
+      padding: '24px 32px 48px'
     }}>
-      {/* Header Eyebrow & Platform Identification */}
-      <header style={{ marginBottom: 'var(--space-5)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <span className="eyebrow-square" />
-          <span className="mono-label" style={{ color: 'var(--color-accent)', letterSpacing: '0.12em' }}>
-            CRISIS OPERATIONS · REAL-TIME TRIAGE
-          </span>
+      {/* Editorial Header */}
+      <header style={{ marginBottom: '24px' }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '4px 14px',
+          borderRadius: 'var(--radius-pill)',
+          backgroundColor: 'var(--color-paper-pill)',
+          color: 'var(--color-forest)',
+          border: '1px solid var(--color-rule-2)',
+          fontSize: '11px',
+          fontWeight: 600,
+          letterSpacing: '0.05em',
+          marginBottom: '12px'
+        }}>
+          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-forest)' }} />
+          <span>INCIDENT OPERATIONS · DISPATCH CONSOLE</span>
         </div>
 
         <h1 style={{
-          fontSize: 'clamp(2rem, 3.8vw, 3rem)',
-          fontWeight: 700,
+          fontSize: 'clamp(2.4rem, 4vw, 3.4rem)',
+          fontWeight: 400,
+          letterSpacing: '-0.02em',
           color: 'var(--color-ink)',
           marginBottom: '6px'
         }}>
-          Disaster Response Coordination
+          Emergency Crisis <span style={{ fontStyle: 'italic', color: 'var(--color-forest)' }}>Operations</span>
         </h1>
 
         <p style={{
-          fontSize: '0.95rem',
+          fontSize: '1.02rem',
           color: 'var(--color-ink-2)',
-          maxWidth: '56ch',
-          lineHeight: 1.5
+          maxWidth: '65ch',
+          lineHeight: 1.6
         }}>
-          Real-time crisis telemetry, PostGIS spatial radar, and multi-agency emergency resource dispatch.
+          Real-time incident triage, PostGIS spatial radar mapping, and emergency relief resource dispatch.
         </p>
       </header>
 
-      {/* 01 · Instant Status Counters (Zero-Click Metric Visibility) */}
+      {/* 01 · Status Overview Counters */}
       <StatsBar disasters={disasters} />
 
-      {/* 02 · Main Operations Grid (Triage Cards 70% + Live Stream 30%) */}
+      {/* 02 · Main Grid (Incident Cards 70% + Live Feed 30%) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 340px',
-        gap: 'var(--space-5)',
+        gridTemplateColumns: 'minmax(0, 1fr) 360px',
+        gap: '24px',
         alignItems: 'start'
       }}>
         {/* Left: Search, Filters & Incident Cards */}
-        <section aria-label="Incident Triage Registry">
-          {/* Quick Filter Strip */}
+        <section aria-label="Incident Registry">
+          {/* Filter Bar */}
           <div
             className="aurora-card"
             style={{
-              padding: '12px 16px',
-              marginBottom: 'var(--space-4)',
+              padding: '16px 20px',
+              marginBottom: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              border: '1px solid var(--color-rule)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px'
+              gap: '12px',
+              boxShadow: 'var(--shadow-sm)'
             }}
           >
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <input
                 type="text"
-                placeholder="Search incidents by name, city, district, or keyword..."
+                placeholder="Search incidents by title, location, or keyword..."
                 value={filters.search}
                 onChange={(e) => setFilter('search', e.target.value)}
                 style={{
                   flex: 1,
-                  padding: '8px 12px',
+                  padding: '9px 14px',
+                  borderRadius: 'var(--radius-pill)',
                   fontSize: '13px'
                 }}
               />
@@ -109,15 +126,17 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
               <select
                 value={filters.status}
                 onChange={(e) => setFilter('status', e.target.value)}
-                className="mono-label"
                 style={{
-                  padding: '8px 12px',
-                  fontSize: '11px',
-                  cursor: 'pointer'
+                  padding: '9px 14px',
+                  borderRadius: 'var(--radius-pill)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  backgroundColor: '#ffffff'
                 }}
               >
                 <option value="">ALL STATUSES</option>
-                <option value="active">CRITICAL / ACTIVE</option>
+                <option value="active">ACTIVE</option>
                 <option value="monitoring">MONITORING</option>
                 <option value="resolved">RESOLVED</option>
               </select>
@@ -127,17 +146,17 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
                   type="button"
                   onClick={resetFilters}
                   className="btn-outline"
-                  style={{ fontSize: '11px', padding: '6px 12px' }}
+                  style={{ fontSize: '12px', padding: '7px 14px' }}
                 >
-                  RESET
+                  Reset
                 </button>
               )}
             </div>
 
-            {/* Quick Tag Category Pills */}
+            {/* Quick Category Tags */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-              <span className="mono-label" style={{ fontSize: '10px', color: 'var(--color-muted)' }}>
-                CATEGORY:
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-muted)', marginRight: '2px' }}>
+                CATEGORIES:
               </span>
               {quickTags.map((tag) => {
                 const isSelected = filters.tag.toLowerCase() === tag;
@@ -147,14 +166,13 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
                     type="button"
                     onClick={() => setFilter('tag', isSelected ? '' : tag)}
                     style={{
-                      padding: '2px 8px',
-                      borderRadius: 'var(--radius-xs)',
+                      padding: '3px 10px',
+                      borderRadius: 'var(--radius-pill)',
                       fontSize: '11px',
-                      fontFamily: 'var(--font-mono)',
-                      backgroundColor: isSelected ? 'var(--color-accent)' : 'var(--color-paper)',
-                      color: isSelected ? '#030d11' : 'var(--color-ink-2)',
-                      border: `1px solid ${isSelected ? 'var(--color-accent)' : 'var(--color-rule)'}`,
-                      fontWeight: isSelected ? 700 : 400,
+                      fontWeight: 600,
+                      backgroundColor: isSelected ? 'var(--color-forest)' : 'var(--color-paper-pill)',
+                      color: isSelected ? '#ffffff' : 'var(--color-forest)',
+                      border: `1px solid ${isSelected ? 'var(--color-forest)' : 'var(--color-rule-2)'}`,
                       cursor: 'pointer'
                     }}
                   >
@@ -169,19 +187,19 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
           {loading && disasters.length === 0 ? (
             <div style={{
               textAlign: 'center',
-              padding: 'var(--space-8)',
+              padding: '48px',
               color: 'var(--color-muted)',
-              fontSize: '13px'
+              fontSize: '14px'
             }}>
-              Loading crisis incident records...
+              Loading incident records...
             </div>
           ) : error ? (
             <div style={{
-              padding: '12px',
-              backgroundColor: 'var(--color-critical-dim)',
-              border: '1px solid var(--color-critical-border)',
-              borderRadius: 'var(--radius-xs)',
-              color: 'var(--color-critical)',
+              padding: '14px 18px',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: '10px',
+              color: '#b91c1c',
               fontSize: '13px'
             }}>
               {error}
@@ -189,21 +207,23 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
           ) : disasters.length === 0 ? (
             <div className="aurora-card" style={{
               textAlign: 'center',
-              padding: 'var(--space-8)',
-              color: 'var(--color-muted)'
+              padding: '48px',
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              border: '1px solid var(--color-rule)'
             }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '4px' }}>
+              <div style={{ fontSize: '1.2rem', fontFamily: 'var(--font-display)', color: 'var(--color-ink)', marginBottom: '4px' }}>
                 No Incidents Found
               </div>
-              <div style={{ fontSize: '12px' }}>
-                No active events match current filters. Log a new disaster or reset filters.
+              <div style={{ fontSize: '13px', color: 'var(--color-muted)' }}>
+                No active events match current filters.
               </div>
             </div>
           ) : (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
-              gap: 'var(--space-4)'
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gap: '18px'
             }}>
               {disasters.map((d) => (
                 <DisasterCard
@@ -217,8 +237,8 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
           )}
         </section>
 
-        {/* Right: Real-Time Stream (No navigation needed to view updates) */}
-        <section aria-label="Real-Time Telemetry Feed">
+        {/* Right: Live Broadcast Stream */}
+        <section aria-label="Real-Time Feed">
           <LiveFeed events={liveEvents} isConnected={isSocketConnected} />
         </section>
       </div>

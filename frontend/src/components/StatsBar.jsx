@@ -1,5 +1,5 @@
-/* Hallmark Theme: Aurora (usehallmark.com)
- * Disaster Management Instant Status Counters
+/* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
+ * Status Overview Counters
  */
 import React from 'react';
 
@@ -11,32 +11,36 @@ export default function StatsBar({ disasters = [] }) {
 
   const stats = [
     {
-      code: 'ACT-01',
-      label: 'ACTIVE INCIDENTS',
+      label: 'Active Incidents',
       value: active,
-      color: 'var(--color-critical)',
-      tag: 'IMMEDIATE ACTION'
+      color: '#b91c1c',
+      bg: '#fef2f2',
+      border: '#fecaca',
+      tag: 'Immediate Action'
     },
     {
-      code: 'MON-02',
-      label: 'UNDER SURVEILLANCE',
+      label: 'Under Surveillance',
       value: monitoring,
-      color: 'var(--color-warning)',
-      tag: 'ELEVATED RISK'
+      color: '#b45309',
+      bg: '#fffbeb',
+      border: '#fde68a',
+      tag: 'Monitoring'
     },
     {
-      code: 'RES-03',
-      label: 'RESOLVED / CONTAINED',
+      label: 'Resolved / Contained',
       value: resolved,
-      color: 'var(--color-success)',
-      tag: 'POST-HAZARD'
+      color: 'var(--color-forest)',
+      bg: 'var(--color-forest-subtle)',
+      border: 'var(--color-forest-border)',
+      tag: 'Contained'
     },
     {
-      code: 'TOT-04',
-      label: 'TOTAL TRACKED',
+      label: 'Total Incidents Tracked',
       value: total,
-      color: 'var(--color-accent)',
-      tag: 'POSTGIS REGISTRY'
+      color: 'var(--color-ink)',
+      bg: 'var(--color-paper-muted)',
+      border: 'var(--color-rule)',
+      tag: 'PostGIS Registry'
     }
   ];
 
@@ -45,40 +49,44 @@ export default function StatsBar({ disasters = [] }) {
       aria-label="Incident Overview"
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: 'var(--space-3)',
-        marginBottom: 'var(--space-5)'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '16px',
+        marginBottom: '24px'
       }}
     >
-      {stats.map((s) => (
+      {stats.map((s, idx) => (
         <div
-          key={s.code}
+          key={idx}
           className="aurora-card"
           style={{
-            padding: '14px 18px',
+            padding: '18px 22px',
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            border: '1px solid var(--color-rule)',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            boxShadow: 'var(--shadow-sm)'
           }}
         >
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '4px'
+            marginBottom: '6px'
           }}>
-            <span className="mono-label" style={{ color: 'var(--color-muted)', fontSize: '10px' }}>
-              <span className="eyebrow-square" style={{ backgroundColor: s.color }} />
-              {s.code}
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-muted)' }}>
+              {s.label}
             </span>
 
-            <span className="mono-label" style={{
-              fontSize: '9px',
-              padding: '1px 6px',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: 'var(--color-paper)',
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-pill)',
+              backgroundColor: s.bg,
               color: s.color,
-              border: '1px solid var(--color-rule)'
+              border: `1px solid ${s.border}`
             }}>
               {s.tag}
             </span>
@@ -88,19 +96,14 @@ export default function StatsBar({ disasters = [] }) {
             className="tnum"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '2.4rem',
-              fontWeight: 700,
-              lineHeight: 1,
+              fontSize: '2.8rem',
+              fontWeight: 400,
+              lineHeight: 1.05,
               color: s.color,
-              letterSpacing: '-0.03em',
               margin: '6px 0 2px'
             }}
           >
             {s.value.toString().padStart(2, '0')}
-          </div>
-
-          <div className="mono-label" style={{ color: 'var(--color-ink-2)', fontSize: '11px' }}>
-            {s.label}
           </div>
         </div>
       ))}

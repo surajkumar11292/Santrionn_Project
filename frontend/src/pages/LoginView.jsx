@@ -1,5 +1,5 @@
-/* Hallmark Theme: Aurora (16 / 21 — usehallmark.com)
- * Disaster Response Operations Portal - Sign In
+/* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
+ * Clean Editorial Sign In Portal
  */
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
@@ -27,166 +27,182 @@ export default function LoginView() {
       width: '100%',
       backgroundColor: 'var(--color-paper)',
       display: 'flex',
-      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 'var(--space-6)',
+      padding: '40px 24px',
       position: 'relative'
     }}>
-      {/* Top Left Hallmark Eyebrow & Brand */}
+      {/* Background Watermark Initials (matching "S.K" outline watermark in screenshot) */}
       <div style={{
         position: 'absolute',
-        top: '20px',
-        left: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px'
+        top: '40px',
+        right: '60px',
+        fontFamily: 'var(--font-display)',
+        fontSize: 'clamp(8rem, 16vw, 15rem)',
+        fontWeight: 400,
+        color: 'transparent',
+        WebkitTextStroke: '1px rgba(27, 67, 50, 0.08)',
+        userSelect: 'none',
+        pointerEvents: 'none',
+        lineHeight: 1
       }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '1rem',
-          fontWeight: 700,
-          color: 'var(--color-ink)'
-        }}>
-          <span style={{ color: 'var(--color-accent)' }}>/</span> disaster response
-        </span>
-        <span className="mono-label" style={{ color: 'var(--color-muted)', fontSize: '10px' }}>
-          v1.1 · AURORA
-        </span>
+        D.R
       </div>
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: 'var(--space-10)',
-        maxWidth: '920px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '56px',
+        maxWidth: '1060px',
         width: '100%',
-        alignItems: 'center'
+        alignItems: 'center',
+        zIndex: 1
       }}>
-        {/* Left Side: Authentic Disaster Response Headline (Aurora Style) */}
+        {/* Left Column: Editorial Portfolio Style Layout */}
         <div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: 'var(--space-3)'
-          }}>
-            <span className="eyebrow-square" />
-            <span className="mono-label" style={{ color: 'var(--color-accent)', letterSpacing: '0.12em' }}>
-              CRISIS DISPATCH · ACTIVE
-            </span>
-          </div>
-
-          <h1 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
-            fontWeight: 700,
-            lineHeight: 1.08,
-            letterSpacing: '-0.03em',
-            color: 'var(--color-ink)',
-            marginBottom: 'var(--space-4)'
-          }}>
-            Emergency Crisis<br />Management
-          </h1>
-
-          <p style={{
-            fontSize: '1rem',
-            color: 'var(--color-ink-2)',
-            maxWidth: '38ch',
-            marginBottom: 'var(--space-6)',
-            lineHeight: 1.55
-          }}>
-            Unified dispatch console for emergency incident triage, real-time WebSocket incident packets, and PostGIS spatial coordination.
-          </p>
-
+          {/* Pill Badge (matching • FULL-STACK ENGINEER in screenshot) */}
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '16px',
-            padding: '10px 16px',
-            backgroundColor: 'var(--color-paper-surface)',
-            border: '1px solid var(--color-rule)',
-            borderRadius: 'var(--radius-xs)'
+            gap: '8px',
+            padding: '5px 16px',
+            borderRadius: 'var(--radius-pill)',
+            backgroundColor: 'var(--color-paper-pill)',
+            border: '1px solid var(--color-rule-2)',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            color: 'var(--color-forest)',
+            marginBottom: '24px'
           }}>
-            <div>
-              <div className="mono-label" style={{ fontSize: '10px', color: 'var(--color-muted)' }}>
-                LATENCY
-              </div>
-              <div className="tnum" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-accent)' }}>
-                18 MS
-              </div>
-            </div>
-            <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-rule)' }} />
-            <div>
-              <div className="mono-label" style={{ fontSize: '10px', color: 'var(--color-muted)' }}>
-                SECURITY
-              </div>
-              <div className="tnum" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)' }}>
-                LEVEL 4 RBAC
-              </div>
-            </div>
-            <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-rule)' }} />
-            <div>
-              <div className="mono-label" style={{ fontSize: '10px', color: 'var(--color-muted)' }}>
-                DATABASE
-              </div>
-              <div className="tnum" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-success)' }}>
-                POSTGIS LIVE
-              </div>
-            </div>
+            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-forest)' }} />
+            <span>DISASTER OPERATIONS · POSTGIS REGISTRY · LIVE DISPATCH</span>
           </div>
+
+          {/* Heading (Disaster in Serif, Response in Forest Green Italic Serif) */}
+          <h1 style={{
+            fontSize: 'clamp(3rem, 6vw, 4.8rem)',
+            lineHeight: 1.05,
+            letterSpacing: '-0.025em',
+            marginBottom: '8px'
+          }}>
+            <span style={{ color: 'var(--color-ink)', display: 'block' }}>Disaster</span>
+            <span style={{
+              fontStyle: 'italic',
+              color: 'var(--color-forest)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              Response
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '20px',
+                height: '20px',
+                borderRadius: '50%',
+                border: '1px solid var(--color-forest)',
+                fontSize: '10px',
+                color: 'var(--color-forest)'
+              }}>
+                ⊙
+              </span>
+            </span>
+          </h1>
+
+          {/* Subtitle with em-dash (matching "— System Design Enthusiast |" in screenshot) */}
+          <div style={{
+            fontSize: '1.2rem',
+            fontStyle: 'italic',
+            fontFamily: 'var(--font-display)',
+            color: 'var(--color-ink-2)',
+            marginBottom: '24px'
+          }}>
+            — Incident Triage & Emergency Resource Dispatch |
+          </div>
+
+          {/* Body Paragraph with highlighted keywords */}
+          <p style={{
+            fontSize: '1.02rem',
+            color: 'var(--color-ink-2)',
+            maxWidth: '46ch',
+            lineHeight: 1.65,
+            marginBottom: '28px'
+          }}>
+            Production disaster management console with <strong style={{ color: 'var(--color-forest)' }}>real-time socket telemetry</strong>, <strong style={{ color: 'var(--color-forest)' }}>PostGIS spatial radius queries</strong>, and <strong style={{ color: 'var(--color-forest)' }}>verified resource dispatch</strong>. Clean, focused, reliable.
+          </p>
         </div>
 
-        {/* Right Side: Aurora Access Card */}
-        <div className="aurora-card" style={{ padding: 'var(--space-6)', width: '100%' }}>
-          <header style={{ marginBottom: 'var(--space-5)' }}>
-            <div className="mono-label" style={{ color: 'var(--color-accent)', marginBottom: '4px' }}>
+        {/* Right Column: Clean White Access Card */}
+        <div className="aurora-card" style={{
+          padding: '36px',
+          width: '100%',
+          backgroundColor: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid var(--color-rule)',
+          boxShadow: 'var(--shadow-md)'
+        }}>
+          <header style={{ marginBottom: '24px' }}>
+            <div style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--color-muted)',
+              letterSpacing: '0.05em',
+              marginBottom: '4px'
+            }}>
               OPERATOR ACCESS
             </div>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 600, color: 'var(--color-ink)' }}>
-              Sign In to Command Console
+            <h2 style={{
+              fontSize: '1.6rem',
+              fontWeight: 400,
+              fontFamily: 'var(--font-display)',
+              color: 'var(--color-ink)'
+            }}>
+              Sign in to Console
             </h2>
           </header>
 
           {error && (
             <div style={{
-              padding: '8px 12px',
-              backgroundColor: 'var(--color-critical-dim)',
-              border: '1px solid var(--color-critical-border)',
-              borderRadius: 'var(--radius-xs)',
-              color: 'var(--color-critical)',
-              fontSize: '12px',
-              marginBottom: 'var(--space-4)'
+              padding: '10px 14px',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: '8px',
+              color: '#b91c1c',
+              fontSize: '13px',
+              marginBottom: '18px'
             }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
-              <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
-                Operator Identity (Email)
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)', marginBottom: '5px' }}>
+                Operator Email
               </label>
               <input
                 type="email"
                 placeholder="admin@relief.io"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', fontSize: '13px' }}
+                style={{ width: '100%', padding: '10px 14px', fontSize: '13.5px', borderRadius: '8px' }}
                 required
               />
             </div>
 
             <div>
-              <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
-                Security Passkey
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-muted)', marginBottom: '5px' }}>
+                Password
               </label>
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', fontSize: '13px', fontFamily: 'var(--font-mono)' }}
+                style={{ width: '100%', padding: '10px 14px', fontSize: '13.5px', borderRadius: '8px' }}
                 required
               />
             </div>
@@ -194,50 +210,93 @@ export default function LoginView() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-cyan"
-              style={{ width: '100%', padding: '10px 16px', marginTop: 'var(--space-2)' }}
+              className="btn-forest"
+              style={{
+                width: '100%',
+                padding: '11px 18px',
+                marginTop: '6px',
+                fontSize: '14px',
+                fontWeight: 600
+              }}
             >
-              {loading ? 'Verifying Credentials...' : 'Enter Operations Console →'}
+              {loading ? 'Verifying...' : 'Sign In →'}
             </button>
           </form>
 
-          {/* 1-Click Role Presets */}
+          {/* Quick Clearance Presets */}
           <div style={{
-            marginTop: 'var(--space-5)',
-            paddingTop: 'var(--space-4)',
+            marginTop: '24px',
+            paddingTop: '20px',
             borderTop: '1px solid var(--color-rule)'
           }}>
-            <div className="mono-label" style={{ color: 'var(--color-muted)', marginBottom: '8px', fontSize: '10px' }}>
-              1-CLICK CLEARANCE PRESETS
+            <div style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              fontFamily: 'var(--font-sans)',
+              color: 'var(--color-muted)',
+              marginBottom: '10px',
+              textAlign: 'center',
+              letterSpacing: '0.04em'
+            }}>
+              QUICK CLEARANCE PRESETS
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
               <button
                 type="button"
                 onClick={() => handleSelectPreset('admin@relief.io', 'admin123')}
-                className="btn-outline"
-                style={{ fontSize: '11px', padding: '6px 4px', flexDirection: 'column', gap: '2px' }}
+                style={{
+                  padding: '8px 6px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--color-rule-2)',
+                  backgroundColor: 'var(--color-paper)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
+                  cursor: 'pointer'
+                }}
               >
-                <span style={{ color: 'var(--color-critical)', fontWeight: 700 }}>👑 ADMIN</span>
-                <span style={{ fontSize: '9px', color: 'var(--color-muted)' }}>Full Clearance</span>
+                <span style={{ color: '#b91c1c', fontWeight: 700, fontSize: '11.5px' }}>ADMIN</span>
+                <span style={{ fontSize: '10px', color: 'var(--color-muted)' }}>Full Access</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => handleSelectPreset('contrib@relief.io', 'contrib123')}
-                className="btn-outline"
-                style={{ fontSize: '11px', padding: '6px 4px', flexDirection: 'column', gap: '2px' }}
+                style={{
+                  padding: '8px 6px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--color-rule-2)',
+                  backgroundColor: 'var(--color-paper)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
+                  cursor: 'pointer'
+                }}
               >
-                <span style={{ color: 'var(--color-warning)', fontWeight: 700 }}>🛡️ CONTRIB</span>
-                <span style={{ fontSize: '9px', color: 'var(--color-muted)' }}>First Responder</span>
+                <span style={{ color: '#b45309', fontWeight: 700, fontSize: '11.5px' }}>CONTRIB</span>
+                <span style={{ fontSize: '10px', color: 'var(--color-muted)' }}>Responder</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => handleSelectPreset('viewer@relief.io', 'viewer123')}
-                className="btn-outline"
-                style={{ fontSize: '11px', padding: '6px 4px', flexDirection: 'column', gap: '2px' }}
+                style={{
+                  padding: '8px 6px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--color-rule-2)',
+                  backgroundColor: 'var(--color-paper)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
+                  cursor: 'pointer'
+                }}
               >
-                <span style={{ color: 'var(--color-accent)', fontWeight: 700 }}>👁️ VIEWER</span>
-                <span style={{ fontSize: '9px', color: 'var(--color-muted)' }}>Auditor Intel</span>
+                <span style={{ color: 'var(--color-forest)', fontWeight: 700, fontSize: '11.5px' }}>VIEWER</span>
+                <span style={{ fontSize: '10px', color: 'var(--color-muted)' }}>Auditor</span>
               </button>
             </div>
           </div>

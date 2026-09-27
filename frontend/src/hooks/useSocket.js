@@ -9,10 +9,21 @@ export function useSocket() {
   const [socketId, setSocketId] = useState(null);
   const [liveEvents, setLiveEvents] = useState([]);
   const socketRef = useRef(null);
+  const recentKeysRef = useRef(new Set());
 
   const { onDisasterCreated, onDisasterUpdated, onDisasterDeleted } = useDisasterStore();
 
   const addLiveEvent = useCallback((eventData) => {
+    // Client-side deduplication key: prevent identical events within 3 seconds
+    const dedupKey = `${eventData.type}:${eventData.title}:${eventData.detail}`;
+    if (recentKeysRef.current.has(dedupKey)) {
+      return;
+    }
+    recentKeysRef.current.add(dedupKey);
+    setTimeout(() => {
+      recentKeysRef.current.delete(dedupKey);
+    }, 3000);
+
     setLiveEvents((prev) => [
       {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
@@ -99,6 +110,21 @@ export function useSocket() {
         detail: data?.report?.content || 'Incoming crisis intelligence',
         level: data?.report?.priority === 'critical' ? 'critical' : 'info',
         data: data?.report
+      });
+    });
+
+    socket.on('official_update', (data) => {
+      const update = data?.update;
+      const detailText = update?.headline
+        ? `${update.headline} — ${update.body || ''}`
+        : (update?.body || update?.message || 'Emergency broadcast bulletin');
+
+      addLiveEvent({
+        type: 'official_update',
+        title: `Official Bulletin: ${update?.agency || 'Emergency Agency'}`,
+        detail: detailText,
+        level: (update?.severity === 'critical' || update?.severity === 'evacuation') ? 'critical' : 'warning',
+        data: update
       });
     });
 

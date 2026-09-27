@@ -1,13 +1,14 @@
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
 import React, { useState } from 'react';
 import { useAuthStore } from './store/authStore';
 import { useSocket } from './hooks/useSocket';
+import { useDisasterStore } from './store/disasterStore';
 import Navbar from './components/Navbar';
+import LoginView from './pages/LoginView';
 import DashboardView from './pages/DashboardView';
 import MapView from './pages/MapView';
-import LoginView from './pages/LoginView';
 import DisasterDetailModal from './components/DisasterDetailModal';
 import CreateDisasterModal from './components/CreateDisasterModal';
-import { useDisasterStore } from './store/disasterStore';
 
 export default function App() {
   const { isAuthenticated } = useAuthStore();
@@ -18,14 +19,20 @@ export default function App() {
   const { connected, liveEvents, joinDisasterRoom, leaveDisasterRoom } = useSocket();
   const { fetchDisasters } = useDisasterStore();
 
-  // If not authenticated, show modern dark command login screen
+  // If unauthenticated, present the Hallmark Access Console
   if (!isAuthenticated) {
     return <LoginView />;
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-bg-base)' }}>
-      {/* Top Operations Navbar */}
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: 'var(--color-paper)',
+      color: 'var(--color-text-primary)'
+    }}>
+      {/* Hallmark Command Console Shell Navigation */}
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -33,7 +40,7 @@ export default function App() {
         isSocketConnected={connected}
       />
 
-      {/* Main View Area */}
+      {/* Main Operations Views */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {currentView === 'dashboard' ? (
           <DashboardView
@@ -46,7 +53,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Detail Drilldown Modal */}
+      {/* 04 · Deep Incident Intel Dossier Modal */}
       {selectedDisaster && (
         <DisasterDetailModal
           disaster={selectedDisaster}
@@ -56,13 +63,11 @@ export default function App() {
         />
       )}
 
-      {/* Create Disaster Modal */}
+      {/* 05 · Incident Registration Modal */}
       {isCreateModalOpen && (
         <CreateDisasterModal
           onClose={() => setIsCreateModalOpen(false)}
-          onSuccess={() => {
-            fetchDisasters();
-          }}
+          onSuccess={() => fetchDisasters()}
         />
       )}
     </div>

@@ -10,9 +10,10 @@ DESIGN.md
 **/PRODUCT.md
 **/DESIGN.md
 .agent/
+.agents/
 .claude/
 .gemini/
-.impeccable/
+skills-lock.json
 
 # Environment Variables
 .env

@@ -1,34 +1,70 @@
 :root {
-  /* Core Palette - Dark Operate Mode */
-  --color-bg-base: #070d1a;
-  --color-bg-surface: #0e1628;
-  --color-bg-elevated: #162035;
-  --color-bg-glass: rgba(14, 22, 40, 0.75);
+  /* ==========================================================================
+     Hallmark Theme · Aurora (16 / 21 — usehallmark.com)
+     Atmospheric Cool Blue-Green / Teal Canvas with Fixed Ambient Blooms
+     ========================================================================== */
 
-  /* Semantic State Colors */
-  --color-critical: #ef4444;
-  --color-critical-dim: rgba(239, 68, 68, 0.15);
-  --color-warning: #f59e0b;
-  --color-warning-dim: rgba(245, 158, 11, 0.15);
-  --color-success: #10b981;
-  --color-success-dim: rgba(16, 185, 129, 0.15);
-  --color-info: #3b82f6;
-  --color-info-dim: rgba(59, 130, 246, 0.15);
+  /* Base Paper Canvas — Deep Cool Blue-Green (Aurora) */
+  --color-paper: oklch(11% 0.024 195);          /* #030d11 */
+  --color-paper-surface: oklch(15% 0.030 195);  /* #07171e */
+  --color-paper-elevated: oklch(19% 0.035 195); /* #0c212a */
+  --color-paper-glass: oklch(15% 0.030 195 / 0.88);
 
-  /* Typography Colors */
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #475569;
+  /* Surface Aliases */
+  --color-bg-base: var(--color-paper);
+  --color-bg-surface: var(--color-paper-surface);
+  --color-bg-elevated: var(--color-paper-elevated);
+  --color-bg-glass: var(--color-paper-glass);
 
-  /* Borders & Dividers */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-active: rgba(255, 255, 255, 0.18);
+  /* Primary Accent: Brilliant Aurora Cyan / Teal (■ ATMOSPHERIC · COOL) */
+  --color-accent: oklch(80% 0.14 190);          /* #22d3ee */
+  --color-accent-subtle: oklch(80% 0.14 190 / 0.12);
+  --color-accent-border: oklch(80% 0.14 190 / 0.38);
 
-  /* Typography Families */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Atmospheric Aurora Blooms */
+  --color-bloom-1: oklch(75% 0.15 185 / 0.14); /* right-middle cyan bloom */
+  --color-bloom-2: oklch(70% 0.14 175 / 0.09); /* bottom-left teal bloom */
 
-  /* Spacing Scale (4px base) */
+  /* Semantic Alerts Calibrated for Disaster Triage */
+  --color-critical: oklch(65% 0.22 25);         /* #ef4444 */
+  --color-critical-dim: oklch(65% 0.22 25 / 0.14);
+  --color-critical-border: oklch(65% 0.22 25 / 0.35);
+
+  --color-warning: oklch(78% 0.17 72);          /* #f59e0b */
+  --color-warning-dim: oklch(78% 0.17 72 / 0.14);
+  --color-warning-border: oklch(78% 0.17 72 / 0.35);
+
+  --color-success: oklch(75% 0.16 160);         /* #10b981 */
+  --color-success-dim: oklch(75% 0.16 160 / 0.14);
+  --color-success-border: oklch(75% 0.16 160 / 0.35);
+
+  --color-info: var(--color-accent);
+  --color-info-dim: var(--color-accent-subtle);
+  --color-info-border: var(--color-accent-border);
+
+  /* Hairlines & Rules */
+  --color-rule: oklch(26% 0.035 195);           /* #112b36 */
+  --color-rule-2: oklch(36% 0.045 195);         /* #1a3f4e */
+  --color-border: var(--color-rule);
+  --color-border-active: var(--color-rule-2);
+
+  /* Typography / Optical Inks */
+  --color-ink: oklch(98% 0.005 195);            /* #f0fdfa */
+  --color-ink-2: oklch(78% 0.015 195);          /* #99f6e4 / #94a3b8 */
+  --color-muted: oklch(58% 0.020 195);          /* #5eead4 / #64748b */
+
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: var(--color-ink-2);
+  --color-text-muted: var(--color-muted);
+
+  /* Fonts: Pure Geometric Geist + JetBrains Mono */
+  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: var(--font-sans);
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-label: var(--font-mono);
+
+  /* Spacing Scale */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -37,23 +73,20 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-10: 40px;
-  --space-12: 48px;
 
-  /* Radii */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
+  /* Structural Radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 9999px;
 
-  /* Shadows & Glass Elevation */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
-  --shadow-glow-critical: 0 0 20px rgba(239, 68, 68, 0.3);
-  --shadow-glow-info: 0 0 20px rgba(59, 130, 246, 0.3);
+  /* Restrained Shadows */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.35);
+  --shadow-md: 0 4px 14px oklch(0% 0 0 / 0.45);
+  --shadow-lg: 0 14px 32px oklch(0% 0 0 / 0.55);
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Performance Transitions */
+  --transition-fast: 90ms ease;
+  --transition-normal: 140ms ease;
 }

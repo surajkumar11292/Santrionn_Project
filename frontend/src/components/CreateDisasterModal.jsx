@@ -1,3 +1,6 @@
+/* Hallmark Theme: Aurora (usehallmark.com)
+ * Disaster Incident Registration Modal
+ */
 import React, { useState } from 'react';
 import { api } from '../api/client';
 
@@ -17,7 +20,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.description) {
-      setError('Title and description are required.');
+      setError('Title and description are required for incident registration.');
       return;
     }
 
@@ -27,7 +30,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
     try {
       const tags = formData.tagsInput
         .split(',')
-        .map((t) => t.trim())
+        .map((t) => t.trim().toLowerCase())
         .filter(Boolean);
 
       const payload = {
@@ -45,158 +48,163 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
       onSuccess?.(response.data);
       onClose();
     } catch (err) {
-      setError(err.message || 'Failed to submit disaster incident');
+      setError(err.message || 'Failed to dispatch disaster incident');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(7, 13, 26, 0.85)',
-      backdropFilter: 'blur(8px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000,
-      padding: 'var(--space-4)'
-    }}
-    onClick={onClose}>
-      <div style={{
-        background: 'var(--color-bg-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-xl)',
-        maxWidth: '580px',
-        width: '100%',
-        padding: 'var(--space-6)',
-        boxShadow: 'var(--shadow-lg)'
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(3, 13, 17, 0.75)',
+        backdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 2000,
+        padding: '16px'
       }}
-      onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-            🚨 Report New Disaster Incident
-          </h2>
+      onClick={onClose}
+    >
+      <div
+        className="aurora-card"
+        style={{
+          maxWidth: '540px',
+          width: '100%',
+          padding: '24px'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '16px',
+          borderBottom: '1px solid var(--color-rule)',
+          paddingBottom: '12px'
+        }}>
+          <div>
+            <div className="mono-label" style={{ color: 'var(--color-accent)', marginBottom: '3px', fontSize: '10px' }}>
+              <span className="eyebrow-square" />
+              INCIDENT REGISTRATION
+            </div>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-ink)' }}>
+              Log Disaster Incident Dossier
+            </h2>
+          </div>
+
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close"
+            className="mono-label"
             style={{
               padding: '4px 8px',
-              borderRadius: 'var(--radius-sm)',
-              color: 'var(--color-text-muted)',
-              background: 'var(--color-bg-base)',
-              border: '1px solid var(--color-border)'
+              borderRadius: 'var(--radius-xs)',
+              color: 'var(--color-muted)',
+              border: '1px solid var(--color-rule)',
+              backgroundColor: 'transparent'
             }}
           >
-            ✕
+            ✕ ESC
           </button>
         </div>
 
         {error && (
           <div style={{
-            padding: 'var(--space-3)',
-            background: 'var(--color-critical-dim)',
-            border: '1px solid rgba(239, 68, 68, 0.4)',
-            borderRadius: 'var(--radius-sm)',
+            padding: '8px 12px',
+            backgroundColor: 'var(--color-critical-dim)',
+            border: '1px solid var(--color-critical-border)',
+            borderRadius: 'var(--radius-xs)',
             color: 'var(--color-critical)',
-            fontSize: '0.85rem',
-            marginBottom: 'var(--space-4)'
+            fontSize: '12px',
+            marginBottom: '12px'
           }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
+            <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
               Incident Title *
             </label>
             <input
               type="text"
-              placeholder="e.g. Severe Flash Flooding in Manhattan, NYC"
+              placeholder="e.g. Flash Flooding in Lower Manhattan, NYC"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                background: 'var(--color-bg-base)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'white',
-                fontSize: '0.9rem'
-              }}
+              style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}
               required
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-              Incident Description *
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <label className="mono-label">Field Description *</label>
+              <span className="mono-label" style={{ color: 'var(--color-accent)', fontSize: '10px' }}>
+                NLP AUTO-GEOCODE
+              </span>
+            </div>
             <textarea
               rows={3}
-              placeholder="Describe the crisis. Mentioning recognized cities (e.g. Miami, Manhattan, NYC, Los Angeles) will automatically resolve coordinates via NLP geocoding engine!"
+              placeholder="Detail emergency conditions. Locations mentioned (e.g. Mumbai, Delhi, Miami, London) are automatically parsed into geo-coordinates."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                background: 'var(--color-bg-base)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'white',
-                fontSize: '0.875rem',
-                resize: 'vertical'
-              }}
+              style={{ width: '100%', padding: '8px 12px', fontSize: '13px', lineHeight: 1.45, resize: 'vertical' }}
               required
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <label className="mono-label">Specific Location (Optional)</label>
+              <span className="mono-label" style={{ color: 'var(--color-muted)', fontSize: '10px' }}>
+                AUTO-RESOLVED IF BLANK
+              </span>
+            </div>
+            <input
+              type="text"
+              placeholder="e.g. Mumbai, Maharashtra or Manhattan, NYC (Leave empty to auto-extract)"
+              value={formData.location_name}
+              onChange={(e) => setFormData({ ...formData, location_name: e.target.value })}
+              style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                Operational Status
+              <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
+                Operational Triage
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  background: 'var(--color-bg-base)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  fontSize: '0.85rem'
-                }}
+                className="mono-label"
+                style={{ width: '100%', padding: '8px 12px', fontSize: '11px', cursor: 'pointer' }}
               >
-                <option value="active">Active (Immediate Danger)</option>
-                <option value="monitoring">Monitoring</option>
-                <option value="resolved">Resolved</option>
+                <option value="active">CRITICAL / ACTIVE</option>
+                <option value="monitoring">MONITORING</option>
+                <option value="resolved">RESOLVED</option>
               </select>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-                Tags (Comma-Separated)
+              <label className="mono-label" style={{ display: 'block', marginBottom: '4px' }}>
+                Classification Tags
               </label>
               <input
                 type="text"
-                placeholder="flood, hurricane, evacuation"
+                placeholder="flood, urgent, medical"
                 value={formData.tagsInput}
                 onChange={(e) => setFormData({ ...formData, tagsInput: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  background: 'var(--color-bg-base)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  fontSize: '0.85rem'
-                }}
+                style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}
               />
             </div>
           </div>
@@ -204,37 +212,24 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
           <div style={{
             display: 'flex',
             justifyContent: 'flex-end',
-            gap: 'var(--space-3)',
-            marginTop: 'var(--space-2)'
+            gap: '8px',
+            marginTop: '8px',
+            paddingTop: '12px',
+            borderTop: '1px solid var(--color-rule)'
           }}>
             <button
               type="button"
               onClick={onClose}
-              style={{
-                padding: '8px 16px',
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--color-text-secondary)',
-                background: 'transparent',
-                border: '1px solid var(--color-border)',
-                fontSize: '0.85rem'
-              }}
+              className="btn-outline"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              style={{
-                padding: '8px 20px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                color: 'white',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                boxShadow: 'var(--shadow-glow-critical)'
-              }}
+              className="btn-cyan"
             >
-              {submitting ? 'Broadcasting...' : 'Broadcast Disaster Incident'}
+              {submitting ? 'Saving Incident...' : 'Broadcast Incident Dossier →'}
             </button>
           </div>
         </form>

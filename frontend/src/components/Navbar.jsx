@@ -1,21 +1,11 @@
+/* Hallmark Theme: Aurora (16 / 21 — usehallmark.com)
+ * Disaster Response Operations Shell
+ */
 import React from 'react';
 import { useAuthStore } from '../store/authStore';
 
 export default function Navbar({ currentView, setCurrentView, onOpenCreateModal, isSocketConnected }) {
   const { user, logout } = useAuthStore();
-
-  const getRoleBadgeStyle = (role) => {
-    switch (role) {
-      case 'admin':
-        return { bg: 'rgba(239, 68, 68, 0.2)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.4)' };
-      case 'contributor':
-        return { bg: 'rgba(245, 158, 11, 0.2)', text: '#f59e0b', border: 'rgba(245, 158, 11, 0.4)' };
-      default:
-        return { bg: 'rgba(59, 130, 246, 0.2)', text: '#3b82f6', border: 'rgba(59, 130, 246, 0.4)' };
-    }
-  };
-
-  const roleStyle = getRoleBadgeStyle(user?.role);
   const canCreate = user?.role === 'admin' || user?.role === 'contributor';
 
   return (
@@ -23,185 +13,158 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: 'var(--space-3) var(--space-6)',
-      background: 'var(--color-bg-surface)',
-      borderBottom: '1px solid var(--color-border)',
+      padding: '8px 18px',
+      backgroundColor: 'var(--color-paper-surface)',
+      borderBottom: '1px solid var(--color-rule)',
       position: 'sticky',
       top: 0,
-      zIndex: 1000,
-      backdropFilter: 'blur(12px)'
+      zIndex: 1000
     }}>
-      {/* Brand Identity & Live Stream Indicator */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+      {/* Brand & Disaster Management Identity */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{
-            fontSize: '1.25rem',
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
-            background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            fontFamily: 'var(--font-mono)',
+            fontSize: '1rem',
+            fontWeight: 700,
+            color: 'var(--color-ink)',
+            letterSpacing: '-0.02em',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            RELIEF.IO
+            <span style={{ color: 'var(--color-accent)' }}>/</span> disaster response
           </span>
-          <span style={{
-            fontSize: '0.75rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            color: 'var(--color-text-muted)',
-            fontWeight: 600,
-            borderLeft: '1px solid var(--color-border)',
-            paddingLeft: 'var(--space-2)'
-          }}>
-            Crisis Command
+
+          <span className="mono-label" style={{ color: 'var(--color-muted)', fontSize: '10px' }}>
+            v1.1
           </span>
         </div>
 
-        {/* Live WebSocket Pulse */}
+        {/* Live WebSocket Telemetry Status */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '6px',
-          padding: '3px 10px',
-          borderRadius: 'var(--radius-full)',
-          background: isSocketConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-          border: `1px solid ${isSocketConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: isSocketConnected ? 'var(--color-success)' : 'var(--color-critical)'
+          gap: '5px',
+          padding: '2px 8px',
+          borderRadius: 'var(--radius-xs)',
+          backgroundColor: isSocketConnected ? 'var(--color-success-dim)' : 'var(--color-critical-dim)',
+          border: `1px solid ${isSocketConnected ? 'var(--color-success-border)' : 'var(--color-critical-border)'}`
         }}>
           <span style={{
-            width: '7px',
-            height: '7px',
+            width: '5px',
+            height: '5px',
             borderRadius: '50%',
-            backgroundColor: isSocketConnected ? 'var(--color-success)' : 'var(--color-critical)',
-            boxShadow: isSocketConnected ? '0 0 8px #10b981' : 'none',
-            display: 'inline-block'
-          }}></span>
-          {isSocketConnected ? 'LIVE FEED' : 'DISCONNECTED'}
+            backgroundColor: isSocketConnected ? 'var(--color-success)' : 'var(--color-critical)'
+          }} />
+          <span className="mono-label" style={{
+            fontSize: '9.5px',
+            color: isSocketConnected ? 'var(--color-success)' : 'var(--color-critical)'
+          }}>
+            {isSocketConnected ? 'LIVE FEED ACTIVE' : 'OFFLINE'}
+          </span>
         </div>
       </div>
 
-      {/* Navigation View Switcher */}
-      <nav style={{ display: 'flex', gap: 'var(--space-2)' }}>
+      {/* Direct View Navigation (Zero click bloat) */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
         <button
-          onClick={() => setCurrentView('dashboard')}
+          type="button"
+          onClick={() => setCurrentView && setCurrentView('dashboard')}
+          className="mono-label"
           style={{
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            background: currentView === 'dashboard' ? 'var(--color-bg-elevated)' : 'transparent',
-            color: currentView === 'dashboard' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-            border: currentView === 'dashboard' ? '1px solid var(--color-border-active)' : '1px solid transparent',
-            transition: 'all var(--transition-fast)'
+            padding: '5px 14px',
+            borderRadius: 'var(--radius-xs)',
+            fontSize: '11px',
+            color: currentView === 'dashboard' ? 'var(--color-ink)' : 'var(--color-muted)',
+            backgroundColor: currentView === 'dashboard' ? 'var(--color-paper-elevated)' : 'transparent',
+            border: currentView === 'dashboard' ? '1px solid var(--color-rule-2)' : '1px solid transparent'
           }}
         >
-          📊 Dashboard
+          OPERATIONS COCKPIT
         </button>
 
         <button
-          onClick={() => setCurrentView('map')}
+          type="button"
+          onClick={() => setCurrentView && setCurrentView('map')}
+          className="mono-label"
           style={{
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            background: currentView === 'map' ? 'var(--color-bg-elevated)' : 'transparent',
-            color: currentView === 'map' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-            border: currentView === 'map' ? '1px solid var(--color-border-active)' : '1px solid transparent',
-            transition: 'all var(--transition-fast)'
+            padding: '5px 14px',
+            borderRadius: 'var(--radius-xs)',
+            fontSize: '11px',
+            color: currentView === 'map' ? 'var(--color-ink)' : 'var(--color-muted)',
+            backgroundColor: currentView === 'map' ? 'var(--color-paper-elevated)' : 'transparent',
+            border: currentView === 'map' ? '1px solid var(--color-rule-2)' : '1px solid transparent'
           }}
         >
-          🗺️ Spatial Map
+          SPATIAL RADAR
         </button>
 
         <a
           href="http://localhost:3000/api-docs"
           target="_blank"
           rel="noreferrer"
+          className="mono-label"
           style={{
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            color: 'var(--color-text-secondary)',
-            border: '1px solid transparent',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px'
+            padding: '5px 10px',
+            borderRadius: 'var(--radius-xs)',
+            fontSize: '11px',
+            color: 'var(--color-muted)',
+            textDecoration: 'none'
           }}
         >
-          📖 API Docs ↗
+          API SPEC ↗
         </a>
       </nav>
 
-      {/* Actions & User Identity */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+      {/* Quick Actions & Operator Identity */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {canCreate && (
           <button
+            type="button"
             onClick={onOpenCreateModal}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-              color: 'white',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              boxShadow: 'var(--shadow-glow-critical)',
-              transition: 'transform var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+            className="btn-cyan"
+            style={{ padding: '5px 12px', fontSize: '11px' }}
           >
-            + Report Disaster
+            + LOG INCIDENT
           </button>
         )}
 
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 'var(--space-2)',
-          background: 'var(--color-bg-base)',
-          padding: '4px 10px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--color-border)'
+          gap: '6px',
+          padding: '3px 8px',
+          borderRadius: 'var(--radius-xs)',
+          backgroundColor: 'var(--color-paper)',
+          border: '1px solid var(--color-rule)'
         }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-            {user?.email || 'operator@relief.io'}
+          <span style={{ fontSize: '11px', color: 'var(--color-ink-2)', fontFamily: 'var(--font-mono)' }}>
+            {user?.email ? user.email.split('@')[0] : 'operator'}
           </span>
-          <span style={{
-            fontSize: '0.7rem',
-            textTransform: 'uppercase',
-            fontWeight: 700,
-            padding: '2px 6px',
-            borderRadius: 'var(--radius-sm)',
-            background: roleStyle.bg,
-            color: roleStyle.text,
-            border: `1px solid ${roleStyle.border}`
+          <span className="mono-label" style={{
+            fontSize: '9px',
+            color: user?.role === 'admin' ? 'var(--color-critical)' : 'var(--color-accent)'
           }}>
-            {user?.role || 'viewer'}
+            [{user?.role?.toUpperCase() || 'VIEWER'}]
           </span>
         </div>
 
         <button
+          type="button"
           onClick={logout}
-          title="Sign out of command session"
+          title="Sign out"
+          className="mono-label"
           style={{
-            padding: '6px 10px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.8rem',
-            color: 'var(--color-text-muted)',
-            border: '1px solid var(--color-border)',
-            background: 'transparent'
+            padding: '4px 8px',
+            borderRadius: 'var(--radius-xs)',
+            fontSize: '10px',
+            color: 'var(--color-muted)',
+            border: '1px solid var(--color-rule)',
+            backgroundColor: 'transparent'
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-critical)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
         >
-          Sign Out
+          EXIT
         </button>
       </div>
     </header>

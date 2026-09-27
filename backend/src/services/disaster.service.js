@@ -16,9 +16,10 @@ class DisasterService {
     let latitude = data.latitude;
     let longitude = data.longitude;
 
-    // Automatic location resolution from description if coordinates not provided
+    // Automatic location resolution from title & description if coordinates not provided
     if (latitude === undefined || longitude === undefined || !locationName) {
-      const resolved = await geoService.resolveLocationFromText(data.description);
+      const combinedText = `${data.title || ''} ${data.description || ''}`.trim();
+      const resolved = await geoService.resolveLocationFromText(combinedText);
       locationName = locationName || resolved.locationName;
       latitude = latitude !== undefined ? latitude : resolved.latitude;
       longitude = longitude !== undefined ? longitude : resolved.longitude;

@@ -167,6 +167,64 @@ INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitu
     'available'
   );
 
+-- Mumbai Emergency Resources (near lat: 19.0760, lng: 72.8777)
+INSERT INTO resources (name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
+  (
+    'KEM Hospital Emergency Trauma Center',
+    'hospital',
+    'Parel, Mumbai',
+    19.0022,
+    72.8427,
+    ST_SetSRID(ST_MakePoint(72.8427, 19.0022), 4326)::geography,
+    450,
+    110,
+    'available'
+  ),
+  (
+    'Lilavati Hospital Disaster Response Wing',
+    'hospital',
+    'Bandra West, Mumbai',
+    19.0520,
+    72.8290,
+    ST_SetSRID(ST_MakePoint(72.8290, 19.0520), 4326)::geography,
+    300,
+    65,
+    'limited'
+  ),
+  (
+    'BMC Central Flood Relief Shelter',
+    'shelter',
+    'Dadar, Mumbai',
+    19.0178,
+    72.8478,
+    ST_SetSRID(ST_MakePoint(72.8478, 19.0178), 4326)::geography,
+    1000,
+    680,
+    'available'
+  ),
+  (
+    'NDRF Flood & Aquatic Rescue Unit 5',
+    'rescue',
+    'Worli Sea Face, Mumbai',
+    19.0176,
+    72.8152,
+    ST_SetSRID(ST_MakePoint(72.8152, 19.0176), 4326)::geography,
+    120,
+    45,
+    'available'
+  ),
+  (
+    'BMC Potable Water Tanker Fleet #7',
+    'water',
+    'Kurla West, Mumbai',
+    19.0726,
+    72.8845,
+    ST_SetSRID(ST_MakePoint(72.8845, 19.0726), 4326)::geography,
+    3500,
+    2800,
+    'available'
+  );
+
 -- ============================================================================
 -- 4. SEED REPORTS (Initial community reports)
 -- ============================================================================

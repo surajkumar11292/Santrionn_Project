@@ -1,3 +1,6 @@
+/* Hallmark Theme: Aurora (usehallmark.com)
+ * Disaster Incident Card - High-Information Density
+ */
 import React from 'react';
 import { useAuthStore } from '../store/authStore';
 
@@ -5,120 +8,120 @@ export default function DisasterCard({ disaster, onSelect, onDelete }) {
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'admin';
 
-  const getStatusBadge = (status) => {
+  const getTriageTone = (status) => {
     switch (status) {
       case 'active':
-        return { text: 'CRITICAL / ACTIVE', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)' };
+        return {
+          label: 'CRITICAL / ACTIVE',
+          color: 'var(--color-critical)',
+          bg: 'var(--color-critical-dim)',
+          border: 'var(--color-critical-border)'
+        };
       case 'monitoring':
-        return { text: 'MONITORING', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.4)' };
+        return {
+          label: 'SURVEILLANCE',
+          color: 'var(--color-warning)',
+          bg: 'var(--color-warning-dim)',
+          border: 'var(--color-warning-border)'
+        };
       case 'resolved':
-        return { text: 'RESOLVED', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.4)' };
+        return {
+          label: 'RESOLVED',
+          color: 'var(--color-success)',
+          bg: 'var(--color-success-dim)',
+          border: 'var(--color-success-border)'
+        };
       default:
-        return { text: status?.toUpperCase(), color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.15)', border: 'rgba(148, 163, 184, 0.3)' };
+        return {
+          label: status?.toUpperCase() || 'LOGGED',
+          color: 'var(--color-muted)',
+          bg: 'var(--color-paper-elevated)',
+          border: 'var(--color-rule)'
+        };
     }
   };
 
-  const badge = getStatusBadge(disaster.status);
+  const triage = getTriageTone(disaster.status);
   const lat = disaster.location?.latitude;
   const lng = disaster.location?.longitude;
 
   return (
-    <div style={{
-      background: 'var(--color-bg-surface)',
-      border: '1px solid var(--color-border)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-5)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      gap: 'var(--space-4)',
-      boxShadow: 'var(--shadow-sm)',
-      transition: 'all var(--transition-normal)',
-      position: 'relative',
-      overflow: 'hidden'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.borderColor = 'var(--color-border-active)';
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.borderColor = 'var(--color-border)';
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-    }}>
-      {/* Top Status & Meta */}
+    <article
+      className="aurora-card"
+      style={{
+        padding: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        gap: '12px'
+      }}
+    >
       <div>
+        {/* Triage Status & Date */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: 'var(--space-2)',
-          marginBottom: 'var(--space-3)'
+          alignItems: 'center',
+          marginBottom: '8px'
         }}>
-          <span style={{
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            padding: '3px 8px',
-            borderRadius: 'var(--radius-sm)',
-            color: badge.color,
-            background: badge.bg,
-            border: `1px solid ${badge.border}`
-          }}>
-            {badge.text}
+          <span
+            className="mono-label"
+            style={{
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-xs)',
+              color: triage.color,
+              backgroundColor: triage.bg,
+              border: `1px solid ${triage.border}`,
+              fontSize: '10px'
+            }}
+          >
+            <span className="eyebrow-square" style={{ backgroundColor: triage.color, width: '5px', height: '5px' }} />
+            {triage.label}
           </span>
 
-          <span style={{
-            fontSize: '0.75rem',
-            color: 'var(--color-text-muted)',
-            fontFamily: 'var(--font-mono)'
-          }}>
-            {disaster.created_at ? new Date(disaster.created_at).toLocaleDateString() : 'Active'}
+          <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)' }}>
+            {disaster.created_at ? new Date(disaster.created_at).toISOString().split('T')[0] : 'LIVE'}
           </span>
         </div>
 
-        {/* Title */}
+        {/* Disaster Incident Title */}
         <h3 style={{
-          fontSize: '1.125rem',
+          fontSize: '1.15rem',
           fontWeight: 700,
-          color: 'var(--color-text-primary)',
-          lineHeight: 1.3,
-          marginBottom: 'var(--space-2)'
+          color: 'var(--color-ink)',
+          marginBottom: '6px',
+          lineHeight: 1.3
         }}>
           {disaster.title}
         </h3>
 
-        {/* Geographic Location */}
+        {/* Epicenter Location & Coordinates */}
         <div style={{
+          fontSize: '12px',
+          color: 'var(--color-accent)',
+          marginBottom: '8px',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          color: 'var(--color-info)',
-          fontSize: '0.85rem',
-          marginBottom: 'var(--space-3)'
+          justifyContent: 'space-between',
+          paddingBottom: '6px',
+          borderBottom: '1px solid var(--color-rule)'
         }}>
-          <span>📍</span>
-          <span style={{ fontWeight: 600 }}>{disaster.location?.name || 'Unspecified Epicenter'}</span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>
+            📍 {disaster.location?.name || 'Unspecified Epicenter'}
+          </span>
           {lat !== undefined && lng !== undefined && (
-            <span style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.75rem',
-              color: 'var(--color-text-muted)',
-              marginLeft: 'auto'
-            }}>
-              {lat.toFixed(3)}, {lng.toFixed(3)}
+            <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)', flexShrink: 0 }}>
+              [{lat.toFixed(3)}, {lng.toFixed(3)}]
             </span>
           )}
         </div>
 
-        {/* Description Snippet */}
+        {/* Field Description */}
         <p style={{
-          fontSize: '0.875rem',
-          color: 'var(--color-text-secondary)',
+          fontSize: '12.5px',
+          color: 'var(--color-ink-2)',
           lineHeight: 1.5,
-          marginBottom: 'var(--space-3)',
+          marginBottom: '10px',
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
@@ -127,19 +130,20 @@ export default function DisasterCard({ disaster, onSelect, onDelete }) {
           {disaster.description}
         </p>
 
-        {/* Tags */}
+        {/* Incident Classification Tags */}
         {disaster.tags && disaster.tags.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {disaster.tags.map((tag, idx) => (
               <span
                 key={idx}
+                className="mono-label"
                 style={{
-                  fontSize: '0.75rem',
-                  color: 'var(--color-text-secondary)',
-                  background: 'var(--color-bg-elevated)',
-                  padding: '2px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--color-border)'
+                  fontSize: '9.5px',
+                  color: 'var(--color-muted)',
+                  backgroundColor: 'var(--color-paper)',
+                  padding: '2px 6px',
+                  borderRadius: 'var(--radius-xs)',
+                  border: '1px solid var(--color-rule)'
                 }}
               >
                 #{tag}
@@ -149,54 +153,44 @@ export default function DisasterCard({ disaster, onSelect, onDelete }) {
         )}
       </div>
 
-      {/* Action Footer */}
+      {/* Action Bar */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 'var(--space-3)',
-        borderTop: '1px solid var(--color-border)'
+        paddingTop: '8px',
+        borderTop: '1px solid var(--color-rule)',
+        marginTop: '4px'
       }}>
         <button
-          onClick={() => onSelect(disaster)}
-          style={{
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.825rem',
-            fontWeight: 600,
-            background: 'var(--color-bg-elevated)',
-            color: 'var(--color-info)',
-            border: '1px solid var(--color-border)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'background var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-bg-elevated)')}
+          type="button"
+          onClick={() => onSelect && onSelect(disaster)}
+          className="btn-cyan"
+          style={{ padding: '5px 12px', fontSize: '11px' }}
         >
-          🔍 View Intel & Resources
+          <span>Inspect Dossier</span>
+          <span aria-hidden="true">→</span>
         </button>
 
         {isAdmin && (
           <button
-            onClick={() => onDelete(disaster.id)}
-            title="Delete disaster (Admin)"
+            type="button"
+            onClick={() => onDelete && onDelete(disaster.id)}
+            title="De-register incident record"
+            className="mono-label"
             style={{
-              padding: '6px 10px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.8rem',
+              padding: '4px 8px',
+              borderRadius: 'var(--radius-xs)',
+              fontSize: '10px',
               color: 'var(--color-critical)',
-              background: 'transparent',
-              border: '1px solid rgba(239, 68, 68, 0.2)'
+              backgroundColor: 'transparent',
+              border: '1px solid var(--color-critical-border)'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            🗑️
+            DELETE
           </button>
         )}
       </div>
-    </div>
+    </article>
   );
 }

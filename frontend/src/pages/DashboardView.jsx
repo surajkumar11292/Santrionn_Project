@@ -1,3 +1,6 @@
+/* Hallmark Theme: Aurora (usehallmark.com)
+ * Disaster Operations Cockpit - High-Density Single-View Layout
+ */
 import React, { useEffect } from 'react';
 import { useDisasterStore } from '../store/disasterStore';
 import StatsBar from '../components/StatsBar';
@@ -5,7 +8,7 @@ import DisasterCard from '../components/DisasterCard';
 import LiveFeed from '../components/LiveFeed';
 import { api } from '../api/client';
 
-export default function DashboardView({ onSelectDisaster, liveEvents, isSocketConnected }) {
+export default function DashboardView({ onSelectDisaster, liveEvents = [], isSocketConnected = false }) {
   const {
     disasters,
     loading,
@@ -21,114 +24,138 @@ export default function DashboardView({ onSelectDisaster, liveEvents, isSocketCo
   }, []);
 
   const handleDeleteDisaster = async (id) => {
-    if (!window.confirm('Are you sure you want to permanently remove this incident?')) return;
+    if (!window.confirm('Confirm de-registration of this active incident record?')) return;
     try {
       await api.disasters.delete(id);
       fetchDisasters();
     } catch (err) {
-      alert(`Deletion failed: ${err.message}`);
+      alert(`De-registration failed: ${err.message}`);
     }
   };
 
-  const quickTags = ['flood', 'fire', 'hurricane', 'storm', 'earthquake'];
+  const quickTags = ['flood', 'fire', 'earthquake', 'storm', 'medical', 'hurricane'];
 
   return (
-    <div style={{ padding: 'var(--space-6)', maxWidth: '1440px', margin: '0 auto', width: '100%' }}>
-      {/* KPI Stats */}
+    <div style={{
+      maxWidth: '1440px',
+      margin: '0 auto',
+      width: '100%',
+      padding: 'var(--space-6)'
+    }}>
+      {/* Header Eyebrow & Platform Identification */}
+      <header style={{ marginBottom: 'var(--space-5)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+          <span className="eyebrow-square" />
+          <span className="mono-label" style={{ color: 'var(--color-accent)', letterSpacing: '0.12em' }}>
+            CRISIS OPERATIONS · REAL-TIME TRIAGE
+          </span>
+        </div>
+
+        <h1 style={{
+          fontSize: 'clamp(2rem, 3.8vw, 3rem)',
+          fontWeight: 700,
+          color: 'var(--color-ink)',
+          marginBottom: '6px'
+        }}>
+          Disaster Response Coordination
+        </h1>
+
+        <p style={{
+          fontSize: '0.95rem',
+          color: 'var(--color-ink-2)',
+          maxWidth: '56ch',
+          lineHeight: 1.5
+        }}>
+          Real-time crisis telemetry, PostGIS spatial radar, and multi-agency emergency resource dispatch.
+        </p>
+      </header>
+
+      {/* 01 · Instant Status Counters (Zero-Click Metric Visibility) */}
       <StatsBar disasters={disasters} />
 
-      {/* Main Grid: Left = Incidents (70%), Right = Live Feed (30%) */}
+      {/* 02 · Main Operations Grid (Triage Cards 70% + Live Stream 30%) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 360px',
-        gap: 'var(--space-6)',
+        gridTemplateColumns: 'minmax(0, 1fr) 340px',
+        gap: 'var(--space-5)',
         alignItems: 'start'
       }}>
-        {/* Left Column: Filter Controls & Incidents List */}
-        <div>
-          {/* Filter Bar */}
-          <div style={{
-            background: 'var(--color-bg-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 'var(--space-4)',
-            marginBottom: 'var(--space-6)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-3)'
-          }}>
-            <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+        {/* Left: Search, Filters & Incident Cards */}
+        <section aria-label="Incident Triage Registry">
+          {/* Quick Filter Strip */}
+          <div
+            className="aurora-card"
+            style={{
+              padding: '12px 16px',
+              marginBottom: 'var(--space-4)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}
+          >
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <input
                 type="text"
-                placeholder="Search disasters by title or description..."
+                placeholder="Search incidents by name, city, district, or keyword..."
                 value={filters.search}
                 onChange={(e) => setFilter('search', e.target.value)}
                 style={{
                   flex: 1,
                   padding: '8px 12px',
-                  background: 'var(--color-bg-base)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  fontSize: '0.875rem'
+                  fontSize: '13px'
                 }}
               />
 
               <select
                 value={filters.status}
                 onChange={(e) => setFilter('status', e.target.value)}
+                className="mono-label"
                 style={{
                   padding: '8px 12px',
-                  background: 'var(--color-bg-base)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  fontSize: '0.875rem'
+                  fontSize: '11px',
+                  cursor: 'pointer'
                 }}
               >
-                <option value="">All Statuses</option>
-                <option value="active">Active Only</option>
-                <option value="monitoring">Monitoring Only</option>
-                <option value="resolved">Resolved Only</option>
+                <option value="">ALL STATUSES</option>
+                <option value="active">CRITICAL / ACTIVE</option>
+                <option value="monitoring">MONITORING</option>
+                <option value="resolved">RESOLVED</option>
               </select>
 
               {(filters.tag || filters.status || filters.search) && (
                 <button
+                  type="button"
                   onClick={resetFilters}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.8rem',
-                    color: 'var(--color-text-secondary)',
-                    border: '1px solid var(--color-border)',
-                    background: 'var(--color-bg-elevated)'
-                  }}
+                  className="btn-outline"
+                  style={{ fontSize: '11px', padding: '6px 12px' }}
                 >
-                  Clear Filters
+                  RESET
                 </button>
               )}
             </div>
 
-            {/* Quick Tag Pills */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Filter by Tag:
+            {/* Quick Tag Category Pills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span className="mono-label" style={{ fontSize: '10px', color: 'var(--color-muted)' }}>
+                CATEGORY:
               </span>
               {quickTags.map((tag) => {
                 const isSelected = filters.tag.toLowerCase() === tag;
                 return (
                   <button
                     key={tag}
+                    type="button"
                     onClick={() => setFilter('tag', isSelected ? '' : tag)}
                     style={{
-                      padding: '3px 10px',
-                      borderRadius: 'var(--radius-full)',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      background: isSelected ? 'var(--color-info)' : 'var(--color-bg-elevated)',
-                      color: isSelected ? 'white' : 'var(--color-text-secondary)',
-                      border: `1px solid ${isSelected ? 'var(--color-info)' : 'var(--color-border)'}`,
-                      transition: 'all var(--transition-fast)'
+                      padding: '2px 8px',
+                      borderRadius: 'var(--radius-xs)',
+                      fontSize: '11px',
+                      fontFamily: 'var(--font-mono)',
+                      backgroundColor: isSelected ? 'var(--color-accent)' : 'var(--color-paper)',
+                      color: isSelected ? '#030d11' : 'var(--color-ink-2)',
+                      border: `1px solid ${isSelected ? 'var(--color-accent)' : 'var(--color-rule)'}`,
+                      fontWeight: isSelected ? 700 : 400,
+                      cursor: 'pointer'
                     }}
                   >
                     #{tag}
@@ -138,45 +165,44 @@ export default function DashboardView({ onSelectDisaster, liveEvents, isSocketCo
             </div>
           </div>
 
-          {/* Incidents Grid */}
+          {/* Incident Cards Grid */}
           {loading && disasters.length === 0 ? (
             <div style={{
               textAlign: 'center',
-              padding: 'var(--space-10)',
-              color: 'var(--color-text-muted)',
-              fontSize: '1rem'
+              padding: 'var(--space-8)',
+              color: 'var(--color-muted)',
+              fontSize: '13px'
             }}>
-              Loading active disaster intelligence...
+              Loading crisis incident records...
             </div>
           ) : error ? (
             <div style={{
-              padding: 'var(--space-6)',
-              background: 'var(--color-critical-dim)',
-              border: '1px solid rgba(239, 68, 68, 0.4)',
-              borderRadius: 'var(--radius-md)',
+              padding: '12px',
+              backgroundColor: 'var(--color-critical-dim)',
+              border: '1px solid var(--color-critical-border)',
+              borderRadius: 'var(--radius-xs)',
               color: 'var(--color-critical)',
-              textAlign: 'center'
+              fontSize: '13px'
             }}>
               {error}
             </div>
           ) : disasters.length === 0 ? (
-            <div style={{
+            <div className="aurora-card" style={{
               textAlign: 'center',
-              padding: 'var(--space-12)',
-              background: 'var(--color-bg-surface)',
-              border: '1px dashed var(--color-border)',
-              borderRadius: 'var(--radius-lg)',
-              color: 'var(--color-text-muted)'
+              padding: 'var(--space-8)',
+              color: 'var(--color-muted)'
             }}>
-              <h3>No Disaster Incidents Found</h3>
-              <p style={{ fontSize: '0.875rem', marginTop: '6px' }}>
-                Try adjusting your search criteria or register a new disaster incident.
-              </p>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '4px' }}>
+                No Incidents Found
+              </div>
+              <div style={{ fontSize: '12px' }}>
+                No active events match current filters. Log a new disaster or reset filters.
+              </div>
             </div>
           ) : (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
               gap: 'var(--space-4)'
             }}>
               {disasters.map((d) => (
@@ -189,12 +215,12 @@ export default function DashboardView({ onSelectDisaster, liveEvents, isSocketCo
               ))}
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Right Column: Live Event Feed (Socket.IO Real-Time Stream) */}
-        <div>
+        {/* Right: Real-Time Stream (No navigation needed to view updates) */}
+        <section aria-label="Real-Time Telemetry Feed">
           <LiveFeed events={liveEvents} isConnected={isSocketConnected} />
-        </div>
+        </section>
       </div>
     </div>
   );

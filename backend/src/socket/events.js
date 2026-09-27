@@ -2,6 +2,7 @@ const { getIO } = require('../config/socket');
 
 /**
  * Standardized Real-Time Event Dispatchers
+ * Broadcasts events once cleanly without duplicating to room subscribers.
  */
 
 const emitDisasterCreated = (disaster) => {
@@ -12,11 +13,7 @@ const emitDisasterCreated = (disaster) => {
     disaster
   };
 
-  // Broadcast to global feed
   io.emit('disaster_created', payload);
-  if (io.to) {
-    io.to('disasters').emit('disaster_created', payload);
-  }
 };
 
 const emitDisasterUpdated = (disaster, changes = {}) => {
@@ -28,12 +25,7 @@ const emitDisasterUpdated = (disaster, changes = {}) => {
     changes
   };
 
-  // Broadcast to global feed
   io.emit('disaster_updated', payload);
-  // Broadcast to specific disaster room subscribers
-  if (io.to) {
-    io.to(`disaster:${disaster.id}`).emit('disaster_updated', payload);
-  }
 };
 
 const emitDisasterDeleted = (disasterId) => {
@@ -45,9 +37,6 @@ const emitDisasterDeleted = (disasterId) => {
   };
 
   io.emit('disaster_deleted', payload);
-  if (io.to) {
-    io.to(`disaster:${disasterId}`).emit('disaster_deleted', payload);
-  }
 };
 
 const emitReportAdded = (disasterId, report) => {
@@ -60,9 +49,6 @@ const emitReportAdded = (disasterId, report) => {
   };
 
   io.emit('report_added', payload);
-  if (io.to) {
-    io.to(`disaster:${disasterId}`).emit('report_added', payload);
-  }
 };
 
 const emitOfficialUpdate = (disasterId, update) => {
@@ -74,11 +60,7 @@ const emitOfficialUpdate = (disasterId, update) => {
     update
   };
 
-  // Broadcast to global feed for emergency alerts
   io.emit('official_update', payload);
-  if (io.to) {
-    io.to(`disaster:${disasterId}`).emit('official_update', payload);
-  }
 };
 
 module.exports = {

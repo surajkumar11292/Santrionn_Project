@@ -126,37 +126,48 @@ npm run dev
 
 ```mermaid
 flowchart TD
-    subgraph ClientLayer["Client & Operator Layer"]
+    subgraph ClientLayer["1. Client & Operator Layer"]
         UI["React 18 + Vite (Operate Mode Dashboard)"]
         Map["Leaflet Spatial Map (Dark Matter Tiles)"]
         SocketClient["Socket.IO Client (Real-Time Rooms)"]
     end
 
-    subgraph GatewayLayer["API & WebSocket Gateway (Express + Socket.IO)"]
+    subgraph GatewayLayer["2. Gateway & Middleware Layer"]
         AuthMiddleware["JWT & RBAC Middleware\n(admin, contributor, viewer)"]
         JoiValidator["Joi Schema Validation"]
         SocketGateway["Socket.IO Server Gateway\n(disaster:<id> rooms & global feed)"]
     end
 
-    subgraph ServiceLayer["Business Logic Layer"]
-        DisasterService["Disaster Service\n(Incident Lifecycle)"]
-        GeoService["NLP Geocoding Service\n(Text Extraction + Coordinate Fallback)"]
-        ResourceService["Resource Proximity Service\n(PostGIS ST_DWithin)"]
-        ReportService["Report Ingestion Service\n(Normalization & Heuristic Classifier)"]
-        ImageService["AI Computer Vision Service\n(Hazard Assessment & Hashing)"]
-        QueueService["Background Queue & Worker\n(FIFO State Machine & Ingestion)"]
+    subgraph ServiceLayer["3. Business Logic Layer"]
+        direction TB
+        subgraph CoreServices["Incident Lifecycle & Real-Time Engine"]
+            DisasterService["Disaster Service\n(Incident Lifecycle)"]
+            ImageService["AI Computer Vision Service\n(Hazard Assessment & Hashing)"]
+            QueueService["Background Queue & Worker\n(FIFO State Machine & Ingestion)"]
+        end
+        subgraph SpatialFeeds["Spatial Intelligence & Feed Ingestion"]
+            GeoService["Progressive Hierarchical Geocoder\n(NLP Entity + Multi-Tier OSM Nominatim)"]
+            ResourceService["Resource Proximity Service\n(PostGIS ST_DWithin)"]
+            ReportService["Report Ingestion Service\n(Normalization & Heuristic Classifier)"]
+        end
     end
 
-    subgraph DataLayer["Storage & Cache Layer"]
-        Postgres[("PostgreSQL 15 + PostGIS 3.3\n(GEOGRAPHY Point, GIST Spatial Index)")]
-        RedisCache[("Redis 7 In-Memory Cache\n(Cache-Aside TTL 300s / 120s / 24h)")]
-        ExternalSocial[("Mock Crisis Social Stream\n(Latency & Fault Simulation)")]
+    subgraph ExternalLayer["4. External Services & Upstream Feeds"]
+        OSM["OpenStreetMap Nominatim API\n(Multi-Tier Progressive Geocoding)"]
+        ExternalSocial["Mock Crisis Social Stream\n(Fault-Tolerant Crisis Intel)"]
     end
 
+    subgraph DataLayer["5. Storage & In-Memory Cache"]
+        Postgres[("PostgreSQL 15 + PostGIS 3.3\n(GEOGRAPHY Point, GiST Spatial Index)")]
+        RedisCache[("Redis 7 In-Memory Cache\n(Cache-Aside 300s/120s/24h + Job Queues)")]
+    end
+
+    %% Client to Gateway
     UI --> AuthMiddleware
     Map --> AuthMiddleware
     SocketClient <--> SocketGateway
 
+    %% Gateway to Services
     AuthMiddleware --> JoiValidator
     JoiValidator --> DisasterService
     JoiValidator --> ResourceService
@@ -164,20 +175,27 @@ flowchart TD
     JoiValidator --> ImageService
     JoiValidator --> QueueService
 
+    %% Service to Service
     DisasterService --> GeoService
-    DisasterService --> Postgres
-    DisasterService -.-> SocketGateway
 
-    ResourceService --> RedisCache
-    ResourceService --> Postgres
-
-    ReportService --> RedisCache
+    %% Service to External APIs
+    GeoService --> OSM
     ReportService --> ExternalSocial
-    ReportService --> Postgres
-    ReportService -.-> SocketGateway
 
-    ImageService --> RedisCache
+    %% Services to Data & Cache
+    DisasterService --> Postgres
+    ResourceService --> Postgres
+    ResourceService --> RedisCache
+    ReportService --> Postgres
+    ReportService --> RedisCache
     ImageService --> Postgres
+    ImageService --> RedisCache
+    GeoService --> RedisCache
+    QueueService --> RedisCache
+
+    %% Real-time Socket Dispatches
+    DisasterService -.-> SocketGateway
+    ReportService -.-> SocketGateway
     ImageService -.-> SocketGateway
 ```
 
@@ -213,7 +231,7 @@ sequenceDiagram
     participant API as Express API
     participant Cache as Redis 7
     participant Ext as Mock Social Stream
-    participant DB as PostgreSQL
+    participant DB as PostgreSQL 15
 
     Client->>API: GET /disasters/:id/reports
     API->>Cache: GET reports:disaster:{id}
@@ -253,13 +271,36 @@ sequenceDiagram
 
 ---
 
-### 4. Natural Language Location Resolution
-When creating an incident with unstructured text (e.g., *"Heavy flooding has affected Manhattan, NYC"* or *"flood at mumbai"*):
-1. **Contextual Entity Parsing**: NLP regex and word-boundary tokenizers identify candidate geographical locations from incident descriptions and titles.
-2. **Registry Mapping**: Resolves against an internal coordinate lookup matrix of major crisis-prone metropolitan regions (US, India, UK, Europe, Asia).
-3. **Phonetic & Typo Resilience**: Handles spelling variations (e.g. `'uttrakhand'` and `'uttarakhand'`).
-4. **Live Geocoder Fallback**: Attempts OpenStreetMap Nominatim geocoding with a 1.5-second timeout, falling back gracefully to known regional coordinates if offline.
-5. **Cache-Aside Persistence**: All resolved coordinates are cached in Redis for 24 hours.
+### 4. Location Resolution (NLP & Progressive Hierarchical Geocoding)
+Incident reporting in crisis scenarios often involves ambiguous, unpunctuated, colloquial, or micro-locality spatial descriptions. The platform implements a production-grade, multi-tier geocoding resolution pipeline designed to resolve coordinates to verified administrative anchors while preserving spatial data integrity:
+
+1. **Dual Ingestion Paths (Explicit vs. NLP Extracted)**:
+   - **Explicit Location Input**: When field responders supply an explicit location (e.g., via the *Specific Location* field), it is ingested directly without destructive token truncation.
+   - **Autonomous Narrative Extraction**: For unpunctuated situational titles (*"Heavy rain at urjanagar, khagual, patna, bihar causing inundation"*), regex contextual boundary parsers isolate the spatial clause after prepositional cues (`in`, `at`, `near`, `across`, `affected`) while cleanly discarding consequence clauses (`causing...`, `leading to...`, `with...`).
+
+2. **Progressive Hierarchical Suffix Evaluation (Specific-to-Broad)**:
+   - Remote villages, sectors, and micro-localities (e.g., *Urjanagar*) are frequently unindexed in global cartographic databases. Rather than failing or querying isolated words that accidentally match identically named villages in unrelated states, the resolver evaluates candidate suffixes progressively (`segments.slice(i).join(', ')`):
+     - **Tier 1 (Sub-locality)**: `urjanagar, khagual, patna, bihar` $\rightarrow$ Unindexed village (0 hits).
+     - **Tier 2 (Administrative Town)**: `khagual, patna, bihar` $\rightarrow$ **Exact Match**: `Goverment hospital, Khagual, Moti Chowk Road, Patna, Bihar [25.578, 85.048]`.
+     - **Tier 3 (District Anchor)**: If Khagaul were also unindexed, automatically steps back to `patna, bihar` (`[25.609, 85.123]`).
+     - **Tier 4 (State Anchor)**: Steps back to `bihar` (`[25.644, 85.906]`).
+   - **Original Text Invariant**: Crucially, the incident details, broadcast feed, and database records **100% preserve the operator's original input string** (e.g., *"urjanagar, khagual, patna, bihar"* or *"Army Public School Danapur Cantt"*). Only the spatial latitude/longitude coordinate pair is mapped to the nearest verified administrative anchor.
+
+3. **Institutional & Facility Stop-Word Filtering**:
+   - Institutional facilities (e.g., *"Army public school danapur cantt"*) previously risked matching random namesake buildings in distant states (e.g. an Army Public School pond in Kolkata).
+   - The engine enforces an `AMENITY_STOP_WORDS` dictionary (`army`, `public`, `school`, `college`, `hospital`, `station`, `mandir`, `temple`, `gate`, `road`, `street`, `gali`, etc.).
+   - Pure amenity pairs (`"army public"`, `"public school"`) are strictly blocked from external queries.
+   - Leading facility tokens are stripped to isolate the true geographic anchor (`"danapur cantt"`), resolving accurately to Danapur Cantonment, Dinapur-Cum-Khagaul, Patna, Bihar (`[25.634, 85.030]`).
+
+4. **Live OpenStreetMap Nominatim with Domestic Country Prioritization**:
+   - Prioritizes Indian administrative boundaries (`countrycodes=in`) using an `AbortController` timeout (2500ms), falling back globally for international crisis events.
+
+5. **Zero-Silent-Failure Invariant (Deterministic HTTP 400)**:
+   - Arbitrary silent fallbacks (such as misreporting unresolvable input to Mumbai) have been completely eliminated.
+   - If an unresolvable string (e.g., nonsensical text or unindexed territory) is supplied across all candidate tiers, the API immediately throws an explicit `400 Bad Request` (`BadRequestError`) with an actionable error envelope, ensuring crisis spatial integrity.
+
+6. **Redis Cache-Aside Layer**:
+   - Every resolved coordinate pair is cached in Redis under `geocode:<normalized_string>` with a 24-hour (86,400s) TTL, ensuring sub-millisecond retrieval on recurring spatial queries.
 
 ---
 
@@ -297,7 +338,7 @@ Stateless JWT Bearer tokens encode cryptographically verified role claims:
 3. **Priority Classification of Community Reports**:
    - Heuristic triage classifier categorizing citizen field reports into `critical`, `high`, `medium`, and `low` based on life-safety indicators (trapped individuals, gas leaks, water deprivation, medical needs).
 4. **Interactive Spatial Radar (`MapView.jsx`)**:
-   - Tactical dark Leaflet cartography map with live epicenter pins, color-coded severity markers, coordinate readouts, and one-click dossier inspection popups.
+   - Tactical dark Leaflet cartography map featuring live epicenter pins, color-coded severity markers, dynamic radial range rings (10km - 100km), operational status filtering, global KPI metric counters (Total, Active, Monitoring, Resolved) preserved across filtered views, coordinate readouts, and one-click incident details popups.
 5. **Asynchronous Distributed Job Queue (`POST /disasters/:id/sync-reports` & `GET /jobs/:id`)**:
    - Redis-backed background FIFO queue with state machine (`queued` $\rightarrow$ `processing` $\rightarrow$ `completed` / `failed`), decoupled worker loop, HTTP 202 Accepted response, and real-time Socket.IO completion alerts.
 
@@ -308,11 +349,11 @@ Stateless JWT Bearer tokens encode cryptographically verified role claims:
 ### 1. Disaster Management
 - `POST /disasters`: Create incident (Admin, Contributor)
 - `GET /disasters`: List incidents with filters (`?tag=flood&status=active&search=mumbai&page=1&limit=10`)
-- `GET /disasters/:id`: Get incident dossier by UUID
+- `GET /disasters/:id`: Get full incident details by UUID
 - `PATCH /disasters/:id`: Update incident status/tags (Admin, Contributor)
 - `DELETE /disasters/:id`: Delete incident (Admin only)
 
-#### Sample Disaster JSON Response:
+#### Sample Disaster JSON Response (201 Created):
 ```json
 {
   "success": true,
@@ -330,6 +371,17 @@ Stateless JWT Bearer tokens encode cryptographically verified role claims:
     "created_by": "11111111-1111-1111-1111-111111111111",
     "created_at": "2026-09-27T05:11:45.302Z",
     "updated_at": "2026-09-27T05:11:45.302Z"
+  }
+}
+```
+
+#### Sample Disaster JSON Response (400 Bad Request - Unresolvable Location):
+```json
+{
+  "success": false,
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Unable to resolve geographic location for \"unknown_remote_xyz\". Please provide a valid city, district, or landmark name."
   }
 }
 ```
@@ -419,7 +471,7 @@ cd backend
 npm test
 ```
 
-### Verified Test Suites (24/24 Passing Tests)
+### Verified Test Suites (25/25 Passing Tests)
 1. **`tests/disaster.test.js`**: Full CRUD lifecycle (POST with NLP extraction, GET details, PATCH updates, DELETE removal, and 404 verification).
 2. **`tests/validation.test.js`**: Joi validation failure scenarios (missing title, missing description, invalid status enum) asserting standard 400 Bad Request error envelopes.
 3. **`tests/rbac.test.js`**: Security enforcement (401 Unauthorized for missing tokens, 403 Forbidden when `viewer` or `contributor` attempts admin deletions or resource additions).
@@ -455,6 +507,6 @@ In compliance with section 10 of the assignment guidelines:
 - [x] **.env.example**: Documented environment variables with safe defaults (no secrets committed)
 - [x] **API Documentation**: Interactive Swagger UI at [`http://localhost:3000/api-docs`](http://localhost:3000/api-docs) and [`backend/src/docs/swagger.yaml`](file:///d:/Santrionn_Project/backend/src/docs/swagger.yaml)
 - [x] **Postman Collection**: Exported and ready to import from [`postman_collection.json`](file:///d:/Santrionn_Project/postman_collection.json)
-- [x] **Automated Tests**: 7 test suites, 24 tests passing (`npm test`)
+- [x] **Automated Tests**: 7 test suites, 25 tests passing (`npm test`)
 - [x] **Mock Data & Seed Scripts**: Automatic migration and seed scripts (`npm run migrate`, `npm run seed`)
 - [x] **Live Demo & Real-Time Test Client**: Interactive socket tester at [`http://localhost:3000/socket-test`](http://localhost:3000/socket-test)

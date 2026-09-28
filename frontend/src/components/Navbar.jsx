@@ -57,22 +57,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
           <button
             type="button"
             onClick={() => setCurrentView && setCurrentView('dashboard')}
-            style={{
-              height: '32px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              fontSize: '13px',
-              fontWeight: currentView === 'dashboard' ? 700 : 500,
-              color: currentView === 'dashboard' ? '#ffffff' : 'var(--color-ink-2)',
-              backgroundColor: currentView === 'dashboard' ? 'var(--color-forest)' : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: 1,
-              boxSizing: 'border-box'
-            }}
+            className={`btn-nav-pill ${currentView === 'dashboard' ? 'active' : ''}`}
           >
             Incidents
           </button>
@@ -80,22 +65,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
           <button
             type="button"
             onClick={() => setCurrentView && setCurrentView('map')}
-            style={{
-              height: '32px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              fontSize: '13px',
-              fontWeight: currentView === 'map' ? 700 : 500,
-              color: currentView === 'map' ? '#ffffff' : 'var(--color-ink-2)',
-              backgroundColor: currentView === 'map' ? 'var(--color-forest)' : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: 1,
-              boxSizing: 'border-box'
-            }}
+            className={`btn-nav-pill ${currentView === 'map' ? 'active' : ''}`}
           >
             Spatial Radar
           </button>
@@ -104,20 +74,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
             href="http://localhost:3000/api-docs"
             target="_blank"
             rel="noreferrer"
-            style={{
-              height: '32px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              fontSize: '13px',
-              fontWeight: 500,
-              color: 'var(--color-ink-2)',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: 1,
-              boxSizing: 'border-box'
-            }}
+            className="btn-nav-pill"
           >
             API Docs ↗
           </a>
@@ -129,22 +86,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
             <button
               type="button"
               onClick={onOpenCreateModal}
-              style={{
-                height: '32px',
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                fontSize: '13px',
-                fontWeight: 600,
-                backgroundColor: 'var(--color-forest)',
-                color: '#ffffff',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                lineHeight: 1,
-                boxSizing: 'border-box'
-              }}
+              className="btn-nav-pill"
             >
               + Log Incident
             </button>

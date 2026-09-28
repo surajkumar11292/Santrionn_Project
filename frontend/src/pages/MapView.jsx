@@ -112,14 +112,14 @@ export default function MapView({ onSelectDisaster }) {
             <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">
               📍 ${disaster.location?.name || 'Unspecified Epicenter'}
             </div>
-            <button id="btn-${disaster.id}" class="btn-forest" style="
+            <button id="btn-${disaster.id}" class="btn-details-pill" style="
               width: 100%;
               padding: 7px 14px;
               font-size: 12px;
               font-weight: 600;
               cursor: pointer;
             ">
-              Inspect Dossier →
+              View Details →
             </button>
           </div>
         `;

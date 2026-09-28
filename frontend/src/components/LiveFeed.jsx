@@ -34,15 +34,17 @@ export default function LiveFeed({ events = [], isConnected = false }) {
       aria-label="Crisis Broadcast Feed"
       className="aurora-card"
       style={{
-        padding: '20px',
+        padding: '18px 20px',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        maxHeight: 'calc(100vh - 180px)',
+        boxSizing: 'border-box',
         backgroundColor: '#ffffff',
         borderRadius: '16px',
         border: '1px solid var(--color-rule)',
-        boxShadow: 'var(--shadow-sm)'
+        boxShadow: 'var(--shadow-sm)',
+        minHeight: 0,
+        overflow: 'hidden'
       }}
     >
       {/* Feed Header */}
@@ -51,7 +53,8 @@ export default function LiveFeed({ events = [], isConnected = false }) {
         alignItems: 'center',
         paddingBottom: '12px',
         borderBottom: '1px solid var(--color-rule)',
-        marginBottom: '14px'
+        marginBottom: '14px',
+        flexShrink: 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{
@@ -75,16 +78,18 @@ export default function LiveFeed({ events = [], isConnected = false }) {
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px',
+        gap: '10px',
         overflowY: 'auto',
-        paddingRight: '2px'
+        flex: 1,
+        minHeight: 0,
+        paddingRight: '4px'
       }}>
         {broadcastEvents.length === 0 ? (
           <div style={{
             padding: '36px 12px',
             textAlign: 'center',
             color: 'var(--color-muted)',
-            fontSize: '13px',
+            fontSize: '13.5px',
             lineHeight: 1.5
           }}>
             No emergency alerts broadcasted yet. Real-time updates will stream here automatically.
@@ -98,28 +103,45 @@ export default function LiveFeed({ events = [], isConnected = false }) {
                 style={{
                   backgroundColor: isCritical ? '#fef2f2' : 'var(--color-paper-elevated)',
                   border: `1px solid ${isCritical ? '#fecaca' : 'var(--color-rule)'}`,
-                  borderRadius: '10px',
-                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '4px'
+                  gap: '5px',
+                  flexShrink: 0
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  gap: '12px',
+                  width: '100%'
+                }}>
                   <span style={{
-                    fontSize: '11px',
+                    fontSize: '12px',
                     fontWeight: 700,
                     fontFamily: 'var(--font-mono)',
-                    color: isCritical ? '#b91c1c' : 'var(--color-forest)'
+                    color: isCritical ? '#b91c1c' : 'var(--color-forest)',
+                    flex: '1 1 auto',
+                    minWidth: 0
                   }}>
                     {evt.title}
                   </span>
-                  <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)' }}>
+                  <span className="tnum" style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    color: 'var(--color-muted)',
+                    whiteSpace: 'nowrap',
+                    textAlign: 'right',
+                    flexShrink: 0,
+                    marginLeft: 'auto'
+                  }}>
                     {displayTime(evt.timestamp)}
                   </span>
                 </div>
 
-                <div style={{ fontSize: '12.5px', color: 'var(--color-ink-2)', lineHeight: 1.45 }}>
+                <div style={{ fontSize: '13.5px', color: 'var(--color-ink-2)', lineHeight: 1.5, wordBreak: 'break-word' }}>
                   {evt.detail}
                 </div>
               </div>

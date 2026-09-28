@@ -1,5 +1,5 @@
 /* Theme: Editorial Linen & Forest Green (suraj-portfolio-io.vercel.app)
- * Incident Dossier Modal - High-Information Clean Layout
+ * Incident Details Modal - High-Information Clean Layout
  */
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
@@ -204,7 +204,7 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Dossier Header */}
+        {/* Incident Details Header */}
         <header style={{
           padding: '22px 30px',
           borderBottom: '1px solid var(--color-rule)',

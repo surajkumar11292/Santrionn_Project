@@ -305,3 +305,162 @@ a:hover {
   background-color: #dc2626;
   border-color: #dc2626;
 }
+
+/* Light Green Action & Navigation Pill Buttons (Hover to Dark Forest Green) */
+.btn-nav-pill {
+  height: 32px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: #e2ede6;
+  border: 1px solid #b8d5c4;
+  color: #1b4332;
+}
+
+.btn-nav-pill:hover {
+  background-color: var(--color-forest);
+  border-color: var(--color-forest);
+  color: #ffffff;
+}
+
+.btn-nav-pill.active {
+  background-color: var(--color-forest);
+  border-color: var(--color-forest);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Card Action Pill: View Details */
+.btn-details-pill {
+  height: 32px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: #e2ede6;
+  border: 1px solid #b8d5c4;
+  color: #1b4332;
+}
+
+.btn-details-pill:hover {
+  background-color: var(--color-forest);
+  border-color: var(--color-forest);
+  color: #ffffff;
+}
+
+/* Status Filter Dropdown Pill */
+.select-status-pill {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: #e2ede6;
+  border: 1.5px solid #a3c4b2;
+  color: #1b4332;
+  transition: all 0.15s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.select-status-pill:hover,
+.select-status-pill:focus {
+  background-color: #d6e8dc;
+  border-color: #1b4332;
+}
+
+/* Category Filter Tag Pill */
+.category-tag-pill {
+  height: 28px;
+  padding: 4px 13px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: #e2ede6;
+  border: 1px solid #b8d5c4;
+  color: #1b4332;
+}
+
+.category-tag-pill:hover {
+  background-color: var(--color-forest);
+  border-color: var(--color-forest);
+  color: #ffffff;
+}
+
+.category-tag-pill.active {
+  background-color: var(--color-forest);
+  border-color: var(--color-forest);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Card Classification Tag Pill */
+.card-tag-pill {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1b4332;
+  background-color: #e2ede6;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  border: 1px solid #b8d5c4;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.card-tag-pill:hover {
+  background-color: var(--color-forest);
+  border-color: var(--color-forest);
+  color: #ffffff;
+}
+
+/* Card Action Pill: Delete Button (Matches View Details dimensions, turns dark on hover) */
+.btn-delete-pill {
+  height: 32px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+}
+
+.btn-delete-pill:hover {
+  background-color: #991b1b;
+  border-color: #991b1b;
+  color: #ffffff;
+}

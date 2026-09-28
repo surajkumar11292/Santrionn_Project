@@ -55,12 +55,12 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
       {/* 02 · Top Section: Filter Bar & Top 2 Cards (Left) + Broadcast Feed (Right) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 340px',
+        gridTemplateColumns: 'minmax(0, 1fr) 380px',
         gap: '24px',
-        alignItems: 'start',
+        alignItems: 'stretch',
         marginBottom: bottomDisasters.length > 0 ? '20px' : '0'
       }}>
-        {/* Left: Filter Bar + Top 2 Cards */}
+        {/* Left: Filter Bar + Top 2 Cards (Defines row height) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Filter Bar */}
           <div
@@ -119,14 +119,7 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
               <select
                 value={filters.status}
                 onChange={(e) => setFilter('status', e.target.value)}
-                style={{
-                  padding: '9px 14px',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  backgroundColor: '#ffffff'
-                }}
+                className="select-status-pill"
               >
                 <option value="">ALL STATUSES</option>
                 <option value="active">ACTIVE</option>
@@ -138,8 +131,8 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="btn-outline"
-                  style={{ fontSize: '12px', padding: '7px 14px' }}
+                  className="btn-nav-pill"
+                  style={{ fontSize: '12px', height: '36px', padding: '0 14px' }}
                 >
                   Reset
                 </button>
@@ -147,8 +140,8 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
             </div>
 
             {/* Quick Category Tags */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-muted)', marginRight: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.03em', color: 'var(--color-muted)', marginRight: '2px' }}>
                 CATEGORIES:
               </span>
               {quickTags.map((tag) => {
@@ -158,16 +151,7 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
                     key={tag}
                     type="button"
                     onClick={() => setFilter('tag', isSelected ? '' : tag)}
-                    style={{
-                      padding: '3px 10px',
-                      borderRadius: 'var(--radius-pill)',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      backgroundColor: isSelected ? 'var(--color-forest)' : 'var(--color-paper-pill)',
-                      color: isSelected ? '#ffffff' : 'var(--color-forest)',
-                      border: `1px solid ${isSelected ? 'var(--color-forest)' : 'var(--color-rule-2)'}`,
-                      cursor: 'pointer'
-                    }}
+                    className={`category-tag-pill ${isSelected ? 'active' : ''}`}
                   >
                     #{tag}
                   </button>
@@ -231,9 +215,11 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
           )}
         </div>
 
-        {/* Right: Broadcast Feed */}
-        <aside aria-label="Real-Time Feed">
-          <LiveFeed events={liveEvents} isConnected={isSocketConnected} />
+        {/* Right: Broadcast Feed (Levels exactly with the 2 incident cards on the left) */}
+        <aside aria-label="Real-Time Feed" style={{ position: 'relative', width: '100%', height: '100%', minHeight: 0 }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+            <LiveFeed events={liveEvents} isConnected={isSocketConnected} />
+          </div>
         </aside>
       </div>
 

@@ -53,7 +53,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 04 · Deep Incident Intel Dossier Modal */}
+      {/* 04 · Incident Details Modal */}
       {selectedDisaster && (
         <DisasterDetailModal
           disaster={selectedDisaster}

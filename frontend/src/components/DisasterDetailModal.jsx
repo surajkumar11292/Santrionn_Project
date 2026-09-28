@@ -240,8 +240,6 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
 
             <div style={{ fontSize: '13px', color: 'var(--color-forest)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontWeight: 600 }}>📍 {disaster.location?.name || 'Unspecified Epicenter'}</span>
-              <span>·</span>
-              <span style={{ color: 'var(--color-muted)' }}>PostGIS Spatial Registry</span>
             </div>
           </div>
 
@@ -264,14 +262,20 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
         </header>
 
         {/* Tab Navigation Ribbon */}
-        <nav style={{
-          display: 'flex',
-          gap: '8px',
-          padding: '10px 30px',
-          borderBottom: '1px solid var(--color-rule)',
-          backgroundColor: 'var(--color-paper)',
-          overflowX: 'auto'
-        }}>
+        <nav
+          className="modal-tab-nav"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 30px',
+            borderBottom: '1px solid var(--color-rule)',
+            backgroundColor: 'var(--color-paper)',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
           {[
             { id: 'resources', label: 'Nearby Resources', count: resources.length },
             { id: 'updates', label: 'Official Bulletins', count: updates.length },
@@ -285,18 +289,29 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
                   padding: '7px 16px',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: '12.5px',
+                  height: '34px',
+                  borderRadius: '9999px',
+                  fontSize: '13px',
+                  lineHeight: 1,
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? '#ffffff' : 'var(--color-ink-2)',
                   backgroundColor: isActive ? 'var(--color-forest)' : 'transparent',
                   border: 'none',
                   cursor: 'pointer',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  boxSizing: 'border-box'
                 }}
               >
-                {tab.label} <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '11px', fontFamily: 'var(--font-mono)' }}>[{tab.count}]</span>
+                <span>{tab.label}</span>
+                <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+                  [{tab.count}]
+                </span>
               </button>
             );
           })}

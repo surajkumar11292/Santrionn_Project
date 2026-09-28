@@ -39,8 +39,7 @@ export default function StatsBar({ disasters = [] }) {
       value: total,
       color: 'var(--color-ink)',
       bg: 'var(--color-paper-muted)',
-      border: 'var(--color-rule)',
-      tag: 'PostGIS Registry'
+      border: 'var(--color-rule)'
     }
   ];
 
@@ -79,17 +78,19 @@ export default function StatsBar({ disasters = [] }) {
               {s.label}
             </span>
 
-            <span style={{
-              fontSize: '11px',
-              fontWeight: 600,
-              padding: '2px 8px',
-              borderRadius: 'var(--radius-pill)',
-              backgroundColor: s.bg,
-              color: s.color,
-              border: `1px solid ${s.border}`
-            }}>
-              {s.tag}
-            </span>
+            {s.tag && (
+              <span style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-pill)',
+                backgroundColor: s.bg,
+                color: s.color,
+                border: `1px solid ${s.border}`
+              }}>
+                {s.tag}
+              </span>
+            )}
           </div>
 
           <div

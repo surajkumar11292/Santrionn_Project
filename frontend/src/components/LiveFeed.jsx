@@ -45,7 +45,7 @@ export default function LiveFeed({ events = [], isConnected = false }) {
             fontWeight: 400,
             color: 'var(--color-ink)'
           }}>
-            Live Broadcast Feed
+            Broadcast Feed
           </h2>
         </div>
 

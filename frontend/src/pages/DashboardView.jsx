@@ -42,45 +42,8 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
       width: '100%',
       padding: '24px 32px 48px'
     }}>
-      {/* Editorial Header */}
-      <header style={{ marginBottom: '24px' }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '4px 14px',
-          borderRadius: 'var(--radius-pill)',
-          backgroundColor: 'var(--color-paper-pill)',
-          color: 'var(--color-forest)',
-          border: '1px solid var(--color-rule-2)',
-          fontSize: '11px',
-          fontWeight: 600,
-          letterSpacing: '0.05em',
-          marginBottom: '12px'
-        }}>
-          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-forest)' }} />
-          <span>INCIDENT OPERATIONS · DISPATCH CONSOLE</span>
-        </div>
-
-        <h1 style={{
-          fontSize: 'clamp(2.4rem, 4vw, 3.4rem)',
-          fontWeight: 400,
-          letterSpacing: '-0.02em',
-          color: 'var(--color-ink)',
-          marginBottom: '6px'
-        }}>
-          Emergency Crisis <span style={{ fontStyle: 'italic', color: 'var(--color-forest)' }}>Operations</span>
-        </h1>
-
-        <p style={{
-          fontSize: '1.02rem',
-          color: 'var(--color-ink-2)',
-          maxWidth: '65ch',
-          lineHeight: 1.6
-        }}>
-          Real-time incident triage, PostGIS spatial radar mapping, and emergency relief resource dispatch.
-        </p>
-      </header>
+      {/* Semantic accessible title */}
+      <h1 className="sr-only">Disaster Response Incident Operations</h1>
 
       {/* 01 · Status Overview Counters */}
       <StatsBar disasters={disasters} />

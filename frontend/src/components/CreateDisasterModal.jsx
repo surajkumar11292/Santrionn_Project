@@ -9,7 +9,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
     title: '',
     description: '',
     status: 'active',
-    tagsInput: 'flood, urgent',
+    tagsInput: '',
     location_name: '',
     latitude: '',
     longitude: ''

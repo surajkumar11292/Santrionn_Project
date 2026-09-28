@@ -50,28 +50,6 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
               Response
             </span>
           </div>
-
-          {/* Status Pill Badge */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '3px 10px',
-            borderRadius: 'var(--radius-pill)',
-            backgroundColor: isSocketConnected ? 'var(--color-forest-subtle)' : '#fef2f2',
-            border: `1px solid ${isSocketConnected ? 'var(--color-forest-border)' : '#fecaca'}`,
-            fontSize: '11px',
-            fontWeight: 600,
-            color: isSocketConnected ? 'var(--color-forest)' : '#b91c1c'
-          }}>
-            <span style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              backgroundColor: isSocketConnected ? 'var(--color-forest)' : '#b91c1c'
-            }} />
-            <span>{isSocketConnected ? 'LIVE' : 'OFFLINE'}</span>
-          </div>
         </div>
 
         {/* View Switchers */}

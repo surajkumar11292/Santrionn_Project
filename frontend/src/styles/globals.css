@@ -221,3 +221,25 @@ a:hover {
   color: #1a1a1a !important;
   padding: 8px 10px 0 0 !important;
 }
+
+/* Accessibility: Visually Hidden */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Modal Tab Nav: No Scrollbar Clipping */
+.modal-tab-nav::-webkit-scrollbar {
+  display: none;
+}
+.modal-tab-nav {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

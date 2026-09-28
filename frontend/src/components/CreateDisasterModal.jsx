@@ -117,16 +117,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            style={{
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-pill)',
-              color: 'var(--color-ink)',
-              border: '1px solid var(--color-rule-2)',
-              backgroundColor: 'var(--color-paper)',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
+            className="btn-modal-close-pill"
           >
             ✕ ESC
           </button>

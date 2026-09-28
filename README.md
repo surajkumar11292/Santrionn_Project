@@ -29,7 +29,6 @@ A mission-critical, backend-focused disaster response coordination platform engi
 7. [Trade-offs & Production Considerations](#-trade-offs--production-considerations)
 8. [Automated Test Suite](#-automated-test-suite)
 9. [AI Tool Usage Disclosure](#-ai-tool-usage-disclosure)
-10. [Submission Checklist](#-submission-checklist)
 
 ---
 
@@ -142,7 +141,7 @@ flowchart TD
         direction TB
         subgraph CoreServices["Incident Lifecycle & Real-Time Engine"]
             DisasterService["Disaster Service\n(Incident Lifecycle)"]
-            ImageService["AI Computer Vision Service\n(Hazard Assessment & Hashing)"]
+            ImageService["Incident Photography Service\n(Site Documentation & Gallery)"]
             QueueService["Background Queue & Worker\n(FIFO State Machine & Ingestion)"]
         end
         subgraph SpatialFeeds["Spatial Intelligence & Feed Ingestion"]
@@ -254,7 +253,7 @@ sequenceDiagram
 - `reports:disaster:<id>`: **300 seconds (5 minutes)**. Eliminates repeated external network roundtrips during crisis surges while ensuring citizen field intel stays fresh.
 - `resources:<id>:<lat>:<lng>:<radius>`: **120 seconds (2 minutes)**. Balances real-time resource availability against repeated spatial radial computations.
 - `geocode:<normalized_string>`: **86,400 seconds (24 hours)**. Geographic coordinates of cities, districts, and landmarks are static.
-- `image_analysis:<sha256_hash>`: **3,600 seconds (1 hour)**. Deduplicates computer vision processing for identical images.
+- `images:disaster:<id>`: **180 seconds (3 minutes)**. Caches disaster field photography gallery and site conditions.
 
 ---
 
@@ -329,9 +328,9 @@ Stateless JWT Bearer tokens encode cryptographically verified role claims:
 
 ## 🎁 Bonus Features Implemented
 
-1. **AI-Based Image Verification (`POST /disasters/:id/verify-image`)**:
-   - Automated computer vision heuristics model that analyzes visual metadata, detects synthetic/stock photo artifacts, calculates damage severity (`moderate`, `severe`, `catastrophic`), assigns confidence ratings, and extracts hazard tags (`#floodwater_depth_high`, `#submerged_vehicles`, `#active_flame_front`, `#structural_collapse_risk`).
-   - Caches image evaluation hashes in Redis to prevent redundant compute.
+1. **Incident Photography & Field Documentation (`POST /disasters/:id/verify-image` & `GET /disasters/:id/images`)**:
+   - Field photo submission and verification pipeline allowing first responders and verified citizens to document real-time site conditions, structural damage, road closures, and flood levels with timestamped captions.
+   - Caches disaster photo galleries in Redis (`images:disaster:<id>`) with real-time WebSocket broadcast (`image_verified`) across connected operational terminals.
 2. **Official Emergency Bulletins (`POST /disasters/:id/updates` & `GET /disasters/:id/updates`)**:
    - Dedicated authority broadcasting channel for emergency agencies (FEMA, NWS, Civil Defense) with severity classification (`advisory`, `warning`, `evacuation`, `all_clear`).
    - Emits real-time WebSocket alerts to connected operators.
@@ -478,7 +477,7 @@ npm test
 4. **`tests/caching.test.js`**: Redis Cache-Aside pattern (asserting `meta.cached: false` on cache miss and `meta.cached: true` with positive TTL on subsequent requests).
 5. **`tests/officialUpdates.test.js`**: Official emergency agency advisories, cache invalidation, and role restrictions.
 6. **`tests/queue.test.js`**: Asynchronous job queue (`POST /disasters/:id/sync-reports` returning HTTP 202 Accepted, worker processing state machine, telemetry tracking, and completion).
-7. **`tests/imageVerification.test.js`**: AI damage image verification, optical hazard classification, authenticity validation, and Redis cache-aside caching.
+7. **`tests/imageVerification.test.js`**: Incident photo verification, site documentation payload validation, and Redis cache-aside caching.
 
 ---
 
@@ -498,15 +497,4 @@ In compliance with section 10 of the assignment guidelines:
   - Docker Compose volume configuration resolving cross-platform symlink and node-linker constraints in Alpine Linux.
   - All decisions about database schema design, index strategy, TTL values, and RBAC role hierarchy were made manually after evaluation.
 
----
 
-## 📦 Submission Checklist
-
-- [x] **GitHub Repository**: Accessible and clean codebase
-- [x] **README.md**: Setup instructions, architecture diagrams, technical decisions, trade-offs, and AI tool usage disclosure
-- [x] **.env.example**: Documented environment variables with safe defaults (no secrets committed)
-- [x] **API Documentation**: Interactive Swagger UI at [`http://localhost:3000/api-docs`](http://localhost:3000/api-docs) and [`backend/src/docs/swagger.yaml`](file:///d:/Santrionn_Project/backend/src/docs/swagger.yaml)
-- [x] **Postman Collection**: Exported and ready to import from [`postman_collection.json`](file:///d:/Santrionn_Project/postman_collection.json)
-- [x] **Automated Tests**: 7 test suites, 25 tests passing (`npm test`)
-- [x] **Mock Data & Seed Scripts**: Automatic migration and seed scripts (`npm run migrate`, `npm run seed`)
-- [x] **Live Demo & Real-Time Test Client**: Interactive socket tester at [`http://localhost:3000/socket-test`](http://localhost:3000/socket-test)

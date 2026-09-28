@@ -10,7 +10,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
 
   return (
     <header style={{
-      borderBottom: '1px solid var(--color-rule)',
+      borderBottom: '1.5px solid #bab5a6',
       backgroundColor: 'var(--color-paper)',
       padding: '14px 32px',
       position: 'sticky',

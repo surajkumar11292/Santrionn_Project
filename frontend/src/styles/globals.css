@@ -418,7 +418,7 @@ a:hover {
   font-weight: 700;
 }
 
-/* Card Classification Tag Pill */
+/* Card Classification Tag Pill (Static Info Badge, Non-Clickable) */
 .card-tag-pill {
   font-size: 12px;
   font-weight: 600;
@@ -430,11 +430,29 @@ a:hover {
   display: inline-flex;
   align-items: center;
   line-height: 1.2;
-  transition: all 0.15s ease;
-  cursor: pointer;
+  cursor: default;
+  user-select: none;
 }
 
-.card-tag-pill:hover {
+/* Modal Close & ESC Pill Button (turns dark on hover) */
+.btn-modal-close-pill {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-rule-2);
+  color: var(--color-ink);
+  transition: all 0.15s ease;
+}
+
+.btn-modal-close-pill:hover {
   background-color: var(--color-forest);
   border-color: var(--color-forest);
   color: #ffffff;

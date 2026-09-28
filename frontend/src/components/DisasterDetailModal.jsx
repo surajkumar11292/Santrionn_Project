@@ -263,16 +263,7 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
           <button
             type="button"
             onClick={onClose}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              color: 'var(--color-ink)',
-              border: '1px solid var(--color-rule-2)',
-              backgroundColor: 'var(--color-paper)',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
+            className="btn-modal-close-pill"
           >
             ✕ Close
           </button>
@@ -778,57 +769,71 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                         boxShadow: 'var(--shadow-sm)'
                       }}
                     >
-                      <img
-                        src={img.image_url || img.imageUrl}
-                        alt={img.caption || 'Incident damage assessment'}
-                        style={{ width: '100%', height: '160px', objectFit: 'cover', borderBottom: '1px solid var(--color-rule)' }}
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <a
+                        href={img.image_url || img.imageUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ display: 'block', position: 'relative', overflow: 'hidden' }}
+                        title="Click to view full size image"
+                      >
+                        <img
+                          src={img.image_url || img.imageUrl}
+                          alt={img.caption || 'Incident site documentation'}
+                          style={{
+                            width: '100%',
+                            height: '180px',
+                            objectFit: 'cover',
+                            display: 'block',
+                            borderBottom: '1px solid var(--color-rule)'
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </a>
+                      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{
                             fontFamily: 'var(--font-mono)',
-                            fontSize: '10px',
+                            fontSize: '10.5px',
                             fontWeight: 700,
-                            padding: '2px 8px',
+                            padding: '3px 8px',
                             borderRadius: 'var(--radius-pill)',
-                            color: (img.damage_severity || img.severity) === 'critical' || (img.damage_severity || img.severity) === 'catastrophic' ? '#b91c1c' : '#b45309',
-                            backgroundColor: (img.damage_severity || img.severity) === 'critical' || (img.damage_severity || img.severity) === 'catastrophic' ? '#fef2f2' : '#fffbeb'
+                            color: 'var(--color-forest)',
+                            backgroundColor: 'var(--color-forest-subtle)',
+                            border: '1px solid var(--color-forest-border)'
                           }}>
-                            {(img.damage_severity || img.severity)?.toUpperCase()} DAMAGE
+                            📷 FIELD PHOTO
                           </span>
-                          <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--color-ink)' }}>
-                            {Math.round(((img.confidence_score !== undefined ? img.confidence_score : img.damage_score) || 0.95) * ((img.confidence_score !== undefined && img.confidence_score <= 1) ? 100 : 1))}% CONFIDENCE
+                          <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)' }}>
+                            {img.created_at ? new Date(img.created_at).toLocaleDateString() : 'RECENT'}
                           </span>
                         </div>
 
                         {img.caption && (
-                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-ink)' }}>
+                          <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.4 }}>
                             {img.caption}
                           </div>
                         )}
 
-                        {(img.detected_hazards || img.hazard_tags) && (img.detected_hazards || img.hazard_tags).length > 0 && (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '2px' }}>
-                            {(img.detected_hazards || img.hazard_tags).map((tag, idx) => (
-                              <span
-                                key={idx}
-                                style={{
-                                  fontSize: '10px',
-                                  padding: '2px 6px',
-                                  borderRadius: 'var(--radius-pill)',
-                                  background: 'var(--color-paper)',
-                                  border: '1px solid var(--color-rule)',
-                                  color: 'var(--color-muted)'
-                                }}
-                              >
-                                #{tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                        <div style={{ marginTop: 'auto', paddingTop: '6px', display: 'flex', justifyContent: 'flex-end' }}>
+                          <a
+                            href={img.image_url || img.imageUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              fontSize: '11.5px',
+                              fontWeight: 600,
+                              color: 'var(--color-forest)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            Open Full Size ↗
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}

@@ -26,14 +26,14 @@ class MockSocialService {
     const rawExternalStream = [
       {
         tweet_id: 'tw_901928301',
-        text: `Urgent! Need drinking water and baby formula near ${query || 'Manhattan'}. Roads blocked by debris.`,
+        text: `Urgent! Need drinking water and baby formula near ${query || 'Mumbai'}. Roads blocked by debris.`,
         author: {
           screen_name: 'citizen_sarah_99',
           followers_count: 342,
           verified_badge: false
         },
         posted_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-        geo_tag: 'US/East',
+        geo_tag: 'IN/West',
         retweets: 14
       },
       {
@@ -45,7 +45,7 @@ class MockSocialService {
           verified_badge: true
         },
         posted_at: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
-        geo_tag: 'US/East',
+        geo_tag: 'IN/West',
         retweets: 48
       },
       {
@@ -57,19 +57,19 @@ class MockSocialService {
           verified_badge: true
         },
         posted_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-        geo_tag: 'US/East',
+        geo_tag: 'IN/West',
         retweets: 112
       },
       {
         tweet_id: 'tw_901928304',
-        text: `Community center opened on 5th street offering warm meals, dry blankets, and battery charging.`,
+        text: `Community center opened on station road offering warm meals, dry blankets, and battery charging.`,
         author: {
           screen_name: 'local_aid_network',
           followers_count: 450,
           verified_badge: false
         },
         posted_at: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
-        geo_tag: 'US/East',
+        geo_tag: 'IN/West',
         retweets: 29
       }
     ];

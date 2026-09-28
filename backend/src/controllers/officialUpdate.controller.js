@@ -36,6 +36,24 @@ class OfficialUpdateController {
       next(err);
     }
   }
+
+  async getFeed(req, res, next) {
+    try {
+      const days = parseInt(req.query.days, 10) || 7;
+      const feed = await officialUpdateService.getBroadcastFeed(days);
+
+      return successResponse(
+        res,
+        feed,
+        {
+          total: feed.length,
+          retention_days: days
+        }
+      );
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new OfficialUpdateController();

@@ -25,10 +25,9 @@ export default function MapView({ onSelectDisaster }) {
         zoomControl: true
       });
 
-      // CartoDB Positron (Clean Light Paper Cartography)
-      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-        attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
-        subdomains: 'abcd',
+      // OpenStreetMap (Free, Full Detailed Global & India Cartography, No API Key Required)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19
       }).addTo(map);
 
@@ -101,7 +100,7 @@ export default function MapView({ onSelectDisaster }) {
               ${disaster.status} · [${lat.toFixed(3)}, ${lng.toFixed(3)}]
             </div>
             <div style="
-              font-family: 'Instrument Serif', Georgia, serif;
+              font-family: 'Roboto', sans-serif;
               font-size: 18px;
               font-weight: 400;
               color: #1a1a1a;
@@ -146,61 +145,6 @@ export default function MapView({ onSelectDisaster }) {
   return (
     <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 75px)', overflow: 'hidden' }}>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
-
-      {/* Floating Tactical HUD Card */}
-      <div
-        className="aurora-card"
-        style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          padding: '18px 22px',
-          zIndex: 1000,
-          minWidth: '260px',
-          borderRadius: '16px',
-          boxShadow: 'var(--shadow-md)',
-          border: '1px solid var(--color-rule)',
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(8px)'
-        }}
-      >
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          fontSize: '11px',
-          fontWeight: 700,
-          fontFamily: 'var(--font-mono)',
-          color: 'var(--color-forest)',
-          marginBottom: '4px'
-        }}>
-          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-forest)' }} />
-          SPATIAL RADAR
-        </div>
-        <div style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.4rem',
-          fontWeight: 400,
-          color: 'var(--color-ink)'
-        }}>
-          {disasters.length} Epicenters Tracked
-        </div>
-        <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '2px' }}>
-          PostGIS ST_DWithin spatial radius search.
-        </div>
-
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          marginTop: '12px',
-          paddingTop: '10px',
-          borderTop: '1px solid var(--color-paper-muted)'
-        }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#b91c1c' }}>● ACTIVE</span>
-          <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#b45309' }}>● MONITORING</span>
-          <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--color-forest)' }}>● RESOLVED</span>
-        </div>
-      </div>
     </div>
   );
 }

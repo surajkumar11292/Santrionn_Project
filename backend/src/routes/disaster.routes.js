@@ -23,6 +23,9 @@ const router = express.Router();
 // List all disasters with filters (?tag=flood&status=active)
 router.get('/', validate(queryDisastersSchema, 'query'), disasterController.getAll);
 
+// Persistent Emergency Broadcast Feed (7-day history)
+router.get('/feed', officialUpdateController.getFeed);
+
 // Community Reports with Redis Caching and External Stream Integration
 router.get('/:id/reports', reportController.getByDisasterId);
 

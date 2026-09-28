@@ -129,8 +129,8 @@ describe('Disaster CRUD Integration Tests', () => {
     expect(mumbaiRes.status).toBe(200);
     expect(mumbaiRes.body.data.some((d) => d.location.name.includes('Mumbai'))).toBe(true);
 
-    const tokyoRes = await request(app).get('/disasters?search=Tokyo');
-    expect(tokyoRes.status).toBe(200);
-    expect(tokyoRes.body.data.some((d) => d.location.name.includes('Tokyo'))).toBe(true);
+    const chamoliRes = await request(app).get('/disasters?search=Chamoli');
+    expect(chamoliRes.status).toBe(200);
+    expect(chamoliRes.body.data.some((d) => d.location.name.includes('Chamoli'))).toBe(true);
   });
 });

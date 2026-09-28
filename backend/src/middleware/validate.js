@@ -18,7 +18,8 @@ const validate = (schema, property = 'body') => {
         message: detail.message.replace(/['"]/g, '')
       }));
 
-      return next(new BadRequestError('Validation failed on request parameters', details));
+      const detailsMsg = details.map(d => `${d.field}: ${d.message}`).join('; ');
+      return next(new BadRequestError(`Validation failed: ${detailsMsg}`, details));
     }
 
     // Replace request property with sanitized and typed value

@@ -69,9 +69,9 @@ class GeoService {
 
       // Default safe fallback if unresolvable
       return {
-        name: extractedName || 'Manhattan, NYC',
-        latitude: 40.7831,
-        longitude: -73.9712,
+        name: extractedName || 'Mumbai, Maharashtra',
+        latitude: 19.0760,
+        longitude: 72.8777,
         isFallback: true
       };
     });
@@ -116,9 +116,9 @@ class GeoService {
 
   getDefaultLocation() {
     return {
-      locationName: 'Manhattan, NYC',
-      latitude: 40.7831,
-      longitude: -73.9712,
+      locationName: 'Mumbai, Maharashtra',
+      latitude: 19.0760,
+      longitude: 72.8777,
       cached: false
     };
   }

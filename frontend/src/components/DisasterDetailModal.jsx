@@ -87,13 +87,30 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
 
   const handleCreateResource = async (e) => {
     e.preventDefault();
-    if (!newResource.name || !newResource.latitude || !newResource.longitude) return;
+    if (!newResource.name?.trim()) {
+      alert('Please provide a resource name.');
+      return;
+    }
+
+    const rawLat = newResource.latitude !== '' ? parseFloat(newResource.latitude) : disaster.location?.latitude;
+    const rawLng = newResource.longitude !== '' ? parseFloat(newResource.longitude) : disaster.location?.longitude;
+
+    if (rawLat === undefined || rawLat === null || isNaN(rawLat) || rawLat < -90 || rawLat > 90) {
+      alert('Latitude must be a valid geographic coordinate between -90 and 90 (e.g. 29.2183 for Uttarakhand or 19.0760 for Mumbai).\n\nYou entered: ' + (newResource.latitude || '(empty)'));
+      return;
+    }
+
+    if (rawLng === undefined || rawLng === null || isNaN(rawLng) || rawLng < -180 || rawLng > 180) {
+      alert('Longitude must be a valid geographic coordinate between -180 and 180 (e.g. 79.5130 for Uttarakhand or 72.8777 for Mumbai).\n\nYou entered: ' + (newResource.longitude || '(empty)'));
+      return;
+    }
+
     try {
       await api.resources.create(disaster.id, {
-        name: newResource.name,
+        name: newResource.name.trim(),
         type: newResource.type,
-        latitude: parseFloat(newResource.latitude),
-        longitude: parseFloat(newResource.longitude)
+        latitude: rawLat,
+        longitude: rawLng
       });
       setNewResource({ name: '', type: 'shelter', latitude: '', longitude: '' });
       loadResources();
@@ -344,7 +361,12 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                     max="50"
                     value={radius}
                     onChange={(e) => setRadius(Number(e.target.value))}
-                    style={{ accentColor: 'var(--color-forest)' }}
+                    style={{
+                      width: '140px',
+                      height: '6px',
+                      borderRadius: '999px',
+                      background: `linear-gradient(to right, var(--color-forest) 0%, var(--color-forest) ${(radius / 50) * 100}%, #e5e7eb ${(radius / 50) * 100}%, #e5e7eb 100%)`
+                    }}
                   />
                   <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--color-forest)' }}>
                     {radius} KM
@@ -435,10 +457,10 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-muted)', marginBottom: '12px' }}>
                     + Provision Emergency Asset (Admin)
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr auto', gap: '8px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1.1fr 1.1fr auto', gap: '8px', alignItems: 'center' }}>
                     <input
                       type="text"
-                      placeholder="Resource name..."
+                      placeholder="Resource name (e.g. Relief Food Center)"
                       value={newResource.name}
                       onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
                       style={{ padding: '8px 12px', fontSize: '13px', borderRadius: '8px' }}
@@ -458,25 +480,29 @@ export default function DisasterDetailModal({ disaster, onClose, onJoinRoom, onL
                     <input
                       type="number"
                       step="any"
-                      placeholder="Lat"
+                      min="-90"
+                      max="90"
+                      placeholder="Lat (-90 to 90)"
                       value={newResource.latitude}
                       onChange={(e) => setNewResource({ ...newResource, latitude: e.target.value })}
                       style={{ padding: '8px 10px', fontSize: '13px', borderRadius: '8px' }}
-                      required
+                      title="Geographic Latitude between -90 and 90"
                     />
                     <input
                       type="number"
                       step="any"
-                      placeholder="Lng"
+                      min="-180"
+                      max="180"
+                      placeholder="Lng (-180 to 180)"
                       value={newResource.longitude}
                       onChange={(e) => setNewResource({ ...newResource, longitude: e.target.value })}
                       style={{ padding: '8px 10px', fontSize: '13px', borderRadius: '8px' }}
-                      required
+                      title="Geographic Longitude between -180 and 180"
                     />
                     <button
                       type="submit"
                       className="btn-forest"
-                      style={{ padding: '8px 18px', fontSize: '12px' }}
+                      style={{ padding: '8px 18px', fontSize: '12px', whiteSpace: 'nowrap' }}
                     >
                       Deploy
                     </button>

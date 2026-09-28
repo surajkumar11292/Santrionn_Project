@@ -153,7 +153,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
             </label>
             <input
               type="text"
-              placeholder="e.g. Flash Flooding in Lower Manhattan, NYC"
+              placeholder="e.g. Severe Cyclone & Coastal Flooding in Mumbai"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               style={{ width: '100%', padding: '9px 12px', fontSize: '13px', borderRadius: '8px' }}
@@ -172,7 +172,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
             </div>
             <textarea
               rows={3}
-              placeholder="Detail emergency conditions. Mentioned cities/regions (e.g. Mumbai, Delhi, Miami, London) are automatically parsed into geo-coordinates."
+              placeholder="Detail emergency conditions. Mentioned cities/regions (e.g. Mumbai, Chamoli, Wayanad, Chennai) are automatically parsed into geo-coordinates."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               style={{ width: '100%', padding: '9px 12px', fontSize: '13px', lineHeight: 1.45, resize: 'vertical', borderRadius: '8px' }}
@@ -191,7 +191,7 @@ export default function CreateDisasterModal({ onClose, onSuccess }) {
             </div>
             <input
               type="text"
-              placeholder="e.g. Mumbai, Maharashtra or Manhattan, NYC"
+              placeholder="e.g. Mumbai, Maharashtra or Chamoli, Uttarakhand"
               value={formData.location_name}
               onChange={(e) => setFormData({ ...formData, location_name: e.target.value })}
               style={{ width: '100%', padding: '9px 12px', fontSize: '13px', borderRadius: '8px' }}

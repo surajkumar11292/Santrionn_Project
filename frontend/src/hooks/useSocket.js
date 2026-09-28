@@ -1,8 +1,28 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useDisasterStore } from '../store/disasterStore';
+import { api } from '../api/client';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+
+export function formatBroadcastDateTime(dateInput) {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return String(dateInput);
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const strHours = String(hours).padStart(2, '0');
+
+  return `${yyyy}-${mm}-${dd} · ${strHours}:${minutes} ${ampm}`;
+}
 
 export function useSocket() {
   const [connected, setConnected] = useState(false);
@@ -12,6 +32,35 @@ export function useSocket() {
   const recentKeysRef = useRef(new Set());
 
   const { onDisasterCreated, onDisasterUpdated, onDisasterDeleted } = useDisasterStore();
+
+  // Load initial persistent 7-day broadcast feed from database
+  useEffect(() => {
+    let isMounted = true;
+    api.disasters
+      .getFeed(7)
+      .then((res) => {
+        if (!isMounted) return;
+        const feedList = res?.data;
+        if (Array.isArray(feedList) && feedList.length > 0) {
+          const formatted = feedList.map((item) => ({
+            id: item.id,
+            type: item.type || 'official_update',
+            title: item.title,
+            detail: item.detail,
+            level: item.level || 'warning',
+            timestamp: formatBroadcastDateTime(item.timestamp || item.created_at)
+          }));
+          setLiveEvents(formatted);
+        }
+      })
+      .catch((err) => {
+        console.warn('[Broadcast Feed] Initial feed fetch error:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const addLiveEvent = useCallback((eventData) => {
     // Client-side deduplication key: prevent identical events within 3 seconds
@@ -27,12 +76,13 @@ export function useSocket() {
     setLiveEvents((prev) => [
       {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: formatBroadcastDateTime(new Date()),
         ...eventData
       },
-      ...prev.slice(0, 29) // Keep last 30 events
+      ...prev
     ]);
   }, []);
+
 
   useEffect(() => {
     const socket = io(SOCKET_URL, {

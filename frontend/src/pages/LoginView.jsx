@@ -60,26 +60,7 @@ export default function LoginView() {
       }}>
         {/* Left Column: Editorial Portfolio Style Layout */}
         <div>
-          {/* Pill Badge (matching • FULL-STACK ENGINEER in screenshot) */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '5px 16px',
-            borderRadius: 'var(--radius-pill)',
-            backgroundColor: 'var(--color-paper-pill)',
-            border: '1px solid var(--color-rule-2)',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            color: 'var(--color-forest)',
-            marginBottom: '24px'
-          }}>
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-forest)' }} />
-            <span>DISASTER OPERATIONS · POSTGIS REGISTRY · LIVE DISPATCH</span>
-          </div>
-
-          {/* Heading (Disaster in Serif, Response in Forest Green Italic Serif) */}
+          {/* Heading */}
           <h1 style={{
             fontSize: 'clamp(3rem, 6vw, 4.8rem)',
             lineHeight: 1.05,
@@ -89,48 +70,22 @@ export default function LoginView() {
             <span style={{ color: 'var(--color-ink)', display: 'block' }}>Disaster</span>
             <span style={{
               fontStyle: 'italic',
-              color: 'var(--color-forest)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '12px'
+              color: 'var(--color-forest)'
             }}>
               Response
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                border: '1px solid var(--color-forest)',
-                fontSize: '10px',
-                color: 'var(--color-forest)'
-              }}>
-                ⊙
-              </span>
             </span>
           </h1>
 
-          {/* Subtitle with em-dash (matching "— System Design Enthusiast |" in screenshot) */}
-          <div style={{
-            fontSize: '1.2rem',
-            fontStyle: 'italic',
-            fontFamily: 'var(--font-display)',
-            color: 'var(--color-ink-2)',
-            marginBottom: '24px'
-          }}>
-            — Incident Triage & Emergency Resource Dispatch |
-          </div>
-
-          {/* Body Paragraph with highlighted keywords */}
+          {/* Simple, human description */}
           <p style={{
-            fontSize: '1.02rem',
+            fontSize: '1rem',
             color: 'var(--color-ink-2)',
-            maxWidth: '46ch',
-            lineHeight: 1.65,
+            maxWidth: '44ch',
+            lineHeight: 1.6,
+            marginTop: '16px',
             marginBottom: '28px'
           }}>
-            Production disaster management console with <strong style={{ color: 'var(--color-forest)' }}>real-time socket telemetry</strong>, <strong style={{ color: 'var(--color-forest)' }}>PostGIS spatial radius queries</strong>, and <strong style={{ color: 'var(--color-forest)' }}>verified resource dispatch</strong>. Clean, focused, reliable.
+            Coordinate emergency rescue operations, locate nearby relief supplies, and report crisis incidents in real time across India.
           </p>
         </div>
 

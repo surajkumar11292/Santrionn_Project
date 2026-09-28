@@ -44,6 +44,7 @@ export const api = {
   // Disasters
   disasters: {
     list: (params = {}) => apiClient.get('/disasters', { params }),
+    getFeed: (days = 7) => apiClient.get('/disasters/feed', { params: { days } }),
     getById: (id) => apiClient.get(`/disasters/${id}`),
     create: (data) => apiClient.post('/disasters', data),
     update: (id, data) => apiClient.patch(`/disasters/${id}`, data),

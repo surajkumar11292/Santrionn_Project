@@ -4,6 +4,23 @@
 import React from 'react';
 
 export default function LiveFeed({ events = [], isConnected = false }) {
+  const displayTime = (ts) => {
+    if (!ts) return '';
+    if (typeof ts === 'string' && ts.includes('·')) return ts;
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return String(ts);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const strHours = String(hours).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} · ${strHours}:${minutes} ${ampm}`;
+  };
+
   // Filter out internal system packets and deleted/removed incident notices
   const broadcastEvents = events.filter((evt) => 
     evt.type !== 'system' && 
@@ -98,7 +115,7 @@ export default function LiveFeed({ events = [], isConnected = false }) {
                     {evt.title}
                   </span>
                   <span className="tnum" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)' }}>
-                    {evt.timestamp}
+                    {displayTime(evt.timestamp)}
                   </span>
                 </div>
 

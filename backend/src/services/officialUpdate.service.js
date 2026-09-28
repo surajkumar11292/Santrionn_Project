@@ -64,11 +64,29 @@ class OfficialUpdateService {
     // Invalidate cache for fresh retrieval
     const cacheKey = `official_updates:disaster:${disasterId}`;
     await cacheService.del(cacheKey);
+    await cacheService.del('broadcast_feed:7d');
 
     // Broadcast real-time WebSocket alert
     emitOfficialUpdate(disasterId, update);
 
     return update;
+  }
+
+  /**
+   * Retrieve aggregate crisis broadcast feed across incidents for past N days (default: 7)
+   */
+  async getBroadcastFeed(days = 7) {
+    const cacheKey = `broadcast_feed:${days}d`;
+    const cached = await cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const items = await officialUpdateRepo.findBroadcastFeed(days);
+
+    // Cache feed for 60 seconds
+    await cacheService.set(cacheKey, items, 60);
+    return items;
   }
 }
 

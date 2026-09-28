@@ -1,579 +1,230 @@
 -- Clean existing seed data cleanly (cascading)
-TRUNCATE reports, resources, disasters, users CASCADE;
+TRUNCATE reports, resources, disasters, users, official_updates, disaster_image_verifications CASCADE;
 
--- ============================================================================
--- 1. SEED USERS (bcrypt passwords via pgcrypto: admin123, contrib123, viewer123)
--- ============================================================================
+-- 1. SEED USERS
 INSERT INTO users (id, name, email, password_hash, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'Admin Officer', 'admin@relief.io', crypt('admin123', gen_salt('bf', 10)), 'admin'),
   ('22222222-2222-2222-2222-222222222222', 'Field Coordinator', 'contrib@relief.io', crypt('contrib123', gen_salt('bf', 10)), 'contributor'),
   ('33333333-3333-3333-3333-333333333333', 'Public Observer', 'viewer@relief.io', crypt('viewer123', gen_salt('bf', 10)), 'viewer');
 
--- ============================================================================
--- 2. SEED DISASTERS (Diverse locations, hazards, tags, and operational statuses)
--- ============================================================================
+-- 2. SEED DISASTERS (55 Diverse Indian Incidents)
 INSERT INTO disasters (id, title, description, location_name, latitude, longitude, location, tags, status, created_by) VALUES
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'Severe Flash Flooding in Manhattan, NYC',
-    'Heavy flooding and subway inundation has affected Manhattan, NYC following torrential rainfall and sewer system overflow.',
-    'Manhattan, NYC',
-    40.7831,
-    -73.9712,
-    ST_SetSRID(ST_MakePoint(-73.9712, 40.7831), 4326)::geography,
-    ARRAY['flood', 'storm', 'infrastructure', 'subway'],
-    'active',
-    '11111111-1111-1111-1111-111111111111'
-  ),
-  (
-    'a2222222-2222-2222-2222-222222222222',
-    'Coastal Storm Surge in Miami Beach',
-    'Category 3 hurricane storm surge threatening low-lying coastal avenues and infrastructure in Miami Beach.',
-    'Miami Beach, FL',
-    25.7907,
-    -80.1300,
-    ST_SetSRID(ST_MakePoint(-80.1300, 25.7907), 4326)::geography,
-    ARRAY['hurricane', 'surge', 'coastal', 'power-outage'],
-    'active',
-    '22222222-2222-2222-2222-222222222222'
-  ),
-  (
-    'a3333333-3333-3333-3333-333333333333',
-    'Topanga Canyon Wildfire Evacuation',
-    'Fast-moving brush fire spreading across Topanga Canyon with mandatory evacuation orders in effect.',
-    'Topanga Canyon, Los Angeles',
-    34.0922,
-    -118.6019,
-    ST_SetSRID(ST_MakePoint(-118.6019, 34.0922), 4326)::geography,
-    ARRAY['wildfire', 'smoke', 'evacuation'],
-    'monitoring',
-    '11111111-1111-1111-1111-111111111111'
-  ),
-  (
-    'a4444444-4444-4444-4444-444444444444',
-    'Magnitude 6.2 Structural Damage in San Francisco',
-    'Seismic event centered near San Francisco causing localized building collapses and gas pipeline leaks.',
-    'San Francisco, CA',
-    37.7749,
-    -122.4194,
-    ST_SetSRID(ST_MakePoint(-122.4194, 37.7749), 4326)::geography,
-    ARRAY['earthquake', 'collapse', 'gas-leak'],
-    'active',
-    '22222222-2222-2222-2222-222222222222'
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'Severe Cyclone & Coastal Inundation in Mumbai',
-    'Intense cyclonic storm hitting Mumbai shoreline with continuous rainfall, high tide breaches, and suburban waterlogging.',
-    'Mumbai, Maharashtra',
-    19.0760,
-    72.8777,
-    ST_SetSRID(ST_MakePoint(72.8777, 19.0760), 4326)::geography,
-    ARRAY['cyclone', 'flood', 'hurricane', 'urgent', 'coastal'],
-    'active',
-    '11111111-1111-1111-1111-111111111111'
-  ),
-  (
-    'a6666666-6666-6666-6666-666666666666',
-    'Himalayan Cloudburst & Flash Landslide in Uttarakhand',
-    'Sudden cloudburst causing heavy debris flow and road blockages across Chamoli district, stranding mountain pilgrims.',
-    'Chamoli, Uttarakhand',
-    30.2937,
-    79.5603,
-    ST_SetSRID(ST_MakePoint(79.5603, 30.2937), 4326)::geography,
-    ARRAY['landslide', 'flood', 'rescue', 'urgent'],
-    'active',
-    '22222222-2222-2222-2222-222222222222'
-  ),
-  (
-    'a7777777-7777-7777-7777-777777777777',
-    'Extreme Monsoon Riverine Overflow in Kochi',
-    'Periyar river basin overflow triggering low-lying residential inundation and relief camp mobilizations.',
-    'Kochi, Kerala',
-    9.9312,
-    76.2673,
-    ST_SetSRID(ST_MakePoint(76.2673, 9.9312), 4326)::geography,
-    ARRAY['flood', 'monsoon', 'medical', 'shelter'],
-    'monitoring',
-    '11111111-1111-1111-1111-111111111111'
-  ),
-  (
-    'a8888888-8888-8888-8888-888888888888',
-    'Magnitude 7.1 Seismic Tremor in Tokyo Bay',
-    'Strong offshore seismic activity shaking Greater Tokyo with bullet train halts and structural inspection alerts.',
-    'Tokyo Bay, Japan',
-    35.6762,
-    139.6503,
-    ST_SetSRID(ST_MakePoint(139.6503, 35.6762), 4326)::geography,
-    ARRAY['earthquake', 'tsunami', 'infrastructure', 'metro'],
-    'active',
-    '22222222-2222-2222-2222-222222222222'
-  ),
-  (
-    'a9999999-9999-9999-9999-999999999999',
-    'Thames Barrier Tidal Surge & Flood Warning',
-    'High spring tides combined with North Sea gale storm surge triggering Thames flood barrier deployment in London.',
-    'London, United Kingdom',
-    51.5074,
-    -0.1278,
-    ST_SetSRID(ST_MakePoint(-0.1278, 51.5074), 4326)::geography,
-    ARRAY['flood', 'tidal', 'storm', 'infrastructure'],
-    'monitoring',
-    '11111111-1111-1111-1111-111111111111'
-  ),
-  (
-    'baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    'Blue Mountains Bushfire Perimeter Breach',
-    'Intense summer heatwave driving uncontrolled bushfires toward residential perimeters in the Blue Mountains.',
-    'Sydney, Australia',
-    -33.8688,
-    151.2093,
-    ST_SetSRID(ST_MakePoint(151.2093, -33.8688), 4326)::geography,
-    ARRAY['wildfire', 'heatwave', 'evacuation', 'fire'],
-    'active',
-    '22222222-2222-2222-2222-222222222222'
-  ),
-  (
-    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-    'Industrial Chemical Vapor Containment in New Delhi',
-    'Ammonia and chemical vapor leak from an industrial zone contained and neutralized by hazardous materials squads.',
-    'New Delhi, NCR',
-    28.6139,
-    77.2090,
-    ST_SetSRID(ST_MakePoint(77.2090, 28.6139), 4326)::geography,
-    ARRAY['chemical', 'hazmat', 'air-quality', 'medical'],
-    'resolved',
-    '11111111-1111-1111-1111-111111111111'
-  ),
-  (
-    'cccccccc-cccc-cccc-cccc-cccccccccccc',
-    'Kilauea Volcanic Ash & Lava Corridor Hazard',
-    'Volcanic fissure eruption emitting toxic sulfur dioxide plumes and basaltic lava towards uninhabited coastal sector.',
-    'Kilauea, Hawaii',
-    19.4069,
-    -155.2834,
-    ST_SetSRID(ST_MakePoint(-155.2834, 19.4069), 4326)::geography,
-    ARRAY['volcano', 'ash', 'evacuation'],
-    'resolved',
-    '22222222-2222-2222-2222-222222222222'
-  );
+  ('a1111111-1111-1111-1111-111111111111', 'Severe Cyclone & Coastal Inundation in Mumbai', 'Intense cyclonic storm hitting Mumbai shoreline with continuous rainfall, high tide breaches, and suburban waterlogging.', 'Mumbai, Maharashtra', 19.076, 72.8777, ST_SetSRID(ST_MakePoint(72.8777, 19.076), 4326)::geography, ARRAY['flood', 'cyclone', 'urgent', 'coastal'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('a2222222-2222-2222-2222-222222222222', 'Himalayan Cloudburst & Flash Landslide in Chamoli', 'Sudden cloudburst causing heavy debris flow and road blockages across Chamoli district, stranding mountain pilgrims.', 'Chamoli, Uttarakhand', 30.2937, 79.5603, ST_SetSRID(ST_MakePoint(79.5603, 30.2937), 4326)::geography, ARRAY['landslide', 'flood', 'rescue', 'urgent'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('a3333333-3333-3333-3333-333333333333', 'Monsoon Debris Flow & Riverine Inundation in Wayanad', 'Torrential southwest monsoon rains triggering localized hillside debris flow and overflowing river tributaries in Wayanad.', 'Wayanad, Kerala', 11.6854, 76.132, ST_SetSRID(ST_MakePoint(76.132, 11.6854), 4326)::geography, ARRAY['flood', 'monsoon', 'landslide', 'shelter'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('a4444444-4444-4444-4444-444444444444', 'Coastal Storm Surge & Urban Flooding in Chennai', 'Bay of Bengal cyclonic depression causing severe waterlogging across Velachery and low-lying coastal corridors.', 'Chennai, Tamil Nadu', 13.0827, 80.2707, ST_SetSRID(ST_MakePoint(80.2707, 13.0827), 4326)::geography, ARRAY['cyclone', 'flood', 'surge', 'coastal'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('a5555555-5555-5555-5555-555555555555', 'Brahmaputra River Basin Overflow in Guwahati', 'Brahmaputra river flowing above danger levels inundating riparian villages, agricultural plains, and low-lying sectors.', 'Guwahati, Assam', 26.1445, 91.7362, ST_SetSRID(ST_MakePoint(91.7362, 26.1445), 4326)::geography, ARRAY['flood', 'riverine', 'evacuation', 'monsoon'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('a6666666-6666-6666-6666-666666666666', 'Tropical Cyclonic Storm Depressive Surge in Puri', 'Deep depression over the Bay of Bengal making landfall near Puri coast with high winds and tidal ingress.', 'Puri, Odisha', 19.8135, 85.8312, ST_SetSRID(ST_MakePoint(85.8312, 19.8135), 4326)::geography, ARRAY['cyclone', 'storm', 'surge', 'coastal'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('a7777777-7777-7777-7777-777777777777', 'Hillside Subsidence & Highway Landslip in Shimla', 'Heavy monsoon precipitation causing slope destabilization and national highway blockages near Shimla ridges.', 'Shimla, Himachal Pradesh', 31.1048, 77.1734, ST_SetSRID(ST_MakePoint(77.1734, 31.1048), 4326)::geography, ARRAY['landslide', 'monsoon', 'infrastructure', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('a8888888-8888-8888-8888-888888888888', 'Magnitude 5.8 Seismic Tremor in Kutch & Bhuj', 'Moderate intraplate seismic tremor shaking Kutch district with wall cracks and precautionary evacuation protocols.', 'Bhuj, Gujarat', 23.242, 69.6669, ST_SetSRID(ST_MakePoint(69.6669, 23.242), 4326)::geography, ARRAY['earthquake', 'seismic', 'medical', 'structural'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('a9999999-9999-9999-9999-999999999999', 'Yamuna River High Water Level Overflow in Delhi', 'Monsoon discharge from upstream barrages causing water levels to cross evacuation thresholds along Yamuna floodplains.', 'New Delhi, NCR', 28.6139, 77.209, ST_SetSRID(ST_MakePoint(77.209, 28.6139), 4326)::geography, ARRAY['flood', 'river', 'evacuation', 'monsoon'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tapi River Dam Discharge Inundation in Surat', 'Regulated water discharge from Ukai reservoir successfully channelled with floodwaters fully receding.', 'Surat, Gujarat', 21.1702, 72.8311, ST_SetSRID(ST_MakePoint(72.8311, 21.1702), 4326)::geography, ARRAY['flood', 'water', 'resolved'], 'resolved', '22222222-2222-2222-2222-222222222222'),
+  ('c1111111-1111-1111-1111-111111111111', 'Torrential Rain & Canal Overflow in Haldwani', 'Heavy precipitation over Kumaon foothills overwhelming local stormwater canals and inundating residential sectors in Haldwani.', 'Haldwani, Uttarakhand', 29.2183, 79.513, ST_SetSRID(ST_MakePoint(79.513, 29.2183), 4326)::geography, ARRAY['flood', 'monsoon', 'rescue'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('c2222222-2222-2222-2222-222222222222', 'Slope Erosion & Highway Collapse near Joshimath', 'Structural land sinking along the Badrinath route near Joshimath requiring vehicular diversions and geological surveys.', 'Joshimath, Uttarakhand', 30.5564, 79.5647, ST_SetSRID(ST_MakePoint(79.5647, 30.5564), 4326)::geography, ARRAY['landslide', 'infrastructure', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('c3333333-3333-3333-3333-333333333333', 'Glacial Outflow & Flash Flood in Kedarnath Valley', 'Mandakini river basin swelling following intense alpine rainfall; SDRF teams monitoring upper pilgrim bridges.', 'Kedarnath, Uttarakhand', 30.7352, 79.0669, ST_SetSRID(ST_MakePoint(79.0669, 30.7352), 4326)::geography, ARRAY['flood', 'glacial', 'urgent'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('c4444444-4444-4444-4444-444444444444', 'Ganga River High Gauge Flow in Haridwar', 'Water discharge at Bhimgoda barrage crossing warning line; ghat bathing suspended under safety directives.', 'Haridwar, Uttarakhand', 29.9457, 78.1642, ST_SetSRID(ST_MakePoint(78.1642, 29.9457), 4326)::geography, ARRAY['flood', 'riverine', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('c5555555-5555-5555-5555-555555555555', 'Flash Mudflow on Manali Highway in Kullu Valley', 'Beas river tributary mudflow blocking vehicular transit along the Chandigarh-Manali national highway corridor.', 'Kullu, Himachal Pradesh', 31.9579, 77.1095, ST_SetSRID(ST_MakePoint(77.1095, 31.9579), 4326)::geography, ARRAY['landslide', 'storm', 'infrastructure'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('c6666666-6666-6666-6666-666666666666', 'Beas River Water Surge in Mandi', 'Torrential downpour in catchment hills raising water level near Victoria bridge; relief squads on high alert.', 'Mandi, Himachal Pradesh', 31.7087, 76.932, ST_SetSRID(ST_MakePoint(76.932, 31.7087), 4326)::geography, ARRAY['flood', 'river', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('c7777777-7777-7777-7777-777777777777', 'Jhelum River Gauge Spillover in Srinagar', 'Continuous precipitation across Kashmir valley causing Jhelum river to flow near alert levels around Ram Munshi Bagh.', 'Srinagar, Jammu & Kashmir', 34.0837, 74.7973, ST_SetSRID(ST_MakePoint(74.7973, 34.0837), 4326)::geography, ARRAY['flood', 'riverine', 'evacuation'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('c8888888-8888-8888-8888-888888888888', 'Ghaggar River Embankment Breach in Patiala', 'Sustained monsoon flow causing embankment seepage across rural farmland; irrigation units reinforcing bunds.', 'Patiala, Punjab', 30.3398, 76.3869, ST_SetSRID(ST_MakePoint(76.3869, 30.3398), 4326)::geography, ARRAY['flood', 'agriculture', 'resolved'], 'resolved', '22222222-2222-2222-2222-222222222222'),
+  ('c9999999-9999-9999-9999-999999999999', 'Ganga & Varuna Confluence Inundation in Varanasi', 'Floodwaters submerging lower steps of historical ghats; river navigation boats grounded temporarily.', 'Varanasi, Uttar Pradesh', 25.3176, 82.9739, ST_SetSRID(ST_MakePoint(82.9739, 25.3176), 4326)::geography, ARRAY['flood', 'riverine', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('d1111111-1111-1111-1111-111111111111', 'Sangam Lowland Inundation in Prayagraj', 'Combined flow from Ganga and Yamuna inundating low-lying agricultural floodplains in Daraganj.', 'Prayagraj, Uttar Pradesh', 25.4358, 81.8463, ST_SetSRID(ST_MakePoint(81.8463, 25.4358), 4326)::geography, ARRAY['flood', 'riverine', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('d2222222-2222-2222-2222-222222222222', 'Rapti River Flood Overflow in Gorakhpur', 'Rapti river rising above danger level affecting peri-urban rural wards with relief boats mobilized.', 'Gorakhpur, Uttar Pradesh', 26.7606, 83.3732, ST_SetSRID(ST_MakePoint(83.3732, 26.7606), 4326)::geography, ARRAY['flood', 'river', 'active'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('d3333333-3333-3333-3333-333333333333', 'Kosi River High Discharge Surge in Supaul', 'Over 2.5 lakh cusecs water release from Kosi barrage inundating sandbar settlements across Supaul.', 'Supaul, Bihar', 26.126, 86.6053, ST_SetSRID(ST_MakePoint(86.6053, 26.126), 4326)::geography, ARRAY['flood', 'evacuation', 'urgent'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('d4444444-4444-4444-4444-444444444444', 'Bagmati River Embankment Pressure in Darbhanga', 'Catchment runoff creating pressure along Kusheshwar Asthan ring bund; SDRF inspecting reinforcement work.', 'Darbhanga, Bihar', 26.1542, 85.8918, ST_SetSRID(ST_MakePoint(85.8918, 26.1542), 4326)::geography, ARRAY['flood', 'riverine', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('d5555555-5555-5555-5555-555555555555', 'Kaziranga National Park Wetland Flooding', 'Seasonal Brahmaputra overflow inundating highlands; wildlife corridors monitored along National Highway 715.', 'Kaziranga, Assam', 26.5775, 93.1711, ST_SetSRID(ST_MakePoint(93.1711, 26.5775), 4326)::geography, ARRAY['flood', 'wildlife', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('d6666666-6666-6666-6666-666666666666', 'Barak River Flash Inundation in Silchar', 'Unprecedented rainfall in adjoining hills causing urban waterlogging and power substation shutdowns in Silchar.', 'Silchar, Assam', 24.817, 92.7937, ST_SetSRID(ST_MakePoint(92.7937, 24.817), 4326)::geography, ARRAY['flood', 'storm', 'power-outage'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('d7777777-7777-7777-7777-777777777777', 'Mahanadi River Basin Discharge in Cuttack', 'Over 30 gates opened at Hirakud reservoir causing heavy water volume flow through Mundali barrage near Cuttack.', 'Cuttack, Odisha', 20.4625, 85.8828, ST_SetSRID(ST_MakePoint(85.8828, 20.4625), 4326)::geography, ARRAY['flood', 'river', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('d8888888-8888-8888-8888-888888888888', 'Coastal Tidal Ingress & Surge in Balasore', 'High tidal swells combined with deep sea depression breaching mud embankments in Chandipur coastal belt.', 'Balasore, Odisha', 21.4934, 86.9135, ST_SetSRID(ST_MakePoint(86.9135, 21.4934), 4326)::geography, ARRAY['cyclone', 'surge', 'coastal'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('d9999999-9999-9999-9999-999999999999', 'Teesta River Flash Surge & GLOF in North Sikkim', 'High-altitude lake outburst resulting in rapid water level surge along Chungthang dam basin.', 'Gangtok, Sikkim', 27.3389, 88.6065, ST_SetSRID(ST_MakePoint(88.6065, 27.3389), 4326)::geography, ARRAY['flood', 'glacial', 'urgent'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('e1111111-1111-1111-1111-111111111111', 'Torrential Cloudburst Inundation in Cherrapunji', 'Record single-day rainfall causing flash torrents across Southern Meghalaya gorges and plateau roads.', 'Shillong, Meghalaya', 25.5788, 91.8933, ST_SetSRID(ST_MakePoint(91.8933, 25.5788), 4326)::geography, ARRAY['flood', 'storm', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('e2222222-2222-2222-2222-222222222222', 'Imphal River Embankment Overflow in Manipur', 'Heavy precipitation causing river water to spill onto adjoining roads and residential sectors in Imphal West.', 'Imphal, Manipur', 24.817, 93.9368, ST_SetSRID(ST_MakePoint(93.9368, 24.817), 4326)::geography, ARRAY['flood', 'evacuation', 'shelter'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('e3333333-3333-3333-3333-333333333333', 'Mula-Mutha River Swelling in Pune', 'Khadakwasla dam water release raising river water level across low-lying riverside causeways in Pune.', 'Pune, Maharashtra', 18.5204, 73.8567, ST_SetSRID(ST_MakePoint(73.8567, 18.5204), 4326)::geography, ARRAY['flood', 'riverine', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('e4444444-4444-4444-4444-444444444444', 'Panchganga River Flood Stage in Kolhapur', 'Water level crossing alert threshold at Rajaram barrage; NDRF teams stationed at vulnerable riverine bends.', 'Kolhapur, Maharashtra', 16.705, 74.2433, ST_SetSRID(ST_MakePoint(74.2433, 16.705), 4326)::geography, ARRAY['flood', 'rescue', 'active'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('e5555555-5555-5555-5555-555555555555', 'Western Ghats Ridge Landslip in Raigad', 'Continuous hillside monsoon downpour triggering earth slippage along the Mumbai-Goa highway section.', 'Thane, Maharashtra', 19.2183, 72.9781, ST_SetSRID(ST_MakePoint(72.9781, 19.2183), 4326)::geography, ARRAY['landslide', 'monsoon', 'active'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('e6666666-6666-6666-6666-666666666666', 'Godavari River High Level Flow in Nashik', 'Gangapur dam release leading to submergence of small temples near Ramkund; situation under control.', 'Nashik, Maharashtra', 19.9975, 73.7898, ST_SetSRID(ST_MakePoint(73.7898, 19.9975), 4326)::geography, ARRAY['flood', 'river', 'resolved'], 'resolved', '22222222-2222-2222-2222-222222222222'),
+  ('e7777777-7777-7777-7777-777777777777', 'Sabarmati Riverfront Overflow in Ahmedabad', 'Heavy discharge from Dharoi dam raising river levels across lower promenade; pedestrian access restricted.', 'Ahmedabad, Gujarat', 23.0225, 72.5714, ST_SetSRID(ST_MakePoint(72.5714, 23.0225), 4326)::geography, ARRAY['flood', 'riverine', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('e8888888-8888-8888-8888-888888888888', 'Vishwamitri River Spate in Vadodara', 'Heavy rainfall in Pavagadh hills causing Vishwamitri river to overflow into central lowlands of Vadodara.', 'Vadodara, Gujarat', 22.3072, 73.1812, ST_SetSRID(ST_MakePoint(73.1812, 22.3072), 4326)::geography, ARRAY['flood', 'urban', 'active'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('e9999999-9999-9999-9999-999999999999', 'Aji River Reservoir Overflow in Rajkot', 'Precautionary discharge into Aji river channel with drainage channels effectively operating.', 'Rajkot, Gujarat', 22.3039, 70.8022, ST_SetSRID(ST_MakePoint(70.8022, 22.3039), 4326)::geography, ARRAY['flood', 'water', 'resolved'], 'resolved', '11111111-1111-1111-1111-111111111111'),
+  ('f1111111-1111-1111-1111-111111111111', 'Desert Flash Inundation in Barmer', 'Rare depression over Thar desert dumping intense rainfall; temporary drainage pumps deployed in sandy depressions.', 'Jaipur, Rajasthan', 26.9124, 75.7873, ST_SetSRID(ST_MakePoint(75.7873, 26.9124), 4326)::geography, ARRAY['flood', 'storm', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('f2222222-2222-2222-2222-222222222222', 'Mandovi River Estuarine Storm Surge in Goa', 'Spring high tides coupled with Arabian Sea squalls inundating low-lying ferry ramps along Panaji shoreline.', 'Panaji, Goa', 15.4909, 73.8278, ST_SetSRID(ST_MakePoint(73.8278, 15.4909), 4326)::geography, ARRAY['coastal', 'storm', 'surge'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('f3333333-3333-3333-3333-333333333333', 'Nag River Overflow in Central Nagpur', 'Monsoon cloudburst overloading stormwater channels in Nagpur; civic teams clearing debris culverts.', 'Nagpur, Maharashtra', 21.1458, 79.0882, ST_SetSRID(ST_MakePoint(79.0882, 21.1458), 4326)::geography, ARRAY['flood', 'urban', 'resolved'], 'resolved', '22222222-2222-2222-2222-222222222222'),
+  ('f4444444-4444-4444-4444-444444444444', 'Urban Flash Flooding & Lake Inundation in Bengaluru', 'Sudden cloudburst overwhelming stormwater drains near Bellandur lake basin with drainage pumps deployed.', 'Bengaluru, Karnataka', 12.9716, 77.5946, ST_SetSRID(ST_MakePoint(77.5946, 12.9716), 4326)::geography, ARRAY['flood', 'storm', 'infrastructure', 'drainage'], 'resolved', '11111111-1111-1111-1111-111111111111'),
+  ('f5555555-5555-5555-5555-555555555555', 'Hillside Slope Landslip in Kodagu (Coorg)', 'Western Ghats slope displacement along Madikeri road; emergency transit restoration in progress.', 'Bengaluru, Karnataka', 12.4244, 75.7382, ST_SetSRID(ST_MakePoint(75.7382, 12.4244), 4326)::geography, ARRAY['landslide', 'monsoon', 'monitoring'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('f6666666-6666-6666-6666-666666666666', 'Netravati River Basin Spate in Mangaluru', 'Sustained coastal rains causing Netravati river to rise above warning gauge in Bantwal near Mangaluru.', 'Mangaluru, Karnataka', 12.9141, 74.856, ST_SetSRID(ST_MakePoint(74.856, 12.9141), 4326)::geography, ARRAY['flood', 'coastal', 'active'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('f7777777-7777-7777-7777-777777777777', 'Krishna River Dam Discharge Flood in Belagavi', 'Water discharge from upstream Maharashtra reservoirs inundating low-level causeways across Chikodi belt.', 'Bengaluru, Karnataka', 15.8497, 74.4977, ST_SetSRID(ST_MakePoint(74.4977, 15.8497), 4326)::geography, ARRAY['flood', 'riverine', 'active'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('f8888888-8888-8888-8888-888888888888', 'Kuttanad Below-Sea-Level Inundation in Alappuzha', 'Pamba and Achankovil river floods entering agricultural lowlands; traditional snake boat rescue squads mobilized.', 'Alappuzha, Kerala', 9.4981, 76.3388, ST_SetSRID(ST_MakePoint(76.3388, 9.4981), 4326)::geography, ARRAY['flood', 'monsoon', 'shelter'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('f9999999-9999-9999-9999-999999999999', 'Idukki Reservoir Blue Alert Water Release', 'Periyar river volume regulated smoothly through Cheruthoni dam gates; downstream settlements safe.', 'Idukki, Kerala', 9.8494, 76.9804, ST_SetSRID(ST_MakePoint(76.9804, 9.8494), 4326)::geography, ARRAY['flood', 'dam', 'resolved'], 'resolved', '22222222-2222-2222-2222-222222222222'),
+  ('1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a', 'Karamana River Basin Overflow in Thiruvananthapuram', 'Heavy precipitation over Peppara catchment causing river flow to submerge riverbank footpaths.', 'Thiruvananthapuram, Kerala', 8.5241, 76.9366, ST_SetSRID(ST_MakePoint(76.9366, 8.5241), 4326)::geography, ARRAY['flood', 'river', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('2b2b2b2b-2b2b-2b2b-2b2b-2b2b2b2b2b2b', 'Nilgiris Mountain Ghat Landslide near Ooty', 'Slumping of soil along Coonoor ghat road stranding vehicular convoys; highway dozers clearing debris.', 'Coimbatore, Tamil Nadu', 11.4102, 76.695, ST_SetSRID(ST_MakePoint(76.695, 11.4102), 4326)::geography, ARRAY['landslide', 'mountain', 'active'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c', 'Noyyal River Overflow in Coimbatore', 'Flash monsoon flow filling check dams; precautionary warnings issued for riparian slum settlements.', 'Coimbatore, Tamil Nadu', 11.0168, 76.9558, ST_SetSRID(ST_MakePoint(76.9558, 11.0168), 4326)::geography, ARRAY['flood', 'river', 'monitoring'], 'monitoring', '11111111-1111-1111-1111-111111111111'),
+  ('4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d', 'Vaigai River Spillway Discharge in Madurai', 'Controlled release from Vaigai dam safely channelled through historical riverbeds of temple city Madurai.', 'Madurai, Tamil Nadu', 9.9252, 78.1198, ST_SetSRID(ST_MakePoint(78.1198, 9.9252), 4326)::geography, ARRAY['flood', 'water', 'resolved'], 'resolved', '22222222-2222-2222-2222-222222222222'),
+  ('5e5e5e5e-5e5e-5e5e-5e5e-5e5e5e5e5e5e', 'Cuddalore Coastal Storm Breach & Sea Ingress', 'Bay of Bengal gale waves penetrating coastal fishing hamlets; NDRF operating inflatable rescue boats.', 'Chennai, Tamil Nadu', 11.748, 79.7714, ST_SetSRID(ST_MakePoint(79.7714, 11.748), 4326)::geography, ARRAY['cyclone', 'coastal', 'active'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('6f6f6f6f-6f6f-6f6f-6f6f-6f6f6f6f6f6f', 'Musi River Floodwater Surge in Hyderabad', 'Himayat Sagar gates opened releasing excess inflow into Musi river; bridges barricaded for public safety.', 'Hyderabad, Telangana', 17.385, 78.4867, ST_SetSRID(ST_MakePoint(78.4867, 17.385), 4326)::geography, ARRAY['flood', 'riverine', 'active'], 'active', '22222222-2222-2222-2222-222222222222'),
+  ('7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a', 'Krishna River Flood Inundation in Vijayawada', 'Prakasam barrage discharging over 4 lakh cusecs; low-lying Bhavani Island and river ghats temporarily closed.', 'Vijayawada, Andhra Pradesh', 16.5062, 80.648, ST_SetSRID(ST_MakePoint(80.648, 16.5062), 4326)::geography, ARRAY['flood', 'riverine', 'active'], 'active', '11111111-1111-1111-1111-111111111111'),
+  ('8b8b8b8b-8b8b-8b8b-8b8b-8b8b8b8b8b8b', 'Cyclone Michaung Coastal Surge in Visakhapatnam', 'High storm waves causing beach erosion near RK Beach; port operations secured under cautionary flag 4.', 'Visakhapatnam, Andhra Pradesh', 17.6868, 83.2185, ST_SetSRID(ST_MakePoint(83.2185, 17.6868), 4326)::geography, ARRAY['cyclone', 'surge', 'coastal'], 'monitoring', '22222222-2222-2222-2222-222222222222'),
+  ('9c9c9c9c-9c9c-9c9c-9c9c-9c9c9c9c9c9c', 'Subarnarekha River Flood Containment in Jamshedpur', 'Monsoon water discharge flowing smoothly past industrial embankments with all safety bunds intact.', 'Jamshedpur, Jharkhand', 22.8046, 86.2029, ST_SetSRID(ST_MakePoint(86.2029, 22.8046), 4326)::geography, ARRAY['flood', 'river', 'resolved'], 'resolved', '11111111-1111-1111-1111-111111111111');
 
--- ============================================================================
--- 3. SEED RESOURCES (Proximity-searchable shelters, hospitals, food, water, rescue units)
--- ============================================================================
--- Manhattan, NYC Resources
+-- 3. SEED RESOURCES
 INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'Mount Sinai Hospital Emergency Center',
-    'hospital',
-    'Upper East Side, Manhattan',
-    40.7900,
-    -73.9535,
-    ST_SetSRID(ST_MakePoint(-73.9535, 40.7900), 4326)::geography,
-    300,
-    65,
-    'limited'
-  ),
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'Red Cross Emergency Shelter - Central High',
-    'shelter',
-    'Harlem, Manhattan',
-    40.8075,
-    -73.9465,
-    ST_SetSRID(ST_MakePoint(-73.9465, 40.8075), 4326)::geography,
-    500,
-    320,
-    'available'
-  ),
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'NYC Water Distribution Point #4',
-    'water',
-    'Midtown West, Manhattan',
-    40.7600,
-    -73.9900,
-    ST_SetSRID(ST_MakePoint(-73.9900, 40.7600), 4326)::geography,
-    2000,
-    1450,
-    'available'
-  ),
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'FEMA Mobile Food Pantry Hub',
-    'food',
-    'Chelsea, Manhattan',
-    40.7465,
-    -74.0014,
-    ST_SetSRID(ST_MakePoint(-74.0014, 40.7465), 4326)::geography,
-    1500,
-    980,
-    'available'
-  ),
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'FDNY Aquatic & Flood Rescue Unit 8',
-    'rescue',
-    'Hudson River Pier 84',
-    40.7650,
-    -74.0020,
-    ST_SetSRID(ST_MakePoint(-74.0020, 40.7650), 4326)::geography,
-    50,
-    12,
-    'available'
-  );
+  ('a1111111-1111-1111-1111-111111111111', 'Mumbai Hospital & Emergency Trauma Ward', 'hospital', 'Mumbai, Maharashtra', 19.081, 72.8827, ST_SetSRID(ST_MakePoint(72.8827, 19.081), 4326)::geography, 400, 120, 'available'),
+  ('a1111111-1111-1111-1111-111111111111', 'Mumbai NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Mumbai, Maharashtra', 19.07, 72.8737, ST_SetSRID(ST_MakePoint(72.8737, 19.07), 4326)::geography, 150, 50, 'available'),
+  ('a2222222-2222-2222-2222-222222222222', 'Chamoli Civil Defense Flood Relief Shelter', 'shelter', 'Chamoli, Uttarakhand', 30.2987, 79.5653, ST_SetSRID(ST_MakePoint(79.5653, 30.2987), 4326)::geography, 1000, 650, 'available'),
+  ('a2222222-2222-2222-2222-222222222222', 'Chamoli Clean Potable Water Tanker Fleet', 'water', 'Chamoli, Uttarakhand', 30.2877, 79.5563, ST_SetSRID(ST_MakePoint(79.5563, 30.2877), 4326)::geography, 3000, 2200, 'available'),
+  ('a3333333-3333-3333-3333-333333333333', 'Wayanad NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Wayanad, Kerala', 11.6904, 76.137, ST_SetSRID(ST_MakePoint(76.137, 11.6904), 4326)::geography, 150, 50, 'available'),
+  ('a3333333-3333-3333-3333-333333333333', 'Wayanad Community Emergency Food Kitchen', 'food', 'Wayanad, Kerala', 11.6794, 76.128, ST_SetSRID(ST_MakePoint(76.128, 11.6794), 4326)::geography, 2000, 1400, 'available'),
+  ('a4444444-4444-4444-4444-444444444444', 'Chennai Clean Potable Water Tanker Fleet', 'water', 'Chennai, Tamil Nadu', 13.087700000000002, 80.2757, ST_SetSRID(ST_MakePoint(80.2757, 13.087700000000002), 4326)::geography, 3000, 2200, 'available'),
+  ('a4444444-4444-4444-4444-444444444444', 'Chennai Hospital & Emergency Trauma Ward', 'hospital', 'Chennai, Tamil Nadu', 13.0767, 80.2667, ST_SetSRID(ST_MakePoint(80.2667, 13.0767), 4326)::geography, 400, 120, 'available'),
+  ('a5555555-5555-5555-5555-555555555555', 'Guwahati Community Emergency Food Kitchen', 'food', 'Guwahati, Assam', 26.1495, 91.74119999999999, ST_SetSRID(ST_MakePoint(91.74119999999999, 26.1495), 4326)::geography, 2000, 1400, 'available'),
+  ('a5555555-5555-5555-5555-555555555555', 'Guwahati Civil Defense Flood Relief Shelter', 'shelter', 'Guwahati, Assam', 26.1385, 91.73219999999999, ST_SetSRID(ST_MakePoint(91.73219999999999, 26.1385), 4326)::geography, 1000, 650, 'available'),
+  ('a6666666-6666-6666-6666-666666666666', 'Puri Hospital & Emergency Trauma Ward', 'hospital', 'Puri, Odisha', 19.8185, 85.83619999999999, ST_SetSRID(ST_MakePoint(85.83619999999999, 19.8185), 4326)::geography, 400, 120, 'available'),
+  ('a6666666-6666-6666-6666-666666666666', 'Puri NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Puri, Odisha', 19.8075, 85.82719999999999, ST_SetSRID(ST_MakePoint(85.82719999999999, 19.8075), 4326)::geography, 150, 50, 'available'),
+  ('a7777777-7777-7777-7777-777777777777', 'Shimla Civil Defense Flood Relief Shelter', 'shelter', 'Shimla, Himachal Pradesh', 31.1098, 77.1784, ST_SetSRID(ST_MakePoint(77.1784, 31.1098), 4326)::geography, 1000, 650, 'available'),
+  ('a7777777-7777-7777-7777-777777777777', 'Shimla Clean Potable Water Tanker Fleet', 'water', 'Shimla, Himachal Pradesh', 31.0988, 77.1694, ST_SetSRID(ST_MakePoint(77.1694, 31.0988), 4326)::geography, 3000, 2200, 'available'),
+  ('a8888888-8888-8888-8888-888888888888', 'Bhuj NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Bhuj, Gujarat', 23.247, 69.6719, ST_SetSRID(ST_MakePoint(69.6719, 23.247), 4326)::geography, 150, 50, 'available'),
+  ('a8888888-8888-8888-8888-888888888888', 'Bhuj Community Emergency Food Kitchen', 'food', 'Bhuj, Gujarat', 23.236, 69.6629, ST_SetSRID(ST_MakePoint(69.6629, 23.236), 4326)::geography, 2000, 1400, 'available'),
+  ('a9999999-9999-9999-9999-999999999999', 'New Delhi Clean Potable Water Tanker Fleet', 'water', 'New Delhi, NCR', 28.6189, 77.214, ST_SetSRID(ST_MakePoint(77.214, 28.6189), 4326)::geography, 3000, 2200, 'available'),
+  ('a9999999-9999-9999-9999-999999999999', 'New Delhi Hospital & Emergency Trauma Ward', 'hospital', 'New Delhi, NCR', 28.6079, 77.205, ST_SetSRID(ST_MakePoint(77.205, 28.6079), 4326)::geography, 400, 120, 'available'),
+  ('baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Surat Community Emergency Food Kitchen', 'food', 'Surat, Gujarat', 21.1752, 72.8361, ST_SetSRID(ST_MakePoint(72.8361, 21.1752), 4326)::geography, 2000, 1400, 'available'),
+  ('baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Surat Civil Defense Flood Relief Shelter', 'shelter', 'Surat, Gujarat', 21.1642, 72.8271, ST_SetSRID(ST_MakePoint(72.8271, 21.1642), 4326)::geography, 1000, 650, 'available'),
+  ('c1111111-1111-1111-1111-111111111111', 'Haldwani Hospital & Emergency Trauma Ward', 'hospital', 'Haldwani, Uttarakhand', 29.2233, 79.518, ST_SetSRID(ST_MakePoint(79.518, 29.2233), 4326)::geography, 400, 120, 'available'),
+  ('c1111111-1111-1111-1111-111111111111', 'Haldwani NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Haldwani, Uttarakhand', 29.2123, 79.509, ST_SetSRID(ST_MakePoint(79.509, 29.2123), 4326)::geography, 150, 50, 'available'),
+  ('c2222222-2222-2222-2222-222222222222', 'Joshimath Civil Defense Flood Relief Shelter', 'shelter', 'Joshimath, Uttarakhand', 30.5614, 79.5697, ST_SetSRID(ST_MakePoint(79.5697, 30.5614), 4326)::geography, 1000, 650, 'available'),
+  ('c2222222-2222-2222-2222-222222222222', 'Joshimath Clean Potable Water Tanker Fleet', 'water', 'Joshimath, Uttarakhand', 30.5504, 79.5607, ST_SetSRID(ST_MakePoint(79.5607, 30.5504), 4326)::geography, 3000, 2200, 'available'),
+  ('c3333333-3333-3333-3333-333333333333', 'Kedarnath NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Kedarnath, Uttarakhand', 30.740199999999998, 79.0719, ST_SetSRID(ST_MakePoint(79.0719, 30.740199999999998), 4326)::geography, 150, 50, 'available'),
+  ('c3333333-3333-3333-3333-333333333333', 'Kedarnath Community Emergency Food Kitchen', 'food', 'Kedarnath, Uttarakhand', 30.7292, 79.0629, ST_SetSRID(ST_MakePoint(79.0629, 30.7292), 4326)::geography, 2000, 1400, 'available'),
+  ('c4444444-4444-4444-4444-444444444444', 'Haridwar Clean Potable Water Tanker Fleet', 'water', 'Haridwar, Uttarakhand', 29.950699999999998, 78.16919999999999, ST_SetSRID(ST_MakePoint(78.16919999999999, 29.950699999999998), 4326)::geography, 3000, 2200, 'available'),
+  ('c4444444-4444-4444-4444-444444444444', 'Haridwar Hospital & Emergency Trauma Ward', 'hospital', 'Haridwar, Uttarakhand', 29.9397, 78.16019999999999, ST_SetSRID(ST_MakePoint(78.16019999999999, 29.9397), 4326)::geography, 400, 120, 'available'),
+  ('c5555555-5555-5555-5555-555555555555', 'Kullu Community Emergency Food Kitchen', 'food', 'Kullu, Himachal Pradesh', 31.962899999999998, 77.11449999999999, ST_SetSRID(ST_MakePoint(77.11449999999999, 31.962899999999998), 4326)::geography, 2000, 1400, 'available'),
+  ('c5555555-5555-5555-5555-555555555555', 'Kullu Civil Defense Flood Relief Shelter', 'shelter', 'Kullu, Himachal Pradesh', 31.9519, 77.10549999999999, ST_SetSRID(ST_MakePoint(77.10549999999999, 31.9519), 4326)::geography, 1000, 650, 'available'),
+  ('c6666666-6666-6666-6666-666666666666', 'Mandi Hospital & Emergency Trauma Ward', 'hospital', 'Mandi, Himachal Pradesh', 31.7137, 76.937, ST_SetSRID(ST_MakePoint(76.937, 31.7137), 4326)::geography, 400, 120, 'available'),
+  ('c6666666-6666-6666-6666-666666666666', 'Mandi NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Mandi, Himachal Pradesh', 31.7027, 76.928, ST_SetSRID(ST_MakePoint(76.928, 31.7027), 4326)::geography, 150, 50, 'available'),
+  ('c7777777-7777-7777-7777-777777777777', 'Srinagar Civil Defense Flood Relief Shelter', 'shelter', 'Srinagar, Jammu & Kashmir', 34.0887, 74.8023, ST_SetSRID(ST_MakePoint(74.8023, 34.0887), 4326)::geography, 1000, 650, 'available'),
+  ('c7777777-7777-7777-7777-777777777777', 'Srinagar Clean Potable Water Tanker Fleet', 'water', 'Srinagar, Jammu & Kashmir', 34.0777, 74.7933, ST_SetSRID(ST_MakePoint(74.7933, 34.0777), 4326)::geography, 3000, 2200, 'available'),
+  ('c8888888-8888-8888-8888-888888888888', 'Patiala NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Patiala, Punjab', 30.3448, 76.39189999999999, ST_SetSRID(ST_MakePoint(76.39189999999999, 30.3448), 4326)::geography, 150, 50, 'available'),
+  ('c8888888-8888-8888-8888-888888888888', 'Patiala Community Emergency Food Kitchen', 'food', 'Patiala, Punjab', 30.3338, 76.38289999999999, ST_SetSRID(ST_MakePoint(76.38289999999999, 30.3338), 4326)::geography, 2000, 1400, 'available'),
+  ('c9999999-9999-9999-9999-999999999999', 'Varanasi Clean Potable Water Tanker Fleet', 'water', 'Varanasi, Uttar Pradesh', 25.322599999999998, 82.9789, ST_SetSRID(ST_MakePoint(82.9789, 25.322599999999998), 4326)::geography, 3000, 2200, 'available'),
+  ('c9999999-9999-9999-9999-999999999999', 'Varanasi Hospital & Emergency Trauma Ward', 'hospital', 'Varanasi, Uttar Pradesh', 25.3116, 82.9699, ST_SetSRID(ST_MakePoint(82.9699, 25.3116), 4326)::geography, 400, 120, 'available'),
+  ('d1111111-1111-1111-1111-111111111111', 'Prayagraj Community Emergency Food Kitchen', 'food', 'Prayagraj, Uttar Pradesh', 25.4408, 81.8513, ST_SetSRID(ST_MakePoint(81.8513, 25.4408), 4326)::geography, 2000, 1400, 'available'),
+  ('d1111111-1111-1111-1111-111111111111', 'Prayagraj Civil Defense Flood Relief Shelter', 'shelter', 'Prayagraj, Uttar Pradesh', 25.4298, 81.8423, ST_SetSRID(ST_MakePoint(81.8423, 25.4298), 4326)::geography, 1000, 650, 'available'),
+  ('d2222222-2222-2222-2222-222222222222', 'Gorakhpur Hospital & Emergency Trauma Ward', 'hospital', 'Gorakhpur, Uttar Pradesh', 26.7656, 83.37819999999999, ST_SetSRID(ST_MakePoint(83.37819999999999, 26.7656), 4326)::geography, 400, 120, 'available'),
+  ('d2222222-2222-2222-2222-222222222222', 'Gorakhpur NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Gorakhpur, Uttar Pradesh', 26.7546, 83.36919999999999, ST_SetSRID(ST_MakePoint(83.36919999999999, 26.7546), 4326)::geography, 150, 50, 'available'),
+  ('d3333333-3333-3333-3333-333333333333', 'Supaul Civil Defense Flood Relief Shelter', 'shelter', 'Supaul, Bihar', 26.131, 86.6103, ST_SetSRID(ST_MakePoint(86.6103, 26.131), 4326)::geography, 1000, 650, 'available'),
+  ('d3333333-3333-3333-3333-333333333333', 'Supaul Clean Potable Water Tanker Fleet', 'water', 'Supaul, Bihar', 26.12, 86.6013, ST_SetSRID(ST_MakePoint(86.6013, 26.12), 4326)::geography, 3000, 2200, 'available'),
+  ('d4444444-4444-4444-4444-444444444444', 'Darbhanga NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Darbhanga, Bihar', 26.1592, 85.8968, ST_SetSRID(ST_MakePoint(85.8968, 26.1592), 4326)::geography, 150, 50, 'available'),
+  ('d4444444-4444-4444-4444-444444444444', 'Darbhanga Community Emergency Food Kitchen', 'food', 'Darbhanga, Bihar', 26.1482, 85.8878, ST_SetSRID(ST_MakePoint(85.8878, 26.1482), 4326)::geography, 2000, 1400, 'available'),
+  ('d5555555-5555-5555-5555-555555555555', 'Kaziranga Clean Potable Water Tanker Fleet', 'water', 'Kaziranga, Assam', 26.5825, 93.17609999999999, ST_SetSRID(ST_MakePoint(93.17609999999999, 26.5825), 4326)::geography, 3000, 2200, 'available'),
+  ('d5555555-5555-5555-5555-555555555555', 'Kaziranga Hospital & Emergency Trauma Ward', 'hospital', 'Kaziranga, Assam', 26.5715, 93.16709999999999, ST_SetSRID(ST_MakePoint(93.16709999999999, 26.5715), 4326)::geography, 400, 120, 'available'),
+  ('d6666666-6666-6666-6666-666666666666', 'Silchar Community Emergency Food Kitchen', 'food', 'Silchar, Assam', 24.822, 92.7987, ST_SetSRID(ST_MakePoint(92.7987, 24.822), 4326)::geography, 2000, 1400, 'available'),
+  ('d6666666-6666-6666-6666-666666666666', 'Silchar Civil Defense Flood Relief Shelter', 'shelter', 'Silchar, Assam', 24.811, 92.7897, ST_SetSRID(ST_MakePoint(92.7897, 24.811), 4326)::geography, 1000, 650, 'available'),
+  ('d7777777-7777-7777-7777-777777777777', 'Cuttack Hospital & Emergency Trauma Ward', 'hospital', 'Cuttack, Odisha', 20.467499999999998, 85.8878, ST_SetSRID(ST_MakePoint(85.8878, 20.467499999999998), 4326)::geography, 400, 120, 'available'),
+  ('d8888888-8888-8888-8888-888888888888', 'Balasore Civil Defense Flood Relief Shelter', 'shelter', 'Balasore, Odisha', 21.4984, 86.9185, ST_SetSRID(ST_MakePoint(86.9185, 21.4984), 4326)::geography, 1000, 650, 'available'),
+  ('d9999999-9999-9999-9999-999999999999', 'Gangtok NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Gangtok, Sikkim', 27.343899999999998, 88.61149999999999, ST_SetSRID(ST_MakePoint(88.61149999999999, 27.343899999999998), 4326)::geography, 150, 50, 'available'),
+  ('e1111111-1111-1111-1111-111111111111', 'Shillong Clean Potable Water Tanker Fleet', 'water', 'Shillong, Meghalaya', 25.5838, 91.89829999999999, ST_SetSRID(ST_MakePoint(91.89829999999999, 25.5838), 4326)::geography, 3000, 2200, 'available'),
+  ('e2222222-2222-2222-2222-222222222222', 'Imphal Community Emergency Food Kitchen', 'food', 'Imphal, Manipur', 24.822, 93.9418, ST_SetSRID(ST_MakePoint(93.9418, 24.822), 4326)::geography, 2000, 1400, 'available'),
+  ('e3333333-3333-3333-3333-333333333333', 'Pune Hospital & Emergency Trauma Ward', 'hospital', 'Pune, Maharashtra', 18.525399999999998, 73.8617, ST_SetSRID(ST_MakePoint(73.8617, 18.525399999999998), 4326)::geography, 400, 120, 'available'),
+  ('e4444444-4444-4444-4444-444444444444', 'Kolhapur Civil Defense Flood Relief Shelter', 'shelter', 'Kolhapur, Maharashtra', 16.709999999999997, 74.2483, ST_SetSRID(ST_MakePoint(74.2483, 16.709999999999997), 4326)::geography, 1000, 650, 'available'),
+  ('e5555555-5555-5555-5555-555555555555', 'Thane NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Thane, Maharashtra', 19.2233, 72.9831, ST_SetSRID(ST_MakePoint(72.9831, 19.2233), 4326)::geography, 150, 50, 'available'),
+  ('e6666666-6666-6666-6666-666666666666', 'Nashik Clean Potable Water Tanker Fleet', 'water', 'Nashik, Maharashtra', 20.002499999999998, 73.7948, ST_SetSRID(ST_MakePoint(73.7948, 20.002499999999998), 4326)::geography, 3000, 2200, 'available'),
+  ('e7777777-7777-7777-7777-777777777777', 'Ahmedabad Community Emergency Food Kitchen', 'food', 'Ahmedabad, Gujarat', 23.0275, 72.57639999999999, ST_SetSRID(ST_MakePoint(72.57639999999999, 23.0275), 4326)::geography, 2000, 1400, 'available'),
+  ('e8888888-8888-8888-8888-888888888888', 'Vadodara Hospital & Emergency Trauma Ward', 'hospital', 'Vadodara, Gujarat', 22.3122, 73.1862, ST_SetSRID(ST_MakePoint(73.1862, 22.3122), 4326)::geography, 400, 120, 'available'),
+  ('e9999999-9999-9999-9999-999999999999', 'Rajkot Civil Defense Flood Relief Shelter', 'shelter', 'Rajkot, Gujarat', 22.308899999999998, 70.8072, ST_SetSRID(ST_MakePoint(70.8072, 22.308899999999998), 4326)::geography, 1000, 650, 'available'),
+  ('f1111111-1111-1111-1111-111111111111', 'Jaipur NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Jaipur, Rajasthan', 26.9174, 75.7923, ST_SetSRID(ST_MakePoint(75.7923, 26.9174), 4326)::geography, 150, 50, 'available'),
+  ('f2222222-2222-2222-2222-222222222222', 'Panaji Clean Potable Water Tanker Fleet', 'water', 'Panaji, Goa', 15.4959, 73.83279999999999, ST_SetSRID(ST_MakePoint(73.83279999999999, 15.4959), 4326)::geography, 3000, 2200, 'available'),
+  ('f3333333-3333-3333-3333-333333333333', 'Nagpur Community Emergency Food Kitchen', 'food', 'Nagpur, Maharashtra', 21.1508, 79.0932, ST_SetSRID(ST_MakePoint(79.0932, 21.1508), 4326)::geography, 2000, 1400, 'available'),
+  ('f4444444-4444-4444-4444-444444444444', 'Bengaluru Hospital & Emergency Trauma Ward', 'hospital', 'Bengaluru, Karnataka', 12.976600000000001, 77.5996, ST_SetSRID(ST_MakePoint(77.5996, 12.976600000000001), 4326)::geography, 400, 120, 'available'),
+  ('f5555555-5555-5555-5555-555555555555', 'Bengaluru Civil Defense Flood Relief Shelter', 'shelter', 'Bengaluru, Karnataka', 12.429400000000001, 75.7432, ST_SetSRID(ST_MakePoint(75.7432, 12.429400000000001), 4326)::geography, 1000, 650, 'available'),
+  ('f6666666-6666-6666-6666-666666666666', 'Mangaluru NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Mangaluru, Karnataka', 12.9191, 74.86099999999999, ST_SetSRID(ST_MakePoint(74.86099999999999, 12.9191), 4326)::geography, 150, 50, 'available'),
+  ('f7777777-7777-7777-7777-777777777777', 'Bengaluru Clean Potable Water Tanker Fleet', 'water', 'Bengaluru, Karnataka', 15.854700000000001, 74.50269999999999, ST_SetSRID(ST_MakePoint(74.50269999999999, 15.854700000000001), 4326)::geography, 3000, 2200, 'available'),
+  ('f8888888-8888-8888-8888-888888888888', 'Alappuzha Community Emergency Food Kitchen', 'food', 'Alappuzha, Kerala', 9.503100000000002, 76.3438, ST_SetSRID(ST_MakePoint(76.3438, 9.503100000000002), 4326)::geography, 2000, 1400, 'available'),
+  ('f9999999-9999-9999-9999-999999999999', 'Idukki Hospital & Emergency Trauma Ward', 'hospital', 'Idukki, Kerala', 9.8544, 76.9854, ST_SetSRID(ST_MakePoint(76.9854, 9.8544), 4326)::geography, 400, 120, 'available'),
+  ('1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a', 'Thiruvananthapuram Civil Defense Flood Relief Shelter', 'shelter', 'Thiruvananthapuram, Kerala', 8.529100000000001, 76.9416, ST_SetSRID(ST_MakePoint(76.9416, 8.529100000000001), 4326)::geography, 1000, 650, 'available'),
+  ('2b2b2b2b-2b2b-2b2b-2b2b-2b2b2b2b2b2b', 'Coimbatore NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Coimbatore, Tamil Nadu', 11.4152, 76.69999999999999, ST_SetSRID(ST_MakePoint(76.69999999999999, 11.4152), 4326)::geography, 150, 50, 'available'),
+  ('3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c', 'Coimbatore Clean Potable Water Tanker Fleet', 'water', 'Coimbatore, Tamil Nadu', 11.0218, 76.96079999999999, ST_SetSRID(ST_MakePoint(76.96079999999999, 11.0218), 4326)::geography, 3000, 2200, 'available'),
+  ('4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d', 'Madurai Community Emergency Food Kitchen', 'food', 'Madurai, Tamil Nadu', 9.930200000000001, 78.1248, ST_SetSRID(ST_MakePoint(78.1248, 9.930200000000001), 4326)::geography, 2000, 1400, 'available'),
+  ('5e5e5e5e-5e5e-5e5e-5e5e-5e5e5e5e5e5e', 'Chennai Hospital & Emergency Trauma Ward', 'hospital', 'Chennai, Tamil Nadu', 11.753, 79.7764, ST_SetSRID(ST_MakePoint(79.7764, 11.753), 4326)::geography, 400, 120, 'available'),
+  ('6f6f6f6f-6f6f-6f6f-6f6f-6f6f6f6f6f6f', 'Hyderabad Civil Defense Flood Relief Shelter', 'shelter', 'Hyderabad, Telangana', 17.39, 78.4917, ST_SetSRID(ST_MakePoint(78.4917, 17.39), 4326)::geography, 1000, 650, 'available'),
+  ('7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a', 'Vijayawada NDRF Aquatic & Quick Rescue Squad', 'rescue', 'Vijayawada, Andhra Pradesh', 16.5112, 80.65299999999999, ST_SetSRID(ST_MakePoint(80.65299999999999, 16.5112), 4326)::geography, 150, 50, 'available'),
+  ('8b8b8b8b-8b8b-8b8b-8b8b-8b8b8b8b8b8b', 'Visakhapatnam Clean Potable Water Tanker Fleet', 'water', 'Visakhapatnam, Andhra Pradesh', 17.6918, 83.2235, ST_SetSRID(ST_MakePoint(83.2235, 17.6918), 4326)::geography, 3000, 2200, 'available'),
+  ('9c9c9c9c-9c9c-9c9c-9c9c-9c9c9c9c9c9c', 'Jamshedpur Community Emergency Food Kitchen', 'food', 'Jamshedpur, Jharkhand', 22.8096, 86.2079, ST_SetSRID(ST_MakePoint(86.2079, 22.8096), 4326)::geography, 2000, 1400, 'available');
 
--- Miami Beach Resources
-INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'a2222222-2222-2222-2222-222222222222',
-    'Mount Sinai Medical Center Miami',
-    'hospital',
-    'Alton Rd, Miami Beach',
-    25.8145,
-    -80.1412,
-    ST_SetSRID(ST_MakePoint(-80.1412, 25.8145), 4326)::geography,
-    250,
-    40,
-    'limited'
-  ),
-  (
-    'a2222222-2222-2222-2222-222222222222',
-    'South Beach Storm Relief Shelter',
-    'shelter',
-    'Washington Ave, Miami Beach',
-    25.7780,
-    -80.1320,
-    ST_SetSRID(ST_MakePoint(-80.1320, 25.7780), 4326)::geography,
-    400,
-    110,
-    'available'
-  ),
-  (
-    'a2222222-2222-2222-2222-222222222222',
-    'US Coast Guard Station Miami Beach',
-    'rescue',
-    'Causeway Island',
-    25.7725,
-    -80.1550,
-    ST_SetSRID(ST_MakePoint(-80.1550, 25.7725), 4326)::geography,
-    80,
-    25,
-    'available'
-  );
+-- 4. SEED REPORTS (Field community intelligence across past 7 days)
+INSERT INTO reports (disaster_id, content, user_handle, source, priority, verified, created_at) VALUES
+  ('a1111111-1111-1111-1111-111111111111', 'Field Update from Mumbai, Maharashtra: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@mumbai_citizen_ravi', 'community_portal', 'critical', true, NOW() - INTERVAL '1 hours'),
+  ('a2222222-2222-2222-2222-222222222222', 'Field Update from Chamoli, Uttarakhand: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@himalayan_scout', 'community_portal', 'high', true, NOW() - INTERVAL '4.5 hours'),
+  ('a3333333-3333-3333-3333-333333333333', 'Field Update from Wayanad, Kerala: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@kerala_relief_net', 'community_portal', 'medium', true, NOW() - INTERVAL '8 hours'),
+  ('a4444444-4444-4444-4444-444444444444', 'Field Update from Chennai, Tamil Nadu: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@chennai_weather_watch', 'community_portal', 'low', true, NOW() - INTERVAL '11.5 hours'),
+  ('a5555555-5555-5555-5555-555555555555', 'Field Update from Guwahati, Assam: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@assam_ground_intel', 'community_portal', 'critical', true, NOW() - INTERVAL '15 hours'),
+  ('a6666666-6666-6666-6666-666666666666', 'Field Update from Puri, Odisha: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@odisha_cyclone_alert', 'community_portal', 'high', true, NOW() - INTERVAL '18.5 hours'),
+  ('a7777777-7777-7777-7777-777777777777', 'Field Update from Shimla, Himachal Pradesh: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@delhi_flood_watch', 'community_portal', 'medium', true, NOW() - INTERVAL '22 hours'),
+  ('a8888888-8888-8888-8888-888888888888', 'Field Update from Bhuj, Gujarat: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@pahadi_volunteer', 'community_portal', 'low', true, NOW() - INTERVAL '25.5 hours'),
+  ('a9999999-9999-9999-9999-999999999999', 'Field Update from New Delhi, NCR: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@punjab_aid_worker', 'community_portal', 'critical', true, NOW() - INTERVAL '29 hours'),
+  ('baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Field Update from Surat, Gujarat: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@bengaluru_ward_scout', 'community_portal', 'high', true, NOW() - INTERVAL '32.5 hours'),
+  ('c1111111-1111-1111-1111-111111111111', 'Field Update from Haldwani, Uttarakhand: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@mumbai_citizen_ravi', 'community_portal', 'medium', true, NOW() - INTERVAL '36 hours'),
+  ('c2222222-2222-2222-2222-222222222222', 'Field Update from Joshimath, Uttarakhand: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@himalayan_scout', 'community_portal', 'low', true, NOW() - INTERVAL '39.5 hours'),
+  ('c3333333-3333-3333-3333-333333333333', 'Field Update from Kedarnath, Uttarakhand: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@kerala_relief_net', 'community_portal', 'critical', true, NOW() - INTERVAL '43 hours'),
+  ('c4444444-4444-4444-4444-444444444444', 'Field Update from Haridwar, Uttarakhand: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@chennai_weather_watch', 'community_portal', 'high', true, NOW() - INTERVAL '46.5 hours'),
+  ('c5555555-5555-5555-5555-555555555555', 'Field Update from Kullu, Himachal Pradesh: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@assam_ground_intel', 'community_portal', 'medium', true, NOW() - INTERVAL '50 hours'),
+  ('c6666666-6666-6666-6666-666666666666', 'Field Update from Mandi, Himachal Pradesh: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@odisha_cyclone_alert', 'community_portal', 'low', true, NOW() - INTERVAL '53.5 hours'),
+  ('c7777777-7777-7777-7777-777777777777', 'Field Update from Srinagar, Jammu & Kashmir: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@delhi_flood_watch', 'community_portal', 'critical', true, NOW() - INTERVAL '57 hours'),
+  ('c8888888-8888-8888-8888-888888888888', 'Field Update from Patiala, Punjab: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@pahadi_volunteer', 'community_portal', 'high', true, NOW() - INTERVAL '60.5 hours'),
+  ('c9999999-9999-9999-9999-999999999999', 'Field Update from Varanasi, Uttar Pradesh: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@punjab_aid_worker', 'community_portal', 'medium', true, NOW() - INTERVAL '64 hours'),
+  ('d1111111-1111-1111-1111-111111111111', 'Field Update from Prayagraj, Uttar Pradesh: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@bengaluru_ward_scout', 'community_portal', 'low', true, NOW() - INTERVAL '67.5 hours'),
+  ('d2222222-2222-2222-2222-222222222222', 'Field Update from Gorakhpur, Uttar Pradesh: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@mumbai_citizen_ravi', 'community_portal', 'critical', true, NOW() - INTERVAL '71 hours'),
+  ('d3333333-3333-3333-3333-333333333333', 'Field Update from Supaul, Bihar: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@himalayan_scout', 'community_portal', 'high', true, NOW() - INTERVAL '74.5 hours'),
+  ('d4444444-4444-4444-4444-444444444444', 'Field Update from Darbhanga, Bihar: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@kerala_relief_net', 'community_portal', 'medium', true, NOW() - INTERVAL '78 hours'),
+  ('d5555555-5555-5555-5555-555555555555', 'Field Update from Kaziranga, Assam: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@chennai_weather_watch', 'community_portal', 'low', true, NOW() - INTERVAL '81.5 hours'),
+  ('d6666666-6666-6666-6666-666666666666', 'Field Update from Silchar, Assam: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@assam_ground_intel', 'community_portal', 'critical', true, NOW() - INTERVAL '85 hours'),
+  ('d7777777-7777-7777-7777-777777777777', 'Field Update from Cuttack, Odisha: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@odisha_cyclone_alert', 'community_portal', 'high', true, NOW() - INTERVAL '88.5 hours'),
+  ('d8888888-8888-8888-8888-888888888888', 'Field Update from Balasore, Odisha: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@delhi_flood_watch', 'community_portal', 'medium', true, NOW() - INTERVAL '92 hours'),
+  ('d9999999-9999-9999-9999-999999999999', 'Field Update from Gangtok, Sikkim: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@pahadi_volunteer', 'community_portal', 'low', true, NOW() - INTERVAL '95.5 hours'),
+  ('e1111111-1111-1111-1111-111111111111', 'Field Update from Shillong, Meghalaya: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@punjab_aid_worker', 'community_portal', 'critical', true, NOW() - INTERVAL '99 hours'),
+  ('e2222222-2222-2222-2222-222222222222', 'Field Update from Imphal, Manipur: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@bengaluru_ward_scout', 'community_portal', 'high', true, NOW() - INTERVAL '102.5 hours'),
+  ('e3333333-3333-3333-3333-333333333333', 'Field Update from Pune, Maharashtra: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@mumbai_citizen_ravi', 'community_portal', 'medium', true, NOW() - INTERVAL '106 hours'),
+  ('e4444444-4444-4444-4444-444444444444', 'Field Update from Kolhapur, Maharashtra: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@himalayan_scout', 'community_portal', 'low', true, NOW() - INTERVAL '109.5 hours'),
+  ('e5555555-5555-5555-5555-555555555555', 'Field Update from Thane, Maharashtra: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@kerala_relief_net', 'community_portal', 'critical', true, NOW() - INTERVAL '113 hours'),
+  ('e6666666-6666-6666-6666-666666666666', 'Field Update from Nashik, Maharashtra: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@chennai_weather_watch', 'community_portal', 'high', true, NOW() - INTERVAL '116.5 hours'),
+  ('e7777777-7777-7777-7777-777777777777', 'Field Update from Ahmedabad, Gujarat: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@assam_ground_intel', 'community_portal', 'medium', true, NOW() - INTERVAL '120 hours'),
+  ('e8888888-8888-8888-8888-888888888888', 'Field Update from Vadodara, Gujarat: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@odisha_cyclone_alert', 'community_portal', 'low', true, NOW() - INTERVAL '123.5 hours'),
+  ('e9999999-9999-9999-9999-999999999999', 'Field Update from Rajkot, Gujarat: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@delhi_flood_watch', 'community_portal', 'critical', true, NOW() - INTERVAL '127 hours'),
+  ('f1111111-1111-1111-1111-111111111111', 'Field Update from Jaipur, Rajasthan: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@pahadi_volunteer', 'community_portal', 'high', true, NOW() - INTERVAL '130.5 hours'),
+  ('f2222222-2222-2222-2222-222222222222', 'Field Update from Panaji, Goa: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@punjab_aid_worker', 'community_portal', 'medium', true, NOW() - INTERVAL '134 hours'),
+  ('f3333333-3333-3333-3333-333333333333', 'Field Update from Nagpur, Maharashtra: Relief supplies arriving at local nodal center. Volunteers assisting residents in low-lying pockets.', '@bengaluru_ward_scout', 'community_portal', 'low', true, NOW() - INTERVAL '137.5 hours');
 
--- Mumbai Emergency Resources (near 19.0760, 72.8777)
-INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'KEM Hospital Emergency Trauma Center',
-    'hospital',
-    'Parel, Mumbai',
-    19.0022,
-    72.8427,
-    ST_SetSRID(ST_MakePoint(72.8427, 19.0022), 4326)::geography,
-    450,
-    110,
-    'available'
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'Lilavati Hospital Disaster Response Wing',
-    'hospital',
-    'Bandra West, Mumbai',
-    19.0520,
-    72.8290,
-    ST_SetSRID(ST_MakePoint(72.8290, 19.0520), 4326)::geography,
-    300,
-    65,
-    'limited'
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'BMC Central Flood Relief Shelter',
-    'shelter',
-    'Dadar, Mumbai',
-    19.0178,
-    72.8478,
-    ST_SetSRID(ST_MakePoint(72.8478, 19.0178), 4326)::geography,
-    1000,
-    680,
-    'available'
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'NDRF Flood & Aquatic Rescue Unit 5',
-    'rescue',
-    'Worli Sea Face, Mumbai',
-    19.0176,
-    72.8152,
-    ST_SetSRID(ST_MakePoint(72.8152, 19.0176), 4326)::geography,
-    120,
-    45,
-    'available'
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'BMC Potable Water Tanker Fleet #7',
-    'water',
-    'Kurla West, Mumbai',
-    19.0726,
-    72.8845,
-    ST_SetSRID(ST_MakePoint(72.8845, 19.0726), 4326)::geography,
-    3500,
-    2800,
-    'available'
-  );
+-- 5. SEED OFFICIAL BULLETINS (Past 7 days)
+INSERT INTO official_updates (disaster_id, agency, severity, headline, body, issued_at) VALUES
+  ('a1111111-1111-1111-1111-111111111111', 'National Disaster Management Authority (NDMA)', 'warning', 'Emergency Alert for Mumbai Region', 'Advisory issued by National Disaster Management Authority (NDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '2 hours'),
+  ('a2222222-2222-2222-2222-222222222222', 'India Meteorological Department (IMD)', 'advisory', 'Emergency Alert for Chamoli Region', 'Advisory issued by India Meteorological Department (IMD). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '7 hours'),
+  ('a3333333-3333-3333-3333-333333333333', 'State Disaster Management Authority (SDMA)', 'evacuation', 'Emergency Alert for Wayanad Region', 'Advisory issued by State Disaster Management Authority (SDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '12 hours'),
+  ('a4444444-4444-4444-4444-444444444444', 'National Disaster Response Force (NDRF)', 'all_clear', 'Emergency Alert for Chennai Region', 'Advisory issued by National Disaster Response Force (NDRF). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '17 hours'),
+  ('a5555555-5555-5555-5555-555555555555', 'Central Water Commission (CWC)', 'warning', 'Emergency Alert for Guwahati Region', 'Advisory issued by Central Water Commission (CWC). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '22 hours'),
+  ('a6666666-6666-6666-6666-666666666666', 'National Disaster Management Authority (NDMA)', 'advisory', 'Emergency Alert for Puri Region', 'Advisory issued by National Disaster Management Authority (NDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '27 hours'),
+  ('a7777777-7777-7777-7777-777777777777', 'India Meteorological Department (IMD)', 'evacuation', 'Emergency Alert for Shimla Region', 'Advisory issued by India Meteorological Department (IMD). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '32 hours'),
+  ('a8888888-8888-8888-8888-888888888888', 'State Disaster Management Authority (SDMA)', 'all_clear', 'Emergency Alert for Bhuj Region', 'Advisory issued by State Disaster Management Authority (SDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '37 hours'),
+  ('a9999999-9999-9999-9999-999999999999', 'National Disaster Response Force (NDRF)', 'warning', 'Emergency Alert for New Delhi Region', 'Advisory issued by National Disaster Response Force (NDRF). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '42 hours'),
+  ('baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Central Water Commission (CWC)', 'advisory', 'Emergency Alert for Surat Region', 'Advisory issued by Central Water Commission (CWC). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '47 hours'),
+  ('c1111111-1111-1111-1111-111111111111', 'National Disaster Management Authority (NDMA)', 'evacuation', 'Emergency Alert for Haldwani Region', 'Advisory issued by National Disaster Management Authority (NDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '52 hours'),
+  ('c2222222-2222-2222-2222-222222222222', 'India Meteorological Department (IMD)', 'all_clear', 'Emergency Alert for Joshimath Region', 'Advisory issued by India Meteorological Department (IMD). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '57 hours'),
+  ('c3333333-3333-3333-3333-333333333333', 'State Disaster Management Authority (SDMA)', 'warning', 'Emergency Alert for Kedarnath Region', 'Advisory issued by State Disaster Management Authority (SDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '62 hours'),
+  ('c4444444-4444-4444-4444-444444444444', 'National Disaster Response Force (NDRF)', 'advisory', 'Emergency Alert for Haridwar Region', 'Advisory issued by National Disaster Response Force (NDRF). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '67 hours'),
+  ('c5555555-5555-5555-5555-555555555555', 'Central Water Commission (CWC)', 'evacuation', 'Emergency Alert for Kullu Region', 'Advisory issued by Central Water Commission (CWC). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '72 hours'),
+  ('c6666666-6666-6666-6666-666666666666', 'National Disaster Management Authority (NDMA)', 'all_clear', 'Emergency Alert for Mandi Region', 'Advisory issued by National Disaster Management Authority (NDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '77 hours'),
+  ('c7777777-7777-7777-7777-777777777777', 'India Meteorological Department (IMD)', 'warning', 'Emergency Alert for Srinagar Region', 'Advisory issued by India Meteorological Department (IMD). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '82 hours'),
+  ('c8888888-8888-8888-8888-888888888888', 'State Disaster Management Authority (SDMA)', 'advisory', 'Emergency Alert for Patiala Region', 'Advisory issued by State Disaster Management Authority (SDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '87 hours'),
+  ('c9999999-9999-9999-9999-999999999999', 'National Disaster Response Force (NDRF)', 'evacuation', 'Emergency Alert for Varanasi Region', 'Advisory issued by National Disaster Response Force (NDRF). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '92 hours'),
+  ('d1111111-1111-1111-1111-111111111111', 'Central Water Commission (CWC)', 'all_clear', 'Emergency Alert for Prayagraj Region', 'Advisory issued by Central Water Commission (CWC). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '97 hours'),
+  ('d2222222-2222-2222-2222-222222222222', 'National Disaster Management Authority (NDMA)', 'warning', 'Emergency Alert for Gorakhpur Region', 'Advisory issued by National Disaster Management Authority (NDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '102 hours'),
+  ('d3333333-3333-3333-3333-333333333333', 'India Meteorological Department (IMD)', 'advisory', 'Emergency Alert for Supaul Region', 'Advisory issued by India Meteorological Department (IMD). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '107 hours'),
+  ('d4444444-4444-4444-4444-444444444444', 'State Disaster Management Authority (SDMA)', 'evacuation', 'Emergency Alert for Darbhanga Region', 'Advisory issued by State Disaster Management Authority (SDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '112 hours'),
+  ('d5555555-5555-5555-5555-555555555555', 'National Disaster Response Force (NDRF)', 'all_clear', 'Emergency Alert for Kaziranga Region', 'Advisory issued by National Disaster Response Force (NDRF). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '117 hours'),
+  ('d6666666-6666-6666-6666-666666666666', 'Central Water Commission (CWC)', 'warning', 'Emergency Alert for Silchar Region', 'Advisory issued by Central Water Commission (CWC). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '122 hours'),
+  ('d7777777-7777-7777-7777-777777777777', 'National Disaster Management Authority (NDMA)', 'advisory', 'Emergency Alert for Cuttack Region', 'Advisory issued by National Disaster Management Authority (NDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '127 hours'),
+  ('d8888888-8888-8888-8888-888888888888', 'India Meteorological Department (IMD)', 'evacuation', 'Emergency Alert for Balasore Region', 'Advisory issued by India Meteorological Department (IMD). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '132 hours'),
+  ('d9999999-9999-9999-9999-999999999999', 'State Disaster Management Authority (SDMA)', 'all_clear', 'Emergency Alert for Gangtok Region', 'Advisory issued by State Disaster Management Authority (SDMA). Citizens are instructed to remain alert, avoid floodplains, and follow instructions from local disaster coordination cells.', NOW() - INTERVAL '137 hours');
 
--- Uttarakhand Resources (near 30.2937, 79.5603)
-INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'a6666666-6666-6666-6666-666666666666',
-    'AIIMS Rishikesh High-Altitude Emergency Ward',
-    'hospital',
-    'Rishikesh Base Camp',
-    30.0869,
-    78.2676,
-    ST_SetSRID(ST_MakePoint(78.2676, 30.0869), 4326)::geography,
-    250,
-    80,
-    'available'
-  ),
-  (
-    'a6666666-6666-6666-6666-666666666666',
-    'ITBP Mountain Rescue & Air Evac Depot',
-    'rescue',
-    'Joshimath, Chamoli',
-    30.5564,
-    79.5647,
-    ST_SetSRID(ST_MakePoint(79.5647, 30.5564), 4326)::geography,
-    150,
-    60,
-    'available'
-  ),
-  (
-    'a6666666-6666-6666-6666-666666666666',
-    'Chamoli Emergency Rations Distribution Point',
-    'food',
-    'Gopeshwar Hub',
-    30.4140,
-    79.3240,
-    ST_SetSRID(ST_MakePoint(79.3240, 30.4140), 4326)::geography,
-    1200,
-    850,
-    'available'
-  );
-
--- Tokyo Bay Resources (near 35.6762, 139.6503)
-INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'a8888888-8888-8888-8888-888888888888',
-    'Tokyo Metropolitan Emergency Medical Center',
-    'hospital',
-    'Shinjuku, Tokyo',
-    35.6900,
-    139.7000,
-    ST_SetSRID(ST_MakePoint(139.7000, 35.6900), 4326)::geography,
-    600,
-    190,
-    'available'
-  ),
-  (
-    'a8888888-8888-8888-8888-888888888888',
-    'Minato Earthquake Tsunami Evacuation Tower',
-    'shelter',
-    'Minato Ward, Tokyo',
-    35.6580,
-    139.7510,
-    ST_SetSRID(ST_MakePoint(139.7510, 35.6580), 4326)::geography,
-    1800,
-    1200,
-    'available'
-  ),
-  (
-    'a8888888-8888-8888-8888-888888888888',
-    'Tokyo Fire Dept Hyper Rescue Unit',
-    'rescue',
-    'Koto Ward, Tokyo',
-    35.6720,
-    139.8170,
-    ST_SetSRID(ST_MakePoint(139.8170, 35.6720), 4326)::geography,
-    200,
-    75,
-    'available'
-  );
-
--- London Resources (near 51.5074, -0.1278)
-INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'a9999999-9999-9999-9999-999999999999',
-    'St Thomas Hospital Emergency Unit',
-    'hospital',
-    'Westminster, London',
-    51.4988,
-    -0.1190,
-    ST_SetSRID(ST_MakePoint(-0.1190, 51.4988), 4326)::geography,
-    400,
-    95,
-    'available'
-  ),
-  (
-    'a9999999-9999-9999-9999-999999999999',
-    'Southwark Thames Flood Relief Base',
-    'shelter',
-    'Bermondsey, London',
-    51.4980,
-    -0.0630,
-    ST_SetSRID(ST_MakePoint(-0.0630, 51.4980), 4326)::geography,
-    800,
-    550,
-    'available'
-  );
-
--- Sydney Resources (near -33.8688, 151.2093)
-INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
-  (
-    'baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    'Westmead Hospital Trauma & Burns Center',
-    'hospital',
-    'Westmead, Sydney',
-    -33.8055,
-    150.9880,
-    ST_SetSRID(ST_MakePoint(150.9880, -33.8055), 4326)::geography,
-    350,
-    110,
-    'available'
-  ),
-  (
-    'baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    'Penrith Bushfire Evacuation Center',
-    'shelter',
-    'Penrith, Sydney',
-    -33.7510,
-    150.6940,
-    ST_SetSRID(ST_MakePoint(150.6940, -33.7510), 4326)::geography,
-    1200,
-    820,
-    'available'
-  );
-
--- ============================================================================
--- 4. SEED REPORTS (Initial community field reports)
--- ============================================================================
-INSERT INTO reports (disaster_id, content, user_handle, source, priority, verified) VALUES
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'Urgent: Water levels reaching 3 feet on 8th Ave and 28th St. Multiple elderly residents stranded on ground floors.',
-    '@ny_citizen_99',
-    'mock_social_stream',
-    'critical',
-    true
-  ),
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'Need clean drinking water near Manhattan Central Park West. Tap water is cloudy and brownish.',
-    '@citizen123',
-    'mock_social_stream',
-    'high',
-    true
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'Urgent! Need drinking water and baby formula near Kurla West. Roads blocked by debris and floodwater.',
-    '@citizen_sarah_99',
-    'community_portal',
-    'high',
-    false
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'Family trapped on second floor due to rapid water rise near Dadar TT circle. Urgent boat rescue needed!',
-    '@mike_rescue_volunteer',
-    'community_portal',
-    'critical',
-    true
-  ),
-  (
-    'a6666666-6666-6666-6666-666666666666',
-    'Massive rockfall blocking Badrinath National Highway near Joshimath. Approximately 40 vehicles queued.',
-    '@himalayan_scout',
-    'mock_social_stream',
-    'high',
-    true
-  ),
-  (
-    'a8888888-8888-8888-8888-888888888888',
-    'Tokyo Metro lines temporarily halted for seismic track clearance. No power outage reported in Ginza.',
-    '@tokyo_transit',
-    'mock_social_stream',
-    'medium',
-    true
-  );
-
--- ============================================================================
--- 5. SEED OFFICIAL BULLETINS
--- ============================================================================
-INSERT INTO official_updates (disaster_id, agency, severity, headline, body) VALUES
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'NYC Emergency Management',
-    'evacuation',
-    'MANDATORY EVACUATION: Zone A Ground Floors & Basements',
-    'Due to unprecedented storm surge reaching 4 feet above ground level, all residents in Zone A ground floors must immediately evacuate to higher elevations or designated emergency shelters.'
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'Brihanmumbai Municipal Corporation (BMC)',
-    'warning',
-    'Red Alert: Severe Cyclone Approaching North Konkan Coast',
-    'Citizens are advised to remain indoors. Coastal roads closed. Emergency relief shelters open across all municipal wards with food and medical supplies.'
-  ),
-  (
-    'a6666666-6666-6666-6666-666666666666',
-    'Uttarakhand Disaster Management Authority',
-    'warning',
-    'Cloudburst Alert & Highway Movement Suspension in Chamoli',
-    'National Highway 7 closed due to flash mudslides. NDRF and SDRF teams mobilized for airlift operations and highway clearance.'
-  ),
-  (
-    'a8888888-8888-8888-8888-888888888888',
-    'Japan Meteorological Agency (JMA)',
-    'warning',
-    'Tsunami Advisory Lifted for Tokyo Bay Coastal Districts',
-    'Seismic shaking subsided. All coastal flood gates engaged. Bullet train operations resuming under safety speed protocols.'
-  );
-
--- ============================================================================
--- 6. SEED VERIFIED DAMAGE IMAGES & HAZARD ASSESSMENTS
--- ============================================================================
+-- 6. SEED VERIFIED DAMAGE IMAGES
 INSERT INTO disaster_image_verifications (
-  disaster_id,
-  image_url,
-  caption,
-  is_genuine,
-  confidence_score,
-  damage_severity,
-  detected_hazards,
-  ai_analysis
+  disaster_id, image_url, caption, is_genuine, confidence_score, damage_severity, detected_hazards, ai_analysis
 ) VALUES
-  (
-    'a1111111-1111-1111-1111-111111111111',
-    'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80',
-    'Severe street submergence along 8th Avenue with abandoned vehicles submerged past wheel wells.',
-    true,
-    0.965,
-    'severe',
-    ARRAY['floodwater_depth_high', 'submerged_vehicles', 'electrical_conduit_risk'],
-    '{"structuralIntegrity": "compromised_subsurface", "waterLevelEstMeters": 0.9, "detectedObjects": ["vehicle", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb
-  ),
-  (
-    'a5555555-5555-5555-5555-555555555555',
-    'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80',
-    'Waterlogged arterial road in Mumbai with rescue teams deploying inflatable boats.',
-    true,
-    0.952,
-    'severe',
-    ARRAY['high_water_level', 'traffic_gridlock', 'submerged_roadway'],
-    '{"structuralIntegrity": "sound", "waterLevelEstMeters": 0.8, "detectedObjects": ["boat", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb
-  );
+  ('a1111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80', 'Waterlogged arterial road in Mumbai with rescue teams deploying inflatable boats.', true, 0.952, 'severe', ARRAY['high_water_level', 'traffic_gridlock', 'submerged_roadway'], '{"structuralIntegrity": "sound", "waterLevelEstMeters": 0.8, "detectedObjects": ["boat", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb),
+  ('a2222222-2222-2222-2222-222222222222', 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80', 'Himalayan riverine flow and landslide debris clearance by disaster management crews near Chamoli.', true, 0.965, 'severe', ARRAY['floodwater_depth_high', 'submerged_vehicles', 'electrical_conduit_risk'], '{"structuralIntegrity": "compromised_subsurface", "waterLevelEstMeters": 0.9, "detectedObjects": ["vehicle", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb);

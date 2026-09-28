@@ -11,6 +11,7 @@ import { api } from '../api/client';
 export default function DashboardView({ onSelectDisaster, liveEvents = [], isSocketConnected = false }) {
   const {
     disasters,
+    allDisasters,
     loading,
     error,
     filters,
@@ -35,6 +36,9 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
 
   const quickTags = ['flood', 'fire', 'earthquake', 'storm', 'medical', 'hurricane'];
 
+  const topDisasters = disasters.slice(0, 2);
+  const bottomDisasters = disasters.slice(2);
+
   return (
     <div style={{
       maxWidth: '1320px',
@@ -45,24 +49,24 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
       {/* Semantic accessible title */}
       <h1 className="sr-only">Disaster Response Incident Operations</h1>
 
-      {/* 01 · Status Overview Counters */}
-      <StatsBar disasters={disasters} />
+      {/* 01 · Status Overview Counters (Remains constant across all filters) */}
+      <StatsBar disasters={allDisasters && allDisasters.length > 0 ? allDisasters : disasters} />
 
-      {/* 02 · Main Grid (Incident Cards 70% + Live Feed 30%) */}
+      {/* 02 · Top Section: Filter Bar & Top 2 Cards (Left) + Broadcast Feed (Right) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 360px',
+        gridTemplateColumns: 'minmax(0, 1fr) 340px',
         gap: '24px',
-        alignItems: 'start'
+        alignItems: 'start',
+        marginBottom: bottomDisasters.length > 0 ? '20px' : '0'
       }}>
-        {/* Left: Search, Filters & Incident Cards */}
-        <section aria-label="Incident Registry">
+        {/* Left: Filter Bar + Top 2 Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Filter Bar */}
           <div
             className="aurora-card"
             style={{
               padding: '16px 20px',
-              marginBottom: '20px',
               backgroundColor: '#ffffff',
               borderRadius: '16px',
               border: '1px solid var(--color-rule)',
@@ -73,18 +77,44 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
             }}
           >
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input
-                type="text"
-                placeholder="Search incidents by title, location, or keyword..."
-                value={filters.search}
-                onChange={(e) => setFilter('search', e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '9px 14px',
-                  borderRadius: 'var(--radius-pill)',
-                  fontSize: '13px'
-                }}
-              />
+              <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="Search incidents by title, location, or keyword..."
+                  value={filters.search}
+                  onChange={(e) => setFilter('search', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '9px 38px 9px 16px',
+                    borderRadius: 'var(--radius-pill)',
+                    fontSize: '13px',
+                    border: '1.5px solid var(--color-forest)',
+                    boxShadow: '0 0 0 2px rgba(27, 67, 50, 0.10)',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--color-forest)"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    pointerEvents: 'none',
+                    opacity: 0.8
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
 
               <select
                 value={filters.status}
@@ -146,7 +176,7 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
             </div>
           </div>
 
-          {/* Incident Cards Grid */}
+          {/* Loading, Error or Empty States */}
           {loading && disasters.length === 0 ? (
             <div style={{
               textAlign: 'center',
@@ -183,12 +213,13 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
               </div>
             </div>
           ) : (
+            /* First 2 Incident Cards (alongside Broadcast Feed) */
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gridTemplateColumns: topDisasters.length === 1 ? '1fr' : 'repeat(2, minmax(0, 1fr))',
               gap: '18px'
             }}>
-              {disasters.map((d) => (
+              {topDisasters.map((d) => (
                 <DisasterCard
                   key={d.id}
                   disaster={d}
@@ -198,138 +229,33 @@ export default function DashboardView({ onSelectDisaster, liveEvents = [], isSoc
               ))}
             </div>
           )}
-        </section>
+        </div>
 
-        {/* Right: Live Broadcast Stream & Active Incidents Queue */}
-        <section aria-label="Real-Time Feed and Incidents" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* Right: Broadcast Feed */}
+        <aside aria-label="Real-Time Feed">
           <LiveFeed events={liveEvents} isConnected={isSocketConnected} />
-
-          {/* Incidents displayed right below the Broadcast Feed */}
-          {disasters.length > 0 && (
-            <div
-              className="aurora-card"
-              style={{
-                padding: '20px',
-                backgroundColor: '#ffffff',
-                borderRadius: '16px',
-                border: '1px solid var(--color-rule)',
-                boxShadow: 'var(--shadow-sm)'
-              }}
-            >
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingBottom: '12px',
-                borderBottom: '1px solid var(--color-rule)',
-                marginBottom: '14px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--color-forest)'
-                  }} />
-                  <h3 style={{
-                    fontSize: '1.15rem',
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: 400,
-                    color: 'var(--color-ink)'
-                  }}>
-                    Active Incidents
-                  </h3>
-                </div>
-                <span style={{
-                  fontSize: '11px',
-                  fontFamily: 'var(--font-mono)',
-                  color: 'var(--color-muted)'
-                }}>
-                  {disasters.length} tracked
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {disasters.map((d) => (
-                  <div
-                    key={d.id}
-                    onClick={() => onSelectDisaster && onSelectDisaster(d)}
-                    style={{
-                      padding: '12px 14px',
-                      borderRadius: '12px',
-                      backgroundColor: 'var(--color-paper)',
-                      border: '1px solid var(--color-rule)',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-forest)';
-                      e.currentTarget.style.backgroundColor = 'var(--color-forest-subtle)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-rule)';
-                      e.currentTarget.style.backgroundColor = 'var(--color-paper)';
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
-                      <h4 style={{
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        color: 'var(--color-ink)',
-                        lineHeight: 1.3
-                      }}>
-                        {d.title}
-                      </h4>
-                      <span style={{
-                        fontSize: '9.5px',
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 700,
-                        padding: '2px 6px',
-                        borderRadius: 'var(--radius-pill)',
-                        backgroundColor: d.status === 'active' ? '#fef2f2' : d.status === 'monitoring' ? '#fffbeb' : '#e8f0eb',
-                        color: d.status === 'active' ? '#b91c1c' : d.status === 'monitoring' ? '#b45309' : 'var(--color-forest)',
-                        border: `1px solid ${d.status === 'active' ? '#fecaca' : d.status === 'monitoring' ? '#fde68a' : 'var(--color-forest-border)'}`,
-                        textTransform: 'uppercase',
-                        flexShrink: 0
-                      }}>
-                        {d.status}
-                      </span>
-                    </div>
-
-                    <div style={{ fontSize: '11.5px', color: 'var(--color-forest)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-                      <span>📍 {d.location_name || d.location?.name || 'Epicenter'}</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
-                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                        {(d.tags || []).slice(0, 2).map((t) => (
-                          <span
-                            key={t}
-                            style={{
-                              fontSize: '10px',
-                              fontFamily: 'var(--font-mono)',
-                              color: 'var(--color-muted)'
-                            }}
-                          >
-                            #{t}
-                          </span>
-                        ))}
-                      </div>
-                      <span style={{
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        color: 'var(--color-forest)'
-                      }}>
-                        Inspect →
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
+        </aside>
       </div>
+
+      {/* 03 · Bottom Grid: 3 incident cards per row across the full width where broadcast feed is not there */}
+      {bottomDisasters.length > 0 && (
+        <section aria-label="All Incidents Grid">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+            gap: '18px'
+          }}>
+            {bottomDisasters.map((d) => (
+              <DisasterCard
+                key={d.id}
+                disaster={d}
+                onSelect={onSelectDisaster}
+                onDelete={handleDeleteDisaster}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

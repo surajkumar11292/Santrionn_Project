@@ -4,12 +4,17 @@
 import React from 'react';
 
 export default function LiveFeed({ events = [], isConnected = false }) {
-  // Filter out any lingering internal system/socket debug packets
-  const broadcastEvents = events.filter((evt) => evt.type !== 'system' && !evt.title?.includes('WebSocket'));
+  // Filter out internal system packets and deleted/removed incident notices
+  const broadcastEvents = events.filter((evt) => 
+    evt.type !== 'system' && 
+    !evt.title?.includes('WebSocket') &&
+    evt.type !== 'disaster_deleted' &&
+    !evt.title?.includes('Removed')
+  );
 
   return (
     <aside
-      aria-label="Live Crisis Broadcast Feed"
+      aria-label="Crisis Broadcast Feed"
       className="aurora-card"
       style={{
         padding: '20px',
@@ -27,7 +32,6 @@ export default function LiveFeed({ events = [], isConnected = false }) {
       <header style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
         paddingBottom: '12px',
         borderBottom: '1px solid var(--color-rule)',
         marginBottom: '14px'
@@ -48,19 +52,6 @@ export default function LiveFeed({ events = [], isConnected = false }) {
             Broadcast Feed
           </h2>
         </div>
-
-        <span style={{
-          fontSize: '11px',
-          fontWeight: 700,
-          fontFamily: 'var(--font-mono)',
-          padding: '2px 8px',
-          borderRadius: 'var(--radius-pill)',
-          backgroundColor: isConnected ? 'var(--color-forest-subtle)' : '#fef2f2',
-          color: isConnected ? 'var(--color-forest)' : '#b91c1c',
-          border: `1px solid ${isConnected ? 'var(--color-forest-border)' : '#fecaca'}`
-        }}>
-          {isConnected ? '● STREAMING' : '○ OFFLINE'}
-        </span>
       </header>
 
       {/* Broadcast Stream */}

@@ -94,12 +94,6 @@ export function useSocket() {
     socket.on('disaster_deleted', (data) => {
       if (data?.disasterId) {
         onDisasterDeleted(data.disasterId);
-        addLiveEvent({
-          type: 'disaster_deleted',
-          title: 'Incident Resolved / Removed',
-          detail: `Disaster ID: ${data.disasterId}`,
-          level: 'info'
-        });
       }
     });
 

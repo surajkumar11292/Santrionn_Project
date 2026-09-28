@@ -58,6 +58,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
             type="button"
             onClick={() => setCurrentView && setCurrentView('dashboard')}
             style={{
+              height: '32px',
               padding: '6px 14px',
               borderRadius: 'var(--radius-pill)',
               fontSize: '13px',
@@ -65,7 +66,12 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
               color: currentView === 'dashboard' ? '#ffffff' : 'var(--color-ink-2)',
               backgroundColor: currentView === 'dashboard' ? 'var(--color-forest)' : 'transparent',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+              boxSizing: 'border-box'
             }}
           >
             Incidents
@@ -75,6 +81,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
             type="button"
             onClick={() => setCurrentView && setCurrentView('map')}
             style={{
+              height: '32px',
               padding: '6px 14px',
               borderRadius: 'var(--radius-pill)',
               fontSize: '13px',
@@ -82,7 +89,12 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
               color: currentView === 'map' ? '#ffffff' : 'var(--color-ink-2)',
               backgroundColor: currentView === 'map' ? 'var(--color-forest)' : 'transparent',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+              boxSizing: 'border-box'
             }}
           >
             Spatial Radar
@@ -93,11 +105,18 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
             target="_blank"
             rel="noreferrer"
             style={{
-              padding: '6px 12px',
+              height: '32px',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-pill)',
               fontSize: '13px',
               fontWeight: 500,
-              color: 'var(--color-muted)',
-              textDecoration: 'none'
+              color: 'var(--color-ink-2)',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+              boxSizing: 'border-box'
             }}
           >
             API Docs ↗
@@ -105,15 +124,26 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
         </nav>
 
         {/* Actions & Role Clearance */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {canCreate && (
             <button
               type="button"
               onClick={onOpenCreateModal}
-              className="btn-forest"
               style={{
-                padding: '7px 16px',
-                fontSize: '13px'
+                height: '32px',
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-pill)',
+                fontSize: '13px',
+                fontWeight: 600,
+                backgroundColor: 'var(--color-forest)',
+                color: '#ffffff',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: 1,
+                boxSizing: 'border-box'
               }}
             >
               + Log Incident
@@ -121,20 +151,24 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
           )}
 
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '4px 10px',
+            height: '32px',
+            padding: '6px 14px',
             borderRadius: 'var(--radius-pill)',
             backgroundColor: 'var(--color-paper-muted)',
             border: '1px solid var(--color-rule)',
-            fontSize: '12px'
+            fontSize: '13px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            boxSizing: 'border-box',
+            lineHeight: 1
           }}>
             <span style={{ color: 'var(--color-ink)', fontWeight: 600 }}>
               {user?.email ? user.email.split('@')[0] : 'operator'}
             </span>
             <span style={{
-              fontSize: '10px',
+              fontSize: '11px',
               fontWeight: 700,
               fontFamily: 'var(--font-mono)',
               color: user?.role === 'admin' ? '#b91c1c' : 'var(--color-forest)',
@@ -147,16 +181,7 @@ export default function Navbar({ currentView, setCurrentView, onOpenCreateModal,
           <button
             type="button"
             onClick={logout}
-            style={{
-              padding: '5px 12px',
-              borderRadius: 'var(--radius-pill)',
-              fontSize: '12px',
-              fontWeight: 500,
-              color: 'var(--color-muted)',
-              border: '1px solid var(--color-rule)',
-              backgroundColor: 'var(--color-paper-surface)',
-              cursor: 'pointer'
-            }}
+            className="btn-signout"
           >
             Sign out
           </button>

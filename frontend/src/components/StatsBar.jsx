@@ -13,33 +13,22 @@ export default function StatsBar({ disasters = [] }) {
     {
       label: 'Active Incidents',
       value: active,
-      color: '#b91c1c',
-      bg: '#fef2f2',
-      border: '#fecaca',
-      tag: 'Immediate Action'
+      color: '#b91c1c'
     },
     {
       label: 'Under Surveillance',
       value: monitoring,
-      color: '#b45309',
-      bg: '#fffbeb',
-      border: '#fde68a',
-      tag: 'Monitoring'
+      color: '#b45309'
     },
     {
       label: 'Resolved / Contained',
       value: resolved,
-      color: 'var(--color-forest)',
-      bg: 'var(--color-forest-subtle)',
-      border: 'var(--color-forest-border)',
-      tag: 'Contained'
+      color: 'var(--color-forest)'
     },
     {
       label: 'Total Incidents Tracked',
       value: total,
-      color: 'var(--color-ink)',
-      bg: 'var(--color-paper-muted)',
-      border: 'var(--color-rule)'
+      color: 'var(--color-ink)'
     }
   ];
 
@@ -68,29 +57,10 @@ export default function StatsBar({ disasters = [] }) {
             boxShadow: 'var(--shadow-sm)'
           }}
         >
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '6px'
-          }}>
+          <div style={{ marginBottom: '6px' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-muted)' }}>
               {s.label}
             </span>
-
-            {s.tag && (
-              <span style={{
-                fontSize: '11px',
-                fontWeight: 600,
-                padding: '2px 8px',
-                borderRadius: 'var(--radius-pill)',
-                backgroundColor: s.bg,
-                color: s.color,
-                border: `1px solid ${s.border}`
-              }}>
-                {s.tag}
-              </span>
-            )}
           </div>
 
           <div

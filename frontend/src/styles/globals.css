@@ -243,3 +243,28 @@ a:hover {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Sign Out Pill Button (Clean, Visible, Red Hover) */
+.btn-signout {
+  height: 32px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+  color: #b91c1c;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-signout:hover {
+  color: #ffffff;
+  background-color: #dc2626;
+  border-color: #dc2626;
+}

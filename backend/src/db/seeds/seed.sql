@@ -10,13 +10,13 @@ INSERT INTO users (id, name, email, password_hash, role) VALUES
   ('33333333-3333-3333-3333-333333333333', 'Public Observer', 'viewer@relief.io', crypt('viewer123', gen_salt('bf', 10)), 'viewer');
 
 -- ============================================================================
--- 2. SEED DISASTERS (PostGIS Points in Longitude, Latitude order)
+-- 2. SEED DISASTERS (Diverse locations, hazards, tags, and operational statuses)
 -- ============================================================================
 INSERT INTO disasters (id, title, description, location_name, latitude, longitude, location, tags, status, created_by) VALUES
   (
     'a1111111-1111-1111-1111-111111111111',
     'Severe Flash Flooding in Manhattan, NYC',
-    'Heavy flooding and subway inundation has affected Manhattan, NYC following torrential rainfall.',
+    'Heavy flooding and subway inundation has affected Manhattan, NYC following torrential rainfall and sewer system overflow.',
     'Manhattan, NYC',
     40.7831,
     -73.9712,
@@ -60,12 +60,108 @@ INSERT INTO disasters (id, title, description, location_name, latitude, longitud
     ARRAY['earthquake', 'collapse', 'gas-leak'],
     'active',
     '22222222-2222-2222-2222-222222222222'
+  ),
+  (
+    'a5555555-5555-5555-5555-555555555555',
+    'Severe Cyclone & Coastal Inundation in Mumbai',
+    'Intense cyclonic storm hitting Mumbai shoreline with continuous rainfall, high tide breaches, and suburban waterlogging.',
+    'Mumbai, Maharashtra',
+    19.0760,
+    72.8777,
+    ST_SetSRID(ST_MakePoint(72.8777, 19.0760), 4326)::geography,
+    ARRAY['cyclone', 'flood', 'hurricane', 'urgent', 'coastal'],
+    'active',
+    '11111111-1111-1111-1111-111111111111'
+  ),
+  (
+    'a6666666-6666-6666-6666-666666666666',
+    'Himalayan Cloudburst & Flash Landslide in Uttarakhand',
+    'Sudden cloudburst causing heavy debris flow and road blockages across Chamoli district, stranding mountain pilgrims.',
+    'Chamoli, Uttarakhand',
+    30.2937,
+    79.5603,
+    ST_SetSRID(ST_MakePoint(79.5603, 30.2937), 4326)::geography,
+    ARRAY['landslide', 'flood', 'rescue', 'urgent'],
+    'active',
+    '22222222-2222-2222-2222-222222222222'
+  ),
+  (
+    'a7777777-7777-7777-7777-777777777777',
+    'Extreme Monsoon Riverine Overflow in Kochi',
+    'Periyar river basin overflow triggering low-lying residential inundation and relief camp mobilizations.',
+    'Kochi, Kerala',
+    9.9312,
+    76.2673,
+    ST_SetSRID(ST_MakePoint(76.2673, 9.9312), 4326)::geography,
+    ARRAY['flood', 'monsoon', 'medical', 'shelter'],
+    'monitoring',
+    '11111111-1111-1111-1111-111111111111'
+  ),
+  (
+    'a8888888-8888-8888-8888-888888888888',
+    'Magnitude 7.1 Seismic Tremor in Tokyo Bay',
+    'Strong offshore seismic activity shaking Greater Tokyo with bullet train halts and structural inspection alerts.',
+    'Tokyo Bay, Japan',
+    35.6762,
+    139.6503,
+    ST_SetSRID(ST_MakePoint(139.6503, 35.6762), 4326)::geography,
+    ARRAY['earthquake', 'tsunami', 'infrastructure', 'metro'],
+    'active',
+    '22222222-2222-2222-2222-222222222222'
+  ),
+  (
+    'a9999999-9999-9999-9999-999999999999',
+    'Thames Barrier Tidal Surge & Flood Warning',
+    'High spring tides combined with North Sea gale storm surge triggering Thames flood barrier deployment in London.',
+    'London, United Kingdom',
+    51.5074,
+    -0.1278,
+    ST_SetSRID(ST_MakePoint(-0.1278, 51.5074), 4326)::geography,
+    ARRAY['flood', 'tidal', 'storm', 'infrastructure'],
+    'monitoring',
+    '11111111-1111-1111-1111-111111111111'
+  ),
+  (
+    'baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'Blue Mountains Bushfire Perimeter Breach',
+    'Intense summer heatwave driving uncontrolled bushfires toward residential perimeters in the Blue Mountains.',
+    'Sydney, Australia',
+    -33.8688,
+    151.2093,
+    ST_SetSRID(ST_MakePoint(151.2093, -33.8688), 4326)::geography,
+    ARRAY['wildfire', 'heatwave', 'evacuation', 'fire'],
+    'active',
+    '22222222-2222-2222-2222-222222222222'
+  ),
+  (
+    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    'Industrial Chemical Vapor Containment in New Delhi',
+    'Ammonia and chemical vapor leak from an industrial zone contained and neutralized by hazardous materials squads.',
+    'New Delhi, NCR',
+    28.6139,
+    77.2090,
+    ST_SetSRID(ST_MakePoint(77.2090, 28.6139), 4326)::geography,
+    ARRAY['chemical', 'hazmat', 'air-quality', 'medical'],
+    'resolved',
+    '11111111-1111-1111-1111-111111111111'
+  ),
+  (
+    'cccccccc-cccc-cccc-cccc-cccccccccccc',
+    'Kilauea Volcanic Ash & Lava Corridor Hazard',
+    'Volcanic fissure eruption emitting toxic sulfur dioxide plumes and basaltic lava towards uninhabited coastal sector.',
+    'Kilauea, Hawaii',
+    19.4069,
+    -155.2834,
+    ST_SetSRID(ST_MakePoint(-155.2834, 19.4069), 4326)::geography,
+    ARRAY['volcano', 'ash', 'evacuation'],
+    'resolved',
+    '22222222-2222-2222-2222-222222222222'
   );
 
 -- ============================================================================
--- 3. SEED RESOURCES (Nearby shelters, hospitals, food, water, rescue units)
+-- 3. SEED RESOURCES (Proximity-searchable shelters, hospitals, food, water, rescue units)
 -- ============================================================================
--- Manhattan, NYC Resources (near lat: 40.7831, lng: -73.9712)
+-- Manhattan, NYC Resources
 INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
   (
     'a1111111-1111-1111-1111-111111111111',
@@ -128,7 +224,7 @@ INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitu
     'available'
   );
 
--- Miami Beach Resources (near lat: 25.7907, lng: -80.1300)
+-- Miami Beach Resources
 INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
   (
     'a2222222-2222-2222-2222-222222222222',
@@ -167,9 +263,10 @@ INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitu
     'available'
   );
 
--- Mumbai Emergency Resources (near lat: 19.0760, lng: 72.8777)
-INSERT INTO resources (name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
+-- Mumbai Emergency Resources (near 19.0760, 72.8777)
+INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
   (
+    'a5555555-5555-5555-5555-555555555555',
     'KEM Hospital Emergency Trauma Center',
     'hospital',
     'Parel, Mumbai',
@@ -181,6 +278,7 @@ INSERT INTO resources (name, type, location_name, latitude, longitude, location,
     'available'
   ),
   (
+    'a5555555-5555-5555-5555-555555555555',
     'Lilavati Hospital Disaster Response Wing',
     'hospital',
     'Bandra West, Mumbai',
@@ -192,6 +290,7 @@ INSERT INTO resources (name, type, location_name, latitude, longitude, location,
     'limited'
   ),
   (
+    'a5555555-5555-5555-5555-555555555555',
     'BMC Central Flood Relief Shelter',
     'shelter',
     'Dadar, Mumbai',
@@ -203,6 +302,7 @@ INSERT INTO resources (name, type, location_name, latitude, longitude, location,
     'available'
   ),
   (
+    'a5555555-5555-5555-5555-555555555555',
     'NDRF Flood & Aquatic Rescue Unit 5',
     'rescue',
     'Worli Sea Face, Mumbai',
@@ -214,6 +314,7 @@ INSERT INTO resources (name, type, location_name, latitude, longitude, location,
     'available'
   ),
   (
+    'a5555555-5555-5555-5555-555555555555',
     'BMC Potable Water Tanker Fleet #7',
     'water',
     'Kurla West, Mumbai',
@@ -225,8 +326,140 @@ INSERT INTO resources (name, type, location_name, latitude, longitude, location,
     'available'
   );
 
+-- Uttarakhand Resources (near 30.2937, 79.5603)
+INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
+  (
+    'a6666666-6666-6666-6666-666666666666',
+    'AIIMS Rishikesh High-Altitude Emergency Ward',
+    'hospital',
+    'Rishikesh Base Camp',
+    30.0869,
+    78.2676,
+    ST_SetSRID(ST_MakePoint(78.2676, 30.0869), 4326)::geography,
+    250,
+    80,
+    'available'
+  ),
+  (
+    'a6666666-6666-6666-6666-666666666666',
+    'ITBP Mountain Rescue & Air Evac Depot',
+    'rescue',
+    'Joshimath, Chamoli',
+    30.5564,
+    79.5647,
+    ST_SetSRID(ST_MakePoint(79.5647, 30.5564), 4326)::geography,
+    150,
+    60,
+    'available'
+  ),
+  (
+    'a6666666-6666-6666-6666-666666666666',
+    'Chamoli Emergency Rations Distribution Point',
+    'food',
+    'Gopeshwar Hub',
+    30.4140,
+    79.3240,
+    ST_SetSRID(ST_MakePoint(79.3240, 30.4140), 4326)::geography,
+    1200,
+    850,
+    'available'
+  );
+
+-- Tokyo Bay Resources (near 35.6762, 139.6503)
+INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
+  (
+    'a8888888-8888-8888-8888-888888888888',
+    'Tokyo Metropolitan Emergency Medical Center',
+    'hospital',
+    'Shinjuku, Tokyo',
+    35.6900,
+    139.7000,
+    ST_SetSRID(ST_MakePoint(139.7000, 35.6900), 4326)::geography,
+    600,
+    190,
+    'available'
+  ),
+  (
+    'a8888888-8888-8888-8888-888888888888',
+    'Minato Earthquake Tsunami Evacuation Tower',
+    'shelter',
+    'Minato Ward, Tokyo',
+    35.6580,
+    139.7510,
+    ST_SetSRID(ST_MakePoint(139.7510, 35.6580), 4326)::geography,
+    1800,
+    1200,
+    'available'
+  ),
+  (
+    'a8888888-8888-8888-8888-888888888888',
+    'Tokyo Fire Dept Hyper Rescue Unit',
+    'rescue',
+    'Koto Ward, Tokyo',
+    35.6720,
+    139.8170,
+    ST_SetSRID(ST_MakePoint(139.8170, 35.6720), 4326)::geography,
+    200,
+    75,
+    'available'
+  );
+
+-- London Resources (near 51.5074, -0.1278)
+INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
+  (
+    'a9999999-9999-9999-9999-999999999999',
+    'St Thomas Hospital Emergency Unit',
+    'hospital',
+    'Westminster, London',
+    51.4988,
+    -0.1190,
+    ST_SetSRID(ST_MakePoint(-0.1190, 51.4988), 4326)::geography,
+    400,
+    95,
+    'available'
+  ),
+  (
+    'a9999999-9999-9999-9999-999999999999',
+    'Southwark Thames Flood Relief Base',
+    'shelter',
+    'Bermondsey, London',
+    51.4980,
+    -0.0630,
+    ST_SetSRID(ST_MakePoint(-0.0630, 51.4980), 4326)::geography,
+    800,
+    550,
+    'available'
+  );
+
+-- Sydney Resources (near -33.8688, 151.2093)
+INSERT INTO resources (disaster_id, name, type, location_name, latitude, longitude, location, capacity, available_units, status) VALUES
+  (
+    'baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'Westmead Hospital Trauma & Burns Center',
+    'hospital',
+    'Westmead, Sydney',
+    -33.8055,
+    150.9880,
+    ST_SetSRID(ST_MakePoint(150.9880, -33.8055), 4326)::geography,
+    350,
+    110,
+    'available'
+  ),
+  (
+    'baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'Penrith Bushfire Evacuation Center',
+    'shelter',
+    'Penrith, Sydney',
+    -33.7510,
+    150.6940,
+    ST_SetSRID(ST_MakePoint(150.6940, -33.7510), 4326)::geography,
+    1200,
+    820,
+    'available'
+  );
+
 -- ============================================================================
--- 4. SEED REPORTS (Initial community reports)
+-- 4. SEED REPORTS (Initial community field reports)
 -- ============================================================================
 INSERT INTO reports (disaster_id, content, user_handle, source, priority, verified) VALUES
   (
@@ -246,23 +479,41 @@ INSERT INTO reports (disaster_id, content, user_handle, source, priority, verifi
     true
   ),
   (
-    'a1111111-1111-1111-1111-111111111111',
-    'Subway stations at 14th street completely sealed off by emergency crews. Safe detours marked on 5th Ave.',
-    '@transit_tracker',
+    'a5555555-5555-5555-5555-555555555555',
+    'Urgent! Need drinking water and baby formula near Kurla West. Roads blocked by debris and floodwater.',
+    '@citizen_sarah_99',
     'community_portal',
-    'medium',
+    'high',
     false
   ),
   (
-    'a2222222-2222-2222-2222-222222222222',
-    'Severe wind gusts knocked down power transformers along Collins Ave. Power lines sparking in water.',
-    '@miami_resident',
-    'mock_social_stream',
+    'a5555555-5555-5555-5555-555555555555',
+    'Family trapped on second floor due to rapid water rise near Dadar TT circle. Urgent boat rescue needed!',
+    '@mike_rescue_volunteer',
+    'community_portal',
     'critical',
+    true
+  ),
+  (
+    'a6666666-6666-6666-6666-666666666666',
+    'Massive rockfall blocking Badrinath National Highway near Joshimath. Approximately 40 vehicles queued.',
+    '@himalayan_scout',
+    'mock_social_stream',
+    'high',
+    true
+  ),
+  (
+    'a8888888-8888-8888-8888-888888888888',
+    'Tokyo Metro lines temporarily halted for seismic track clearance. No power outage reported in Ginza.',
+    '@tokyo_transit',
+    'mock_social_stream',
+    'medium',
     true
   );
 
--- Official Emergency Bulletins & Agency Advisories
+-- ============================================================================
+-- 5. SEED OFFICIAL BULLETINS
+-- ============================================================================
 INSERT INTO official_updates (disaster_id, agency, severity, headline, body) VALUES
   (
     'a1111111-1111-1111-1111-111111111111',
@@ -272,22 +523,29 @@ INSERT INTO official_updates (disaster_id, agency, severity, headline, body) VAL
     'Due to unprecedented storm surge reaching 4 feet above ground level, all residents in Zone A ground floors must immediately evacuate to higher elevations or designated emergency shelters.'
   ),
   (
-    'a1111111-1111-1111-1111-111111111111',
-    'National Weather Service NY',
+    'a5555555-5555-5555-5555-555555555555',
+    'Brihanmumbai Municipal Corporation (BMC)',
     'warning',
-    'Flash Flood Emergency Warning in Effect Through Midnight',
-    'Life-threatening flash flooding ongoing across lower Manhattan. Do not drive or walk through standing waters. Rapid water level increases expected along riverbanks.'
+    'Red Alert: Severe Cyclone Approaching North Konkan Coast',
+    'Citizens are advised to remain indoors. Coastal roads closed. Emergency relief shelters open across all municipal wards with food and medical supplies.'
   ),
   (
-    'a2222222-2222-2222-2222-222222222222',
-    'Miami-Dade Emergency Operations',
+    'a6666666-6666-6666-6666-666666666666',
+    'Uttarakhand Disaster Management Authority',
     'warning',
-    'Category 4 Hurricane Surge Watch & Bridge Closures',
-    'Causeways to Miami Beach will be closed to vehicle traffic at 18:00 EST. Settle in place with 72 hours of water and non-perishable rations.'
+    'Cloudburst Alert & Highway Movement Suspension in Chamoli',
+    'National Highway 7 closed due to flash mudslides. NDRF and SDRF teams mobilized for airlift operations and highway clearance.'
+  ),
+  (
+    'a8888888-8888-8888-8888-888888888888',
+    'Japan Meteorological Agency (JMA)',
+    'warning',
+    'Tsunami Advisory Lifted for Tokyo Bay Coastal Districts',
+    'Seismic shaking subsided. All coastal flood gates engaged. Bullet train operations resuming under safety speed protocols.'
   );
 
 -- ============================================================================
--- 6. SEED VERIFIED DAMAGE IMAGES & AI HAZARD ASSESSMENTS
+-- 6. SEED VERIFIED DAMAGE IMAGES & HAZARD ASSESSMENTS
 -- ============================================================================
 INSERT INTO disaster_image_verifications (
   disaster_id,
@@ -310,12 +568,12 @@ INSERT INTO disaster_image_verifications (
     '{"structuralIntegrity": "compromised_subsurface", "waterLevelEstMeters": 0.9, "detectedObjects": ["vehicle", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb
   ),
   (
-    'a2222222-2222-2222-2222-222222222222',
+    'a5555555-5555-5555-5555-555555555555',
     'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80',
-    'Downed utility poles and damaged structural facade along coastline corridor.',
+    'Waterlogged arterial road in Mumbai with rescue teams deploying inflatable boats.',
     true,
-    0.942,
-    'catastrophic',
-    ARRAY['downed_power_lines', 'structural_collapse_risk', 'flying_debris_hazard'],
-    '{"structuralIntegrity": "severe_facade_failure", "windDamageCategory": 4, "detectedObjects": ["utility_pole", "debris", "facade"], "manipulationArtifactsDetected": false}'::jsonb
+    0.952,
+    'severe',
+    ARRAY['high_water_level', 'traffic_gridlock', 'submerged_roadway'],
+    '{"structuralIntegrity": "sound", "waterLevelEstMeters": 0.8, "detectedObjects": ["boat", "water", "debris"], "manipulationArtifactsDetected": false}'::jsonb
   );

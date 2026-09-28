@@ -111,4 +111,26 @@ describe('Disaster CRUD Integration Tests', () => {
 
     createdDisasterId = null;
   });
+
+  it('GET /disasters - should support filtering across different global locations and hazard types', async () => {
+    // 1. Filter by flood tag
+    const floodRes = await request(app).get('/disasters?tag=flood');
+    expect(floodRes.status).toBe(200);
+    expect(floodRes.body.data.length).toBeGreaterThan(0);
+    expect(floodRes.body.data.some((d) => d.tags.includes('flood'))).toBe(true);
+
+    // 2. Filter by earthquake tag
+    const quakeRes = await request(app).get('/disasters?tag=earthquake');
+    expect(quakeRes.status).toBe(200);
+    expect(quakeRes.body.data.some((d) => d.tags.includes('earthquake'))).toBe(true);
+
+    // 3. Search across different locations (Mumbai, Tokyo)
+    const mumbaiRes = await request(app).get('/disasters?search=Mumbai');
+    expect(mumbaiRes.status).toBe(200);
+    expect(mumbaiRes.body.data.some((d) => d.location.name.includes('Mumbai'))).toBe(true);
+
+    const tokyoRes = await request(app).get('/disasters?search=Tokyo');
+    expect(tokyoRes.status).toBe(200);
+    expect(tokyoRes.body.data.some((d) => d.location.name.includes('Tokyo'))).toBe(true);
+  });
 });

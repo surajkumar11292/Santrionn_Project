@@ -57,6 +57,23 @@ class CacheService {
   }
 
   /**
+   * Delete all keys matching a prefix
+   */
+  async delByPrefix(prefix) {
+    if (!redisClient) return false;
+    try {
+      const keys = await redisClient.keys(`${prefix}*`);
+      if (keys && keys.length > 0) {
+        await redisClient.del(...keys);
+      }
+      return true;
+    } catch (err) {
+      console.warn(`[Cache Warning] Failed to delete prefix "${prefix}":`, err.message);
+      return false;
+    }
+  }
+
+  /**
    * Delete a key from cache
    */
   async del(key) {

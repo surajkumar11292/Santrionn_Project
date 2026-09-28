@@ -5,7 +5,7 @@ const {
   emitDisasterUpdated,
   emitDisasterDeleted
 } = require('../socket/events');
-const { NotFoundError } = require('../utils/errors');
+const { NotFoundError, BadRequestError } = require('../utils/errors');
 
 class DisasterService {
   /**
@@ -18,9 +18,19 @@ class DisasterService {
 
     // Automatic location resolution from explicit location name or title & description
     if (latitude === undefined || longitude === undefined || !locationName) {
-      const targetQuery = data.location_name || `${data.title || ''} ${data.description || ''}`.trim();
-      const resolved = await geoService.resolveLocationFromText(targetQuery);
-      locationName = locationName || resolved.locationName;
+      const isExplicitLocation = Boolean(data.location_name && data.location_name.trim());
+      const targetQuery = isExplicitLocation
+        ? data.location_name.trim()
+        : `${data.title || ''} ${data.description || ''}`.trim();
+      const resolved = await geoService.resolveLocationFromText(targetQuery, isExplicitLocation);
+
+      if (!resolved || resolved.latitude === undefined || resolved.longitude === undefined) {
+        throw new BadRequestError(
+          `Unable to resolve geographic location for "${targetQuery || 'unspecified location'}". Please provide a valid city, district, or landmark name.`
+        );
+      }
+
+      locationName = (data.location_name && data.location_name.trim()) || resolved.locationName;
       latitude = latitude !== undefined ? latitude : resolved.latitude;
       longitude = longitude !== undefined ? longitude : resolved.longitude;
     }

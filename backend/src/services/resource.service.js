@@ -94,6 +94,11 @@ class ResourceService {
       status: data.status
     });
 
+    // Invalidate Redis query cache for this disaster so new asset shows instantly
+    if (resolvedDisasterId) {
+      await cacheService.delByPrefix(`resources:${resolvedDisasterId}:`);
+    }
+
     return resource;
   }
 }
